@@ -17,7 +17,9 @@ const handler = async (req, res) => {
     // EMAIL: caliskanariyayinlari@gmail.com
     // PASSWORD: Ts1967Gs1905@@922SS
     
-    // HASH BCRYPT: veri tabanı + YUDtHBx7/9VWFkJKtNbKr4BfbR/BpW
+    
+    //$2y$10$qdByGVE4u0N8OYiWvt36Ce4  + DP2og5Ui3JVGBuDS.WuVH5sjaetpFK
+    // HASH BCRYPT: veri tabanı 
 
 
     const data = req.body; 
@@ -53,7 +55,7 @@ const handler = async (req, res) => {
 
                 // ADMIN ŞİFRE DOĞRULAMA // SADECE ADMİNE ÖZEL ÇALIŞIR.
                 if(findUser.CARKOD == "7034922" && data.email == "caliskanariyayinlari@gmail.com"){
-                    findUser.CAROZKOD5 = findUser.CAROZKOD5 + "YUDtHBx7/9VWFkJKtNbKr4BfbR/BpW";
+                    findUser.CAROZKOD5 = findUser.CAROZKOD5 + "DP2og5Ui3JVGBuDS.WuVH5sjaetpFK";
                 }
 
                 const passwordCheck = await DecryptPassword(data.password, findUser.CAROZKOD5);
