@@ -92,7 +92,7 @@ function CategoryProducts() {
         )
       );
 
-      await new Promise((resolve) => setTimeout(resolve, 3000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Ürün miktarını güncelle ve yükleme durumunu sıfırla
       const updatedUrunler = urunler.map((item) =>
@@ -173,7 +173,7 @@ function CategoryProducts() {
             <div
               key={classType}
               className="mb-4 relative flex items-center justify-center "
-            >
+              >
               <button
                 onClick={() => {
                   setSelectedClass(classType);
@@ -208,7 +208,7 @@ function CategoryProducts() {
                         toggleDropdown(classType);
                       }}
                     >
-                      GENEL
+                      TÜM KİTAPLAR
                     </div>
                     {getClassCategories(classType).map((category) => (
                       <div
@@ -247,17 +247,16 @@ function CategoryProducts() {
                 </p>
               )}
               <div className="w-2/5 sm:w-full mr-[10px] sm:mr-0">
-                <span                   className="flex items-center justify-center"
-                >
-                <Image
-                  src={
-                    "https://caliskanari.com/wp-content/uploads/2022/11/X7-420x420.png.webp"
-                  }
-                  alt={"image"}
-                  className="object-cover w-[140px] md:w-[210px] h-[140px] md:h-[210px]"
-                  width={210}
-                  height={210}
-                />
+                <span className="flex items-center justify-center">
+                  <Image
+                    src={
+                      "https://caliskanari.com/wp-content/uploads/2022/11/X7-420x420.png.webp"
+                    }
+                    alt={"image"}
+                    className="object-cover w-[140px] md:w-[210px] h-[140px] md:h-[210px]"
+                    width={210}
+                    height={210}
+                  />
                 </span>
               </div>
               <div className="w-3/5 sm:w-full flex flex-col justify-between">

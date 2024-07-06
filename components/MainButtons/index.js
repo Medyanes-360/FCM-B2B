@@ -24,7 +24,7 @@ function MainButtonsComponent() {
           <div className="flex-row flex pt-4 text-CustomGray items-center justify-center ">
             <Link
               className="flex flex-col items-center justify-center group"
-              href={"https://caliskanari.com/shop/"}
+              href={"/store"}
             >
               <span className="w-[60px] h-[60px] flex items-center justify-center group-hover:scale-105 group-hover:text-LightBlue transition-all duration-1000 ease-in-out transform">
                 <CiShop className="w-[40px] h-[40px]" />

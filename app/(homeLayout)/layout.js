@@ -9,7 +9,7 @@ export default function HomeLayout({ children}) {
         <Header />
       </div>
       <div className='bg-white'>{children}</div>
-      <div className='bg-white  bottom-0'>
+      <div className='bg-white lg:px-12 w-screen lg:w-[1188px] bottom-0'>
         <Footer />
       </div>
       <Banner />

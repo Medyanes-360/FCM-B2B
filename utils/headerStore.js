@@ -14,36 +14,36 @@ const headerStore = create((set) => ({
         href: "/",
         subMenus: [],
       },
-      {
-        id: 2,
-        text: "Çalışkan Arı",
-        href: "https://caliskanari.com.tr/",
-        subMenus: [
-          {
-            id: 1,
-            text: "Çalışkan Arı Kütüphane",
-            href: "https://caliskanari.com.tr/online-kutuphane/",
-          },
-        ],
-      },
-      {
-        id: 3,
-        text: "Küçük Arılar",
-        href: "https://kucukarilarakademisi.com/",
-        subMenus: [
-          {
-            id: 1,
-            text: "Küçük Arılar Kütüphane",
-            href: "https://kucukarilarakademisi.com/index.php/online-kutuphane/",
-          },
-        ],
-      },
-      {
-        id: 4,
-        text: "Heyday English",
-        href: "https://heydayenglish.com/",
-        subMenus: [],
-      },
+      // {
+      //   id: 2,
+      //   text: "Çalışkan Arı",
+      //   href: "https://caliskanari.com.tr/",
+      //   subMenus: [
+      //     {
+      //       id: 1,
+      //       text: "Çalışkan Arı Kütüphane",
+      //       href: "https://caliskanari.com.tr/online-kutuphane/",
+      //     },
+      //   ],
+      // },
+      // {
+      //   id: 3,
+      //   text: "Küçük Arılar",
+      //   href: "https://kucukarilarakademisi.com/",
+      //   subMenus: [
+      //     {
+      //       id: 1,
+      //       text: "Küçük Arılar Kütüphane",
+      //       href: "https://kucukarilarakademisi.com/index.php/online-kutuphane/",
+      //     },
+      //   ],
+      // },
+      // {
+      //   id: 4,
+      //   text: "Heyday English",
+      //   href: "https://heydayenglish.com/",
+      //   subMenus: [],
+      // },
       
     ],
     mainMenuLogo: [

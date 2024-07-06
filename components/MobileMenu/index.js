@@ -2,41 +2,14 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { GiHamburgerMenu } from "react-icons/gi";
-import { IoIosArrowForward } from "react-icons/io";
 import { FaTimes } from "react-icons/fa";
-import { IoIosArrowBack } from "react-icons/io";
-import { CiShop } from "react-icons/ci";
+import { RiHome3Line } from "react-icons/ri";
+import { AiOutlineShop } from "react-icons/ai";
+import { MdOutlineContactPage } from "react-icons/md";
 import Image from "next/image";
 
 const MobileMenu = ({ header, user }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [selectedMainMenu, setSelectedMainMenu] = useState(null);
-  const [selectedSubMenu, setSelectedSubMenu] = useState(null);
-
-  const toggleMainMenu = (index) => {
-    if (selectedMainMenu === index) {
-      setSelectedMainMenu(null);
-    } else {
-      setSelectedMainMenu(index);
-    }
-    setSelectedSubMenu(null);
-  };
-
-  const toggleSubMenu = (index) => {
-    if (selectedSubMenu === index) {
-      setSelectedSubMenu(null);
-    } else {
-      setSelectedSubMenu(index);
-    }
-  };
-
-  const handleBackButtonClick = () => {
-    if (selectedSubMenu !== null) {
-      setSelectedSubMenu(null);
-    } else if (selectedMainMenu !== null) {
-      setSelectedMainMenu(null);
-    }
-  };
 
   return (
     <div className="flex xl:hidden justify-between items-center px-4">
@@ -75,7 +48,6 @@ const MobileMenu = ({ header, user }) => {
             className={`absolute left-0 top-0 h-full  bg-white w-[300px] overflow-y-auto
             `}
           >
-            {" "}
             <div className="flex items-center px-4 py-4 relative">
               <Link href="/">
                 <Image
@@ -92,92 +64,31 @@ const MobileMenu = ({ header, user }) => {
                 <FaTimes className=" w-[20px] h-[20px] text-[#555555] hover:text-red-600 hover:scale-110 transition duration-300 ease-in-out transform " />
               </button>
             </div>
-            <div id="mainmenuitem">
-              <ul className="flex flex-col text-CustomGray">
-                {header.mainMenuItems.map((mainMenuItem, index) => (
-                  <li
-                    key={mainMenuItem.id}
-                    className="relative mr-[25px] leading-[1.3] mx-2 "
-                  >
-                    <div className="flex-row hidden lg:flex pt-4 text-CustomGray">
-                      <Link
-                        className="flex flex-col items-center justify-center group"
-                        href={
-                          !user
-                            ? "/auth/login"
-                            : "https://caliskanari.com/shop/"
-                        }
-                      >
-                        <span className="w-[60px] h-[60px] flex items-center justify-center group-hover:scale-105 group-hover:text-LightBlue transition-all duration-1000 ease-in-out transform">
-                          <CiShop className="w-[40px] h-[40px]" />
-                        </span>
-                        <span className="uppercase text-[12px] font-bold tracking-[1px] pb-[15px] hover:text-LightBlue transition-all duration-500 ease-in-out transform">
-                          MAĞAZA
-                        </span>
-                      </Link>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+            <div className="flex flex-row items-center text-LightBlue px-[30px] py-[15px] text-[13px] font-extrabold uppercase">
+              <Link href={"#"} className="">
+                <button className="flex flex-row items-center gap-3">
+                  <RiHome3Line className="w-5 h-5" />
+                  <span className="hover:scale-105 transition-all duration-700 ease-in-out transform">
+                    ANASAYFA
+                  </span>
+                </button>
+              </Link>
             </div>
-            <div
-              className={` ${
-                selectedMainMenu == null && selectedSubMenu == null
-                  ? "my-[30px]"
-                  : ""
-              }`}
-            >
-              <ul>
-                {header.menus.map((menu, index) => (
-                  <li
-                    className={`flex flex-row items-center text-LightBlue px-[30px] text-[13px] font-extrabold uppercase  ${
-                      selectedMainMenu == null && selectedSubMenu == null
-                        ? "py-[15px]  "
-                        : "py-0"
-                    }`}
-                    key={menu.id}
-                  >
-                    {selectedMainMenu == null && selectedSubMenu == null && (
-                      <div className="flex flex-row items-center justify-between w-full group">
-                        <Link
-                          className="transition-all duration-500 transform ease-in-out group-hover:text-DarkBlue "
-                          href={menu.href}
-                        >
-                          {menu.text}
-                        </Link>
-                        {menu.subMenus.length > 0 && (
-                          <div
-                            onClick={() => toggleSubMenu(index)}
-                            className="cursor-pointer"
-                          >
-                            <IoIosArrowForward className="w-4 h-4 text-black fill-LightBlue transition-all duration-500 transform ease-in-out group-hover:fill-DarkBlue " />
-                          </div>
-                        )}
-                      </div>
-                    )}
-                    {selectedSubMenu === index && (
-                      <div>
-                        <button
-                          className="absolute top-9 text-[15px]  flex flex-row items-center justify-center hover:scale-105 transition duration-300 ease-in-out transform "
-                          onClick={handleBackButtonClick}
-                        >
-                          <IoIosArrowBack />
-                          <span className="pl-1">Back</span>
-                        </button>
-                        <ul>
-                          {menu.subMenus.map((subMenu) => (
-                            <li key={subMenu.id} className="py-[25px]">
-                              <Link className="text-[13px]" href={subMenu.href}>
-                                {subMenu.text}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </li>
-                ))}
-              </ul>
+            <div className="flex flex-row items-center text-LightBlue px-[30px] py-[15px] text-[13px] font-extrabold uppercase ">
+              <button className="flex flex-row items-center gap-3">
+                <AiOutlineShop className="w-5 h-5" />
+                <span className="hover:scale-105 transition-all duration-700 ease-in-out transform">
+                  MAĞAZA
+                </span>
+              </button>
+            </div>
+            <div className="flex flex-row items-center text-LightBlue px-[30px] py-[15px] text-[13px] font-extrabold uppercase ">
+              <button className="flex flex-row items-center justify-center gap-3">
+                <MdOutlineContactPage className="w-5 h-5" />
+                <span className="hover:scale-105 transition-all duration-700 ease-in-out transform ">
+                  İLETİŞİM
+                </span>
+              </button>
             </div>
             {!user ? (
               <div className=" flex justify-center">
@@ -195,7 +106,7 @@ const MobileMenu = ({ header, user }) => {
                 </Link>
               </div>
             ) : (
-              <div className="text-white hover:text-red-500 text-2xl flex justify-center">
+              <div className="text-white hover:text-red-500 text-2xl flex justify-center mt-24">
                 {/* signOut */}
                 <Link href="/auth/login" onClick={() => signOut()}>
                   <Image

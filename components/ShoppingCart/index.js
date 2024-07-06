@@ -15,6 +15,7 @@ import OrderConfirmation from "@/components/OrderConfirmation/index.";
 import Link from "next/link";
 import { TbShoppingCartX } from "react-icons/tb";
 import { RxUpdate } from "react-icons/rx";
+import Loading from "../Loading";
 
 const ShoppingCart = () => {
   const [storedCart, setStoredCart] = useState([]); // Sepetteki ürünlerin tutulacağı state
@@ -23,6 +24,7 @@ const ShoppingCart = () => {
   const [deleteIndex, setDeleteIndex] = useState(null); // Silinecek ürünün indexinin tutulacağı state
   const [updatingIndex, setUpdatingIndex] = useState(null); // Güncellenen ürünün indexinin tutulacağı state
   const [confirmOrder, setConfirmOrder] = useState(false); // Sipariş onayının tutulacağı state
+  const [loading, setLoading] = useState(true);
 
   // Sipariş onayı işlevi
   const handleConfirmOrder = () => {
@@ -41,6 +43,7 @@ const ShoppingCart = () => {
       const parsedCart = cartData ? JSON.parse(cartData) : [];
       setStoredCart(parsedCart);
       updateTotalPrice(parsedCart); // Toplam tutarı güncelle
+      setLoading(false);
     }
   }, []);
 
@@ -118,9 +121,13 @@ const ShoppingCart = () => {
   };
 
   return (
-    <div
+   <>
+    {loading ? (
+     <Loading/>
+    ) : (
+      <div
       id="shoppingcart"
-      className="bg-white flex items-center flex-col py-[35px] sm:py-[60px] w-screen lg:w-[1188px] h-screen"
+      className="bg-white flex items-center flex-col py-[35px] sm:py-[60px] w-screen lg:w-[1188px] h-full"
     >
       <div className="flex items-center justify-center text-[35px] md:text-[48px] text-CustomGray leading-[41px] font-bold italic mb-[60px]">
         Sepet
@@ -443,6 +450,7 @@ const ShoppingCart = () => {
         </div>
       )}
     </div>
+    )}</>
   );
 };
 
