@@ -104,7 +104,7 @@ export default function DataTable() {
           {currentPage}
         </span>
         <span className="mx-1">/</span>
-        <span className="md:px-2 md:py-2 py-1 px-3 rounded-full mr-1">
+        <span className="md:px-2 md:py-2 py-1 px-3 rounded-full">
           {totalPages}
         </span>
         <PaginationButton
