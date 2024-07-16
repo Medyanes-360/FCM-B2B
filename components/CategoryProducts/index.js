@@ -8,6 +8,7 @@ import * as Yup from "yup";
 import { FaCheck, FaMinus, FaPlus, FaShoppingCart } from "react-icons/fa";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { getAPI } from "@/services/fetchAPI";
 
 function CategoryProducts() {
   const [urunler, setUrunler] = useState([]); // Ürünler için state
@@ -20,11 +21,7 @@ function CategoryProducts() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/products");
-        if (!response.ok) {
-          throw new Error("API hatası: " + response.status);
-        }
-        const data = await response.json();
+        const data = await getAPI("/products");
         const filteredData = data.data.filter((urun) => urun.STKOZKOD1 === "A"); // STKOZKOD1 === "A" olan ürünleri filtrele
         setUrunler(
           filteredData.map((urun) => ({
@@ -181,8 +178,8 @@ function CategoryProducts() {
                 }}
                 className={`flex flex-row gap-5 items-center justify-center text-[14px] md:text-[12px] lg:text-[14px] font-bold rounded-full py-[22px] pr-[28px] pl-[28px] tracking-[1px] h-[40px] mx-[8px] mb-[8px] hover:scale-105 transition-all duration-500 ease-in-out transform cursor-pointer  ${
                   selectedClass === classType
-                    ? " border border-[3px] border-LightBlue text-LightBlue"
-                    : "border border-[3px] border-CategoriesTitle text-CategoriesTitle"
+                    ? " border-[3px] border-LightBlue text-LightBlue"
+                    : "border-[3px] border-CategoriesTitle text-CategoriesTitle"
                 }`}
               >
                 {classType}
@@ -200,9 +197,9 @@ function CategoryProducts() {
               {dropdownOpen[classType] &&
                 classType !== "ANASINIFI" &&
                 classType !== "İNGİLİZCE" && (
-                  <div className="absolute top-10 mt-2 w-36 rounded-2xl bg-white shadow-lg rounded border border-gray-300 z-[1000]">
+                  <div className="absolute top-10 mt-2 w-36 rounded-2xl bg-white shadow-lg border border-gray-300 z-[1000]">
                     <div
-                      className="cursor-pointer p-2 hover:bg-LightBlue/25 hover:rounded-2xl hover:text-LightBlue duration-300 ease-in-out transform cursor-pointer"
+                      className="p-2 hover:bg-LightBlue/25 hover:rounded-2xl hover:text-LightBlue duration-300 ease-in-out transform cursor-pointer"
                       onClick={() => {
                         setSelectedCategory("hepsi");
                         toggleDropdown(classType);
@@ -213,7 +210,7 @@ function CategoryProducts() {
                     {getClassCategories(classType).map((category) => (
                       <div
                         key={category}
-                        className="cursor-pointer p-2 hover:bg-LightBlue/25 hover:rounded-2xl hover:text-LightBlue duration-300 ease-in-out transform cursor-pointer"
+                        className="p-2 hover:bg-LightBlue/25 hover:rounded-2xl hover:text-LightBlue duration-300 ease-in-out transform cursor-pointer"
                         onClick={() => {
                           setSelectedCategory(category);
                           toggleDropdown(classType);
@@ -247,17 +244,16 @@ function CategoryProducts() {
                 </p>
               )}
               <div className="w-2/5 sm:w-full mr-[10px] sm:mr-0">
-                <span                   className="flex items-center justify-center"
-                >
-                <Image
-                  src={
-                    "https://caliskanari.com/wp-content/uploads/2022/11/X7-420x420.png.webp"
-                  }
-                  alt={"image"}
-                  className="object-cover w-[140px] md:w-[210px] h-[140px] md:h-[210px]"
-                  width={210}
-                  height={210}
-                />
+                <span className="flex items-center justify-center">
+                  <Image
+                    src={
+                      "https://caliskanari.com/wp-content/uploads/2022/11/X7-420x420.png.webp"
+                    }
+                    alt={"image"}
+                    className="object-cover w-[140px] md:w-[210px] h-[140px] md:h-[210px]"
+                    width={210}
+                    height={210}
+                  />
                 </span>
               </div>
               <div className="w-3/5 sm:w-full flex flex-col justify-between">

@@ -1,13 +1,7 @@
 "use client";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { FaSortUp, FaSortDown, FaPrint } from "react-icons/fa";
-import {
-  MdKeyboardDoubleArrowLeft,
-  MdKeyboardArrowLeft,
-  MdKeyboardArrowRight,
-  MdKeyboardDoubleArrowRight,
-} from "react-icons/md";
 import {
   Table,
   TableBody,
@@ -15,57 +9,108 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableFooter,
 } from "./TableComponents";
 import Loading from "../Loading";
+import Link from "next/link";
 import "./printdata.css";
 import { getAPI } from "../../services/fetchAPI/index";
+import ScrollButtons from "../ScrollButtons/ScrollButtons";
 
 export default function DetailedDataTable() {
-  const { data: session } = useSession(); //session bilgisi icin state
+  const { data: session } = useSession();
   const [billingData, setBillingData] = useState([]);
   const [userCarBakiye, setUserCarBakiye] = useState(null);
-  const [sortOrder, setSortOrder] = useState("asc"); //Tarih sıralaması için kullandığımız state
-  const [currentPage, setCurrentPage] = useState(1); //Sayfalama için kullandığımız state
+  const [sortOrder, setSortOrder] = useState("asc");
   const [isLoading, setIsLoading] = useState(true);
-  const [isPrinting, setIsPrinting] = useState(false); //Yazdırma durumu için kullandığımız state
-  const itemsPerPage = 8; //Her sayfada kac satır oldugunu belirlemek için kullanılan state
+  const [borcToplam, setBorcToplam] = useState(0);
+  const [alacakToplam, setAlacakToplam] = useState(0);
+  const [carBorcToplam, setCarBorcToplam] = useState(0);
 
   useEffect(() => {
-    async function fetchData() {
-      //Eğer kullanıcı giriş yapmamış ise istek atmaz.
-      if (!session?.user?.id) return;
-
-      try {
-        // Verileri getirme işlemlerini tek promise ile birleştiriyoruz. Fetch için services kısmından getirdiğimiz getAPI fonksiyonunu kullanıyoruz.
-        const [billingResponse, tableCartResponse] = await Promise.all([
-          getAPI("/detailed-billings"),
-          getAPI("/table-cart"),
-        ]);
-
-        if (!billingResponse || !tableCartResponse)
-          throw new Error("API error");
-
-        setBillingData(billingResponse.data);
-
-        const userTableCartData = tableCartResponse.data.find(
-          (item) => item.CARKOD === session?.user?.id
-        );
-        if (userTableCartData) setUserCarBakiye(userTableCartData.CARBAKIYE);
-      } catch (error) {
-        console.error("Data fetching error:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
     fetchData();
   }, [session?.user?.id]);
 
+  const fetchData = async () => {
+    //EGER KULLANICI GIRIS YAPMAMIS ISE TABLOYU GORUNTULUYEMEZ
+    if (!session?.user?.id) return;
+
+    try {
+      // TUM ISTEKLERI TEK PROMISE ILE BIRLESTIRIYORUZ. CUNKU BIR VERI ERKEN YUKLENIRKEN DIGERLERI GEC YUKLENEBILIR.
+      const [detailedBillings, tableCart, fatfis, billings] = await Promise.all(
+        [
+          getAPI("/detailed-billings"),
+          getAPI("/table-cart"),
+          getAPI("/fatfis"),
+          getAPI("/billings"),
+        ]
+      );
+
+      // EGER API'LERIN HERHANGI BIRI YOK ISE HATA MESAJI VERIR
+      if (!detailedBillings || !tableCart || !fatfis || !billings) {
+        throw new Error("API error");
+      }
+
+      // TUM DATALARI BIRLESTIRIYORUZ
+      const enhancedBillingData = enhanceBillingData(
+        detailedBillings.data,
+        fatfis.data,
+        billings.data
+      );
+      setBillingData(enhancedBillingData);
+
+      processUserTableCartData(tableCart.data);
+    } catch (error) {
+      console.error("Data fetching error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // FATHAR VE CARHAR VERILERINI BURADA MATCHLIYORUZ.
+  const enhanceBillingData = (detailedBillings, fatfisData, billingsData) => {
+    return detailedBillings.map((billing) => {
+      const matchingFatfis = fatfisData.find(
+        (ff) => ff.FATFISREFNO === billing.FATHARREFNO
+      );
+      if (matchingFatfis) {
+        const matchingBilling = billingsData.find(
+          (b) => b.CARHARREFNO === matchingFatfis.FATFISCARREFNO
+        );
+        if (matchingBilling) {
+          return {
+            ...billing,
+            CARHARACIKLAMA: matchingBilling.CARHARACIKLAMA,
+            CARHARACIKLAMA1: matchingBilling.CARHARACIKLAMA1,
+            CARHARISTIPKOD: matchingBilling.CARHARISTIPKOD,
+          };
+        }
+      }
+      return billing;
+    });
+  };
+
+  //TABLO CART BILGILERINI ALIYORUZ
+  const processUserTableCartData = (tableCartData) => {
+    const userTableCartData = tableCartData.find(
+      (item) => item.CARKOD === session?.user?.id
+    );
+    if (userTableCartData) {
+      setUserCarBakiye(userTableCartData.CARBAKIYE);
+      setAlacakToplam(userTableCartData.CARALACAKTOP);
+      setCarBorcToplam(userTableCartData.CARBORCTOP);
+      setBorcToplam(
+        userTableCartData.CARBORCTOP - userTableCartData.CARALACAKTOP
+      );
+    }
+  };
+
+  //VERİYİ FİLTRELİYORUZ
   const filteredData = billingData.filter(
     (item) => item.FATHARCARKOD === session?.user?.id
   );
 
-  // Tarih sıralaması için kullandığımız fonksiyon
+  //TARİHE GÖRE SIRALAMA
   const handleSort = () => {
     const sortedData = [...filteredData].sort((a, b) => {
       const dateA = new Date(a.FATHARTAR);
@@ -77,95 +122,22 @@ export default function DetailedDataTable() {
     setSortOrder(sortOrder === "asc" ? "desc" : "asc");
   };
 
-  //Sayfalama için kullandığımız fonksiyon
-  const paginatedData = isPrinting
-    ? filteredData
-    : filteredData.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
-      );
+  //TARIH FORMATLAMA
+  const formatDate = (dateString) =>
+    dateString ? new Date(dateString).toLocaleDateString("tr-TR") : "N/A";
 
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  //PARA BİRİMİ FORMATLAMA
+  const formatCurrency = (amount) =>
+    amount?.toLocaleString("tr-TR", {
+      style: "currency",
+      currency: "TRY",
+      minimumFractionDigits: 2,
+    }) || "N/A";
 
-  //Pagination butonlarını oluşturmak için kullandığımız fonksiyon
-  function Pagination({ currentPage, totalPages, onPageChange }) {
-    return (
-      <div className="flex items-center no-print">
-        <PaginationButton
-          onClick={() => onPageChange(1)}
-          disabled={currentPage === 1}
-          icon={<MdKeyboardDoubleArrowLeft />}
-        />
-        <PaginationButton
-          onClick={() => onPageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          icon={<MdKeyboardArrowLeft />}
-        />
-        <span className="border md:px-4 md:py-2 py-1 px-3 rounded-full bg-NavyBlue text-white ml-1">
-          {currentPage}
-        </span>
-        <span className="mx-1">/</span>
-        <span className="md:px-2 md:py-2 py-1 px-3 rounded-full">
-          {totalPages}
-        </span>
-        <PaginationButton
-          onClick={() => onPageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          icon={<MdKeyboardArrowRight />}
-        />
-        <PaginationButton
-          onClick={() => onPageChange(totalPages)}
-          disabled={currentPage === totalPages}
-          icon={<MdKeyboardDoubleArrowRight />}
-        />
-      </div>
-    );
-  }
+  //ÇIKTI ALMA ISLEMI
+  const handlePrint = () => window.print();
 
-  function PaginationButton({ onClick, disabled, icon }) {
-    return (
-      <button
-        className={`border-2 rounded-sm text-[18px] mx-1 md:p-3 p-1 ${
-          disabled
-            ? "cursor-not-allowed text-gray-300"
-            : "cursor-pointer hover:bg-gray-200 duration-300 hover:border-NavyBlue hover:rounded-xl"
-        }`}
-        onClick={onClick}
-        disabled={disabled}
-      >
-        {icon}
-      </button>
-    );
-  }
-
-  //Tarih formatlamak için kullandığımız fonksiyon
-  function formatDate(dateString) {
-    return dateString
-      ? new Date(dateString).toLocaleDateString("tr-TR")
-      : "N/A";
-  }
-
-  //Para birimi formatlamak için kullandığımız fonksiyon
-  function formatCurrency(amount) {
-    return (
-      amount?.toLocaleString("tr-TR", {
-        style: "currency",
-        currency: "TRY",
-        minimumFractionDigits: 2,
-      }) || "N/A"
-    );
-  }
-
-  //Yazdırma işlemleri için kullandığımız fonksiyon
-  const handlePrint = () => {
-    setIsPrinting(true);
-    setTimeout(() => {
-      window.print();
-      setIsPrinting(false);
-    }, 100);
-  };
-
-  //Eğer herhangi bir nedenden dolayı loading true olursa, Loading componenti render edilir.
+  //EGER HERHANGI BIR OLAYDAN OTURU isLoading = true OLURSA EKRANDA LOADING COMP. GOZUKECEK.
   if (isLoading) return <Loading />;
 
   return (
@@ -185,15 +157,23 @@ export default function DetailedDataTable() {
           <h1>
             <span className="font-bold">Bakiye:</span>{" "}
             {formatCurrency(userCarBakiye)}
+            {/* TOPLAM BORCUN NEGATIF VEYA POZITIF OLMA DURUMUNA GORE RENGINI BELIRLIYORUZ. */}
+            <span
+              className={`${
+                borcToplam > 0 ? "text-red-500" : "text-green-500"
+              }`}
+            >
+              {borcToplam < 0 ? "(ALACAK)" : "(BORÇ)"}
+            </span>
           </h1>
         </div>
 
         <div className="flex items-center gap-4">
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-          />
+          <Link href="/billings">
+            <button className="bg-NavyBlue no-print text-white px-4 py-2 rounded-full hover:bg-blue-700 transition duration-300 flex items-center">
+              Stoksuz Tabloya Geç
+            </button>
+          </Link>
           <button
             onClick={handlePrint}
             className="bg-NavyBlue text-white px-4 py-2 rounded-full hover:bg-blue-700 transition duration-300 flex items-center no-print"
@@ -203,13 +183,13 @@ export default function DetailedDataTable() {
         </div>
       </div>
 
-      <div className="max-w-[1880px] mx-auto mt-6 border">
+      <div className="max-w-[1880px] mx-auto mt-4 mb-8 border">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead
                 onClick={handleSort}
-                className="cursor-pointer flex items-center py-12 md:py-6"
+                className="cursor-pointer flex items-center py-8"
               >
                 Tarih
                 {sortOrder === "asc" ? (
@@ -219,30 +199,68 @@ export default function DetailedDataTable() {
                 )}
               </TableHead>
               <TableHead>Ürün Kodu</TableHead>
+              <TableHead>İşlem Tipi</TableHead>
               <TableHead>Ürün Cinsi</TableHead>
+              <TableHead>Açıklama</TableHead>
+              <TableHead>Ek Açıklama</TableHead>
               <TableHead>Miktar</TableHead>
               <TableHead>Fiyat</TableHead>
-              <TableHead>Borç</TableHead>
+              <TableHead className="text-center">Borç</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedData.map((item, index) => (
+            {filteredData.map((item, index) => (
               <TableRow
                 key={index}
-                className={index % 2 === 0 ? "" : "bg-gray-100"}
+                className={index % 2 === 0 ? "bg-gray-100" : "bg-white"}
               >
                 <TableCell>{formatDate(item.FATHARTAR)}</TableCell>
                 <TableCell>{item.FATHARSTKKOD}</TableCell>
+                <TableCell>{item.CARHARISTIPKOD || "-"}</TableCell>
                 <TableCell>{item.FATHARSTKCINS}</TableCell>
+                <TableCell>{item.CARHARACIKLAMA || "-"}</TableCell>
+                <TableCell>{item.CARHARACIKLAMA1 || "-"}</TableCell>
                 <TableCell>{item.FATHARMIKTAR}</TableCell>
                 <TableCell>{formatCurrency(item.FATHARFIYAT)}</TableCell>
-                <TableCell>
+                <TableCell className="text-center">
+                  {/* URUN FIYATI ILE SATIN ALINAN MIKTAR CARPILARAK BORC TUTARI ALINIR */}
                   {formatCurrency(item.FATHARFIYAT * item.FATHARMIKTAR)}
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
+          <TableFooter className="no-print">
+            <TableRow>
+              <TableCell colSpan={4}></TableCell>
+              <TableCell colSpan={2} className="text-right font-bold">
+                Alacak Toplam:
+                <span className="ml-2 text-green-500">
+                  {formatCurrency(alacakToplam)}
+                </span>
+              </TableCell>
+              <TableCell colSpan={2} className="text-left font-bold">
+                Borç Toplam:
+                <span className="ml-2 text-red-500">
+                  {formatCurrency(carBorcToplam)}
+                </span>
+              </TableCell>
+              <TableCell className="text-left font-bold">
+                Genel Toplam:
+                <span
+                  className={`ml-2 ${
+                    borcToplam > 0 ? "text-red-500" : "text-green-500"
+                  }`}
+                >
+                  {formatCurrency(borcToplam)}
+                </span>
+              </TableCell>
+            </TableRow>
+          </TableFooter>
         </Table>
+        <div className="flex justify-end no-print">
+          {/* SCROLL BUTONLARI */}
+          <ScrollButtons />
+        </div>
       </div>
     </div>
   );

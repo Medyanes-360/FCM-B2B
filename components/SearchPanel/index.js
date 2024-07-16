@@ -3,6 +3,7 @@ import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import { FaSearch, FaTimes } from "react-icons/fa";
 import Image from "next/image";
+import { getAPI } from "@/services/fetchAPI";
 
 function SearchPanel({ toggleSearchPanel }) {
   const [searchResults, setSearchResults] = useState([]); // Arama sonuçları state'i
@@ -18,8 +19,7 @@ function SearchPanel({ toggleSearchPanel }) {
   // API'den ürünleri getiren fonksiyon
   const fetchProducts = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/products"); // API'den veri çekme
-      const responseData = await response.json(); // JSON formatına dönüştürme
+      const responseData = await getAPI("/products"); // getAPI fonksiyonunu kullanarak veri çekme
 
       // API'den gelen verinin dizi olup olmadığını kontrol etme
       if (Array.isArray(responseData.data)) {
