@@ -26,7 +26,7 @@ module.exports = {
         CategoriesTitle: "#d8d8d8",
         ProductsBorder: "#eaeaea",
         BasketRed: "#f87171",
-        NavyBlue:"#1e3b60"
+        NavyBlue: "#1e3b60",
       },
       statusColor: {
         BeklemedeBg: "#e5e5e5",

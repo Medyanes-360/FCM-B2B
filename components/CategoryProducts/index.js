@@ -89,7 +89,7 @@ function CategoryProducts() {
         )
       );
 
-      await new Promise((resolve) => setTimeout(resolve, 3000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Ürün miktarını güncelle ve yükleme durumunu sıfırla
       const updatedUrunler = urunler.map((item) =>

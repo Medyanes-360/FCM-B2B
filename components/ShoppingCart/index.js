@@ -134,7 +134,7 @@ const ShoppingCart = () => {
           <span className="text-[20px] text-CustomGray font-bold my-[20px]">
             Sepetiniz şu anda boş.
           </span>
-          <Link href={"#"}>
+          <Link href={"/"}>
             <button className="bg-LightBlue text-white px-[24px] py-[10px] rounded-md font-bold text-[14px] mt-[50px] mb-[15px] hover:scale-105 transition-all duration-500 transform ease-in-out hover:bg-LightBlue/50">
               Mağazaya geri dön
             </button>

@@ -1,10 +1,10 @@
 "use client";
 import Link from "next/link";
-import React,{useState} from "react";
+import React, { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import Loading from "../Loading";
 
 const LoginComponent = ({ pageRole }) => {
@@ -18,50 +18,45 @@ const LoginComponent = ({ pageRole }) => {
 
   const validationSchema = Yup.object({
     email: Yup.string()
-    .required('e mail boş bırakılamaz.')
-    .email('Geçerli bir e mail adresi giriniz.'),
+      .required("e mail boş bırakılamaz.")
+      .email("Geçerli bir e mail adresi giriniz."),
     password: Yup.string().required("Parola zorunludur"),
   });
 
   const handleSubmit = (values) => {
-
-   
-
     setIsLoading(true);
 
-      // signIn içine hangi provider ile giriş yapılacağı ve giriş bilgileri gönderilir.
-      const result = signIn('credentials', {
-        email: values.email,
-        password: values.password,
-        role: pageRole,
-        callbackUrl: '/',
-        redirect: false,
-      }).then((res) => {
-        setIsLoading(false);
-        console.log('RES: ', res);
-        if (!res) {
-          // toast.error('Bir hata oluştu. Lütfen tekrar deneyiniz.');
-          console.log("Bir hata oluştu. Lütfen tekrar deneyiniz.")
-          // setIsloading(false);
-        } else if (!res.ok) {
-          // toast.error(res.error);
-          console.log(res.error);
-          // setIsloading(false);
-        } else {
+    // signIn içine hangi provider ile giriş yapılacağı ve giriş bilgileri gönderilir.
+    const result = signIn("credentials", {
+      email: values.email,
+      password: values.password,
+      role: pageRole,
+      callbackUrl: "/",
+      redirect: false,
+    }).then((res) => {
+      setIsLoading(false);
+      console.log("RES: ", res);
+      if (!res) {
+        // toast.error('Bir hata oluştu. Lütfen tekrar deneyiniz.');
+        console.log("Bir hata oluştu. Lütfen tekrar deneyiniz.");
+        // setIsloading(false);
+      } else if (!res.ok) {
+        // toast.error(res.error);
+        console.log(res.error);
+        // setIsloading(false);
+      } else {
+        // BİR PROBLEM YOKSA GİRİŞ BAŞARILI BİLGİSİ VERİRİZ.
+        // setIsAccessing(true);
+        // setIsloading(false);
+        // toast.success('Giriş Başarılı (Yönlendiriliyorsunuz...)');
+        console.log("Giriş Başarılı Yönlendiriliyorsunuz...");
 
-          // BİR PROBLEM YOKSA GİRİŞ BAŞARILI BİLGİSİ VERİRİZ.
-          // setIsAccessing(true);
-          // setIsloading(false);
-          // toast.success('Giriş Başarılı (Yönlendiriliyorsunuz...)');
-           console.log("Giriş Başarılı Yönlendiriliyorsunuz...");
-
-          const timeOut = setInterval(() => {
-            router.push('/');
-            clearInterval(timeOut);
-          }, 2000);
-
-        }
-      });
+        const timeOut = setInterval(() => {
+          router.push("/");
+          clearInterval(timeOut);
+        }, 2000);
+      }
+    });
   };
 
   const router = useRouter();
@@ -113,10 +108,7 @@ const LoginComponent = ({ pageRole }) => {
             </div>
             <div className="mb-4 flex flex-row items-center justify-between">
               <div className="flex flex-row items-center gap-2 justify-center">
-                <Field
-                  type="checkbox"
-                  name="rememberMe"
-                />
+                <Field type="checkbox" name="rememberMe" />
                 <p className="text-[#9A9A9A] uppercase text-[11px] pt-[15px] pb-[10px] leading-[1px] tracking-[1px] font-bold mb-[1px]">
                   Beni hatırla
                 </p>
@@ -132,7 +124,7 @@ const LoginComponent = ({ pageRole }) => {
           </Form>
         )}
       </Formik>
-      {isLoading && <Loading/>}
+      {isLoading && <Loading />}
       <div className="clear" />
       <p className="mt-4 text-CustomRed/75 text-[14px] hover:text-CustomRed  transition-all ease-in-out duration-700 transform ">
         <Link href="https://caliskanari.com/my-account/lost-password/">

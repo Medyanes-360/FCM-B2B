@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useState, useEffect } from "react";
 import headerStore from "@/utils/headerStore";
 import Link from "next/link";
@@ -14,7 +14,6 @@ import { toast } from "react-toastify";
 import { signIn, signOut, useSession } from "next-auth/react";
 
 const Header = () => {
-
   const { header } = headerStore();
   const [hoveredMenu, setHoveredMenu] = useState(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -22,7 +21,7 @@ const Header = () => {
 
   const { data: session } = useSession();
   const user = session?.user;
-  console.log(user)
+  console.log(user);
   const [currentPath, setCurrentPath] = useState("");
 
   useEffect(() => {
@@ -87,26 +86,42 @@ const Header = () => {
                 src="/assets/images/avatarIcon.svg"
                 alt="avatar"
                 className="w-8"
-                width={50} 
+                width={50}
                 height={50}
               />
               <div className="text-sm text-white flex flex-col">
-                <span className="whitespace-nowrap">{user.name.slice(0,20)}...</span>
+                <span className="whitespace-nowrap">
+                  {user.name.slice(0, 20)}...
+                </span>
                 <span className="text-xs">({user.role})</span>
               </div>
-              <div className="text-white hover:text-red-500 text-2xl"> 
-              {/* signOut */}
-              <Link href="/auth/login" onClick={() => signOut()}>              
-                  <Image src="/assets/images/cikisyap.svg" width={100} height={100} alt="" className="mx-4 w-28 hover:scale-110 transition-all transform ease-in-out duration-700" />            
-              </Link>
+              <div className="text-white hover:text-red-500 text-2xl">
+                {/* signOut */}
+                <Link href="#" onClick={() => signOut({ callbackUrl: "/" })}>
+                  <Image
+                    src="/assets/images/cikisyap.svg"
+                    width={100}
+                    height={100}
+                    alt=""
+                    className="mx-4 w-28 hover:scale-110 transition-all transform ease-in-out duration-700"
+                  />
+                </Link>
               </div>
             </div>
           ) : (
-            currentPath === "/" && <div className="flex justify-center items-center mr-4">
-              <Link href="/auth/login" onClick={() => signIn()}>              
-                <Image src="/assets/images/giris.svg" width={100} height={100} alt="" className=" w-28 hover:scale-110 transition-all transform ease-in-out duration-700" />            
-              </Link>
-          </div>
+            currentPath === "/" && (
+              <div className="flex justify-center items-center mr-4">
+                <Link href="/auth/login" onClick={() => signIn()}>
+                  <Image
+                    src="/assets/images/giris.svg"
+                    width={100}
+                    height={100}
+                    alt=""
+                    className=" w-28 hover:scale-110 transition-all transform ease-in-out duration-700"
+                  />
+                </Link>
+              </div>
+            )
           )}
         </div>
       </div>
