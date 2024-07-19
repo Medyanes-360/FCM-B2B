@@ -29,7 +29,8 @@ export default function DataTable() {
   const [borcToplam, setBorcToplam] = useState(0); // Toplam borç
   const [alacakToplam, setAlacakToplam] = useState(0); // Toplam alacak
   const [carBorcToplam, setCarBorcToplam] = useState(0); // Cari borç toplamı
-  const [expandedRow, setExpandedRow] = useState(null); // Genişletilmiş satır
+  const [expandedRows, setExpandedRows] = useState([]); // Genişletilmiş satırlar
+  const [allExpanded, setAllExpanded] = useState(false); // Tüm satırların genişletilme durumu
 
   // Kullanıcı oturumu başladığında verileri çekme
   useEffect(() => {
@@ -105,6 +106,7 @@ export default function DataTable() {
   }
 
   // Detaylı fatura verilerini işleyen yardımcı fonksiyon
+  // Bu fonksiyon, farklı API'lerden gelen verileri birleştirerek daha kapsamlı bir veri seti oluşturur
   function enhanceBillingData(detailedBillings, fatfisData, billingsData) {
     return detailedBillings.reduce((acc, billing) => {
       // Eşleşen fatura fişini bulma
@@ -132,11 +134,13 @@ export default function DataTable() {
   }
 
   // Tarih formatını düzenleyen yardımcı fonksiyon
+  // Gelen tarih string'ini Türkiye tarih formatına çevirir
   function formatDate(dateString) {
     return dateString ? new Date(dateString).toLocaleDateString("tr-TR") : "-";
   }
 
   // Para birimini formatlayan yardımcı fonksiyon
+  // Sayısal değeri Türk Lirası formatında bir string'e çevirir
   function formatCurrency(amount) {
     return (
       amount?.toLocaleString("tr-TR", {
@@ -153,10 +157,34 @@ export default function DataTable() {
   }
 
   // Satır genişletme/daraltma işlemini yöneten fonksiyon
-  function handleRowClick(carharItem) {
-    setExpandedRow(
-      expandedRow === carharItem.CARHARREFNO ? null : carharItem.CARHARREFNO
-    );
+  // Tıklanan satırın genişletilme durumunu tersine çevirir
+  function handleRowClick(carharRefNo) {
+    setExpandedRows((prevExpandedRows) => {
+      if (prevExpandedRows.includes(carharRefNo)) {
+        return prevExpandedRows.filter((refNo) => refNo !== carharRefNo);
+      } else {
+        return [...prevExpandedRows, carharRefNo];
+      }
+    });
+  }
+
+  // Tüm satırları açma/kapatma işlemini yöneten fonksiyon
+  // Tüm satırların genişletilme durumunu tersine çevirir
+  function handleToggleAllRows() {
+    if (allExpanded) {
+      setExpandedRows([]);
+      setAllExpanded(false);
+    } else {
+      const allRefNos = data
+        .filter((item) =>
+          detailedData.some(
+            (detailItem) => detailItem.CARHARREFNO === item.CARHARREFNO
+          )
+        )
+        .map((item) => item.CARHARREFNO);
+      setExpandedRows(allRefNos);
+      setAllExpanded(true);
+    }
   }
 
   // Yükleme durumunda Loading bileşenini gösterme
@@ -164,9 +192,9 @@ export default function DataTable() {
 
   // Ana bileşen render'ı
   return (
-    <div className="print-section">
+    <div className="print-section pt-4 bg-[#dbdbdb]">
       {/* Üst bilgi bölümü */}
-      <div className="max-w-[1880px] mx-auto mt-8 flex flex-col justify-between items-center px-8 gap-4 md:flex-row">
+      <div className="max-w-[80%] mx-auto flex flex-col justify-between bg-white rounded-xl border-2 border-dashed border-[#1e3b606e] items-center px-8 gap-4 md:flex-row p-4">
         <div className="flex flex-col text-center md:text-left">
           <h1 className="text-xl md:text-2xl text-blue-500">Cari Bilgisi</h1>
           <h1>
@@ -188,17 +216,25 @@ export default function DataTable() {
             </span>
           </h1>
         </div>
-        {/* Çıktı butonu */}
-        <button
-          onClick={handlePrint}
-          className="bg-NavyBlue text-white px-4 py-2 rounded-full hover:bg-LightBlue transition duration-300 flex items-center no-print"
-        >
-          <FaPrint className="mr-2" /> Yazdır
-        </button>
+        {/* İşlem butonları */}
+        <div className="flex gap-2">
+          <button
+            onClick={handleToggleAllRows}
+            className="bg-NavyBlue text-white px-4 py-2 rounded-full hover:bg-LightBlue transition duration-300 flex items-center no-print"
+          >
+            {allExpanded ? "Hepsini Kapat" : "Hepsini Aç"}
+          </button>
+          <button
+            onClick={handlePrint}
+            className="bg-NavyBlue text-white px-4 py-2 rounded-full hover:bg-LightBlue transition duration-300 flex items-center no-print"
+          >
+            <FaPrint className="mr-2" /> Yazdır
+          </button>
+        </div>
       </div>
 
       {/* Ana tablo bölümü */}
-      <div className="max-w-[1880px] mx-auto mt-4 mb-8 border">
+      <div className="max-w-[1880px] mx-auto mt-4 border">
         <Table>
           <TableHeader>
             <TableRow>
@@ -215,7 +251,7 @@ export default function DataTable() {
           </TableHeader>
           <TableBody>
             {data
-              .reduce((acc, item, index) => {
+              .reduce((acc, item) => {
                 // Borç ve alacak hesaplamaları
                 const isBorc = item.CARHARGCFLAG === 1;
                 const isAlacak = item.CARHARGCFLAG === 2;
@@ -235,92 +271,105 @@ export default function DataTable() {
 
                 return acc;
               }, [])
-              .map((item, index) => (
-                <React.Fragment key={item.CARHARREFNO}>
-                  {/* Ana tablo satırı */}
-                  <TableRow
-                    className={`${
-                      expandedRow === item.CARHARREFNO
-                        ? "bg-blue-50 border-2 border-NavyBlue"
-                        : index % 2 === 0
-                        ? "bg-gray-100 hover:bg-gray-200"
-                        : "bg-white hover:bg-gray-200"
-                    } cursor-pointer transition-all duration-300`}
-                    onClick={() => handleRowClick(item)}
-                  >
-                    <TableCell className="py-4 pl-4">
-                      {formatDate(item.CARHARTAR)}
-                    </TableCell>
-                    <TableCell className="py-4 pl-4">
-                      {item.CARHARISTIPKOD}
-                    </TableCell>
-                    <TableCell className="py-4 pl-4">
-                      {formatDate(item.CARHARVADETAR) === "01.01.1900"
-                        ? "-"
-                        : formatDate(item.CARHARVADETAR)}
-                    </TableCell>
-                    <TableCell className="py-4 pl-4">
-                      {item.CARHARACIKLAMA1}
-                    </TableCell>
-                    <TableCell className="py-4 pl-4">
-                      {item.CARHARACIKLAMA}
-                    </TableCell>
-                    <TableCell
-                      className={`py-4 pl-4 ${
-                        item.borcAmount > 0 ? "text-red-500" : ""
-                      }`}
+              .map((item, index) => {
+                const hasDetailedData = detailedData.some(
+                  (detailItem) => detailItem.CARHARREFNO === item.CARHARREFNO
+                );
+                const isExpanded = expandedRows.includes(item.CARHARREFNO);
+                return (
+                  <React.Fragment key={item.CARHARREFNO}>
+                    <TableRow
+                      className={`${
+                        isExpanded
+                          ? "bg-blue-50 border-2 border-NavyBlue"
+                          : index % 2 === 0
+                          ? "bg-gray-100 hover:bg-gray-200"
+                          : "bg-white hover:bg-gray-200"
+                      } ${
+                        hasDetailedData
+                          ? "cursor-pointer"
+                          : "cursor-not-allowed"
+                      } transition-all duration-300`}
+                      onClick={() =>
+                        hasDetailedData && handleRowClick(item.CARHARREFNO)
+                      }
                     >
-                      {formatCurrency(item.borcAmount)}
-                    </TableCell>
-                    <TableCell
-                      className={`py-4 pl-4 ${
-                        item.alacakAmount > 0 ? "text-green-500" : ""
-                      }`}
-                    >
-                      {formatCurrency(item.alacakAmount)}
-                    </TableCell>
-                    <TableCell className="py-4 pl-4">
-                      {formatCurrency(Math.abs(item.balance))}
-                      {item.balance > 0
-                        ? " (B)"
-                        : item.balance < 0
-                        ? " (A)"
-                        : ""}
-                    </TableCell>
-                    <TableCell className="py-4 pl-4">
-                      <div className="flex items-center">
-                        {expandedRow === item.CARHARREFNO ? (
-                          <FaChevronUp className="text-blue-500" />
+                      <TableCell className="py-4 pl-4">
+                        {formatDate(item.CARHARTAR)}
+                      </TableCell>
+                      <TableCell className="py-4 pl-4">
+                        {item.CARHARISTIPKOD}
+                      </TableCell>
+                      <TableCell className="py-4 pl-4">
+                        {formatDate(item.CARHARVADETAR) === "01.01.1900"
+                          ? "-"
+                          : formatDate(item.CARHARVADETAR)}
+                      </TableCell>
+                      <TableCell className="py-4 pl-4">
+                        {item.CARHARACIKLAMA1}
+                      </TableCell>
+                      <TableCell className="py-4 pl-4">
+                        {item.CARHARACIKLAMA}
+                      </TableCell>
+                      <TableCell
+                        className={`py-4 pl-4 ${
+                          item.borcAmount > 0 ? "text-red-500" : ""
+                        }`}
+                      >
+                        {formatCurrency(item.borcAmount)}
+                      </TableCell>
+                      <TableCell
+                        className={`py-4 pl-4 ${
+                          item.alacakAmount > 0 ? "text-green-500" : ""
+                        }`}
+                      >
+                        {formatCurrency(item.alacakAmount)}
+                      </TableCell>
+                      <TableCell className="py-4 pl-4">
+                        {formatCurrency(Math.abs(item.balance))}
+                        {item.balance > 0
+                          ? " (B)"
+                          : item.balance < 0
+                          ? " (A)"
+                          : ""}
+                      </TableCell>
+                      <TableCell className="py-4 pl-4">
+                        {hasDetailedData ? (
+                          <div className="flex items-center">
+                            {isExpanded ? (
+                              <FaChevronUp className="text-blue-500" />
+                            ) : (
+                              <FaChevronDown />
+                            )}
+                            <span className="ml-2">
+                              {isExpanded ? "Kapat" : "Stok Bilgisi"}
+                            </span>
+                          </div>
                         ) : (
-                          <FaChevronDown />
+                          <span className="text-gray-400">Detay Yok</span>
                         )}
-                        <span className="ml-2">
-                          {expandedRow === item.CARHARREFNO
-                            ? "Kapat"
-                            : "Stok Bilgisi"}
-                        </span>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                  {/* Genişletilmiş satır (detay tablosu) */}
-                  {expandedRow === item.CARHARREFNO && (
-                    <TableRow className="bg-white border-2 border-b-2 border-t-0 border-NavyBlue">
-                      <TableCell colSpan={9} className="p-0">
-                        <ExpandedTable
-                          detailedData={detailedData.filter(
-                            (fathar) => fathar.CARHARREFNO === item.CARHARREFNO
-                          )}
-                          formatDate={formatDate}
-                          formatCurrency={formatCurrency}
-                        />
                       </TableCell>
                     </TableRow>
-                  )}
-                </React.Fragment>
-              ))}
+                    {isExpanded && hasDetailedData && (
+                      <TableRow className="bg-white border-2 border-b-2 border-t-0 border-NavyBlue">
+                        <TableCell colSpan={9} className="p-0">
+                          <ExpandedTable
+                            detailedData={detailedData.filter(
+                              (fathar) =>
+                                fathar.CARHARREFNO === item.CARHARREFNO
+                            )}
+                            formatDate={formatDate}
+                            formatCurrency={formatCurrency}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </React.Fragment>
+                );
+              })}
           </TableBody>
         </Table>
-        <div className="text-right md:w-[1880px] border-b-0 border-x-0 border-t flex items-center justify-end py-6 px-4 gap-4 no-print">
+        <div className="text-right lg:max-w-[1880px] border-b-0 border-x-0 border-t flex items-center justify-end py-12 px-4 gap-4 no-print">
           <div className="font-normal">
             Borç Toplam:
             <span className="ml-2 text-red-500">
