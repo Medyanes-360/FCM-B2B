@@ -195,38 +195,77 @@ export default function DataTable() {
     <div className="print-section pt-4 bg-[#dbdbdb]">
       {/* Üst bilgi bölümü */}
       <div className="max-w-[80%] mx-auto flex flex-col justify-between bg-white rounded-xl border-2 border-dashed border-[#1e3b606e] items-center px-8 gap-4 md:flex-row p-4">
-        <div className="flex flex-col text-center md:text-left">
-          <h1 className="text-xl md:text-2xl text-blue-500">Cari Bilgisi</h1>
-          <h1>
-            <span className="font-bold">Cari Kodu:</span> {session?.user?.id}
-          </h1>
-          <h1>
-            <span className="font-bold">Cari Unvanı:</span>{" "}
-            {session?.user?.name}
-          </h1>
-          <h1>
-            <span className="font-bold">Bakiye:</span>{" "}
-            {formatCurrency(-userCarBakiye)}{" "}
-            <span
-              className={`${
-                borcToplam > 0 ? "text-red-500" : "text-green-500"
-              }`}
-            >
-              {borcToplam < 0 ? "(ALACAK)" : "(BORÇ)"}
-            </span>
-          </h1>
+        <div className="flex flex-col w-full md:w-auto">
+          <div>
+            <h1 className="text-xl lg:text-2xl text-blue-500">Cari Bilgisi</h1>
+          </div>
+          <div className="flex justify-between gap-8 items-center max-w-[100%]">
+            <div className="flex lg:text-base text-sm flex-col text-center md:text-left">
+              <div>
+                <div className="font-normal">
+                  <span className="font-bold">Cari Kodu:</span>{" "}
+                  <span>{session?.user?.id}</span>
+                </div>
+              </div>
+              <div>
+                <div className="font-normal">
+                  <span className="font-bold">Cari Unvanı:</span>{" "}
+                  <span>{session?.user?.name}</span>
+                </div>
+              </div>
+              <div>
+                <div className="font-normal flex-col">
+                  <span className="font-bold">Bakiye:</span>{" "}
+                  <span>{formatCurrency(-userCarBakiye)} </span>
+                  <span
+                    className={`${
+                      borcToplam > 0 ? "text-red-500" : "text-green-500"
+                    }`}
+                  >
+                    {borcToplam < 0 ? "(ALACAK)" : "(BORÇ)"}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-col text-sm text-center lg:text-base md:text-left">
+              <div className="font-normal">
+                <span className="font-bold">Borç Toplam:</span>
+                <span className="ml-2 text-red-500">
+                  {formatCurrency(carBorcToplam)}
+                </span>
+              </div>
+              <div className="font-normal">
+                <span className="font-bold">Alacak Toplam:</span>
+                <span className="ml-2 text-green-500">
+                  {formatCurrency(alacakToplam)}
+                </span>
+              </div>
+              <div className="font-normal">
+                <span className="font-bold">Genel Toplam:</span>
+                <span
+                  className={`ml-2 ${
+                    borcToplam > 0 ? "text-red-500" : "text-green-500"
+                  }`}
+                >
+                  {formatCurrency(Math.abs(borcToplam))}
+                  {borcToplam > 0 ? " (B)" : " (A)"}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
+
         {/* İşlem butonları */}
-        <div className="flex gap-2">
+        <div className="flex gap-2 text-sm md:text-base">
           <button
             onClick={handleToggleAllRows}
-            className="bg-NavyBlue text-white px-4 py-2 rounded-full hover:bg-LightBlue transition duration-300 flex items-center no-print"
+            className="bg-NavyBlue text-white text-sm w-[90px] lg:w-auto px-2 lg:px-4 py-1 lg:py-2 rounded-full hover:bg-LightBlue transition duration-300 flex items-center no-print"
           >
             {allExpanded ? "Hepsini Kapat" : "Hepsini Aç"}
           </button>
           <button
             onClick={handlePrint}
-            className="bg-NavyBlue text-white px-4 py-2 rounded-full hover:bg-LightBlue transition duration-300 flex items-center no-print"
+            className="bg-NavyBlue text-white text-sm px-2 lg:px-4 py-1 lg:py-2 rounded-full hover:bg-LightBlue transition duration-300 flex items-center no-print"
           >
             <FaPrint className="mr-2" /> Yazdır
           </button>
@@ -369,31 +408,7 @@ export default function DataTable() {
               })}
           </TableBody>
         </Table>
-        <div className="text-right lg:max-w-[1880px] border-b-0 border-x-0 border-t flex items-center justify-end py-12 px-4 gap-4 no-print">
-          <div className="font-normal">
-            Borç Toplam:
-            <span className="ml-2 text-red-500">
-              {formatCurrency(carBorcToplam)}
-            </span>
-          </div>
-          <div className="font-normal">
-            Alacak Toplam:
-            <span className="ml-2 text-green-500">
-              {formatCurrency(alacakToplam)}
-            </span>
-          </div>
-          <div className="font-normal">
-            Genel Toplam:
-            <span
-              className={`ml-2 ${
-                borcToplam > 0 ? "text-red-500" : "text-green-500"
-              }`}
-            >
-              {formatCurrency(Math.abs(borcToplam))}
-              {borcToplam > 0 ? " (B)" : " (A)"}
-            </span>
-          </div>
-        </div>
+        <div className="text-right lg:max-w-[1880px] flex items-center justify-end py-8 px-4 gap-4 no-print"></div>
         <div className="flex justify-end no-print">
           <ScrollButtons />
         </div>

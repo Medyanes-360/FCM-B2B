@@ -16,8 +16,9 @@ function CategoryProducts() {
   const [selectedCategory, setSelectedCategory] = useState(""); // Seçili kategori filtresi için state
   const [dropdownOpen, setDropdownOpen] = useState({}); // Dropdown açılış durumu için state
   const [cart, setCart] = useState([]); // Sepet ürünleri için state
+  const [imageMap, setImageMap] = useState({}); // Resim eşleştirmeleri için state
 
-  // Komponent yüklendiğinde API'den ürünleri getir
+  // Komponent yüklendiğinde API'den ürünleri getir ve resim eşleştirmelerini oluştur
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -30,6 +31,17 @@ function CategoryProducts() {
             addingToCart: false,
           }))
         );
+
+        // Resim verilerini al
+        const imageResponse = await fetch("/data.json");
+        const imageData = await imageResponse.json();
+
+        // Resim eşleştirmelerini oluştur
+        const imgMap = {};
+        imageData.forEach((item) => {
+          imgMap[item.stkkod] = item.path;
+        });
+        setImageMap(imgMap);
       } catch (error) {
         console.error("Veri çekme hatası: ", error);
       }
@@ -247,9 +259,11 @@ function CategoryProducts() {
                 <span className="flex items-center justify-center">
                   <Image
                     src={
-                      "https://caliskanari.com/wp-content/uploads/2022/11/X7-420x420.png.webp"
+                      imageMap[urun.STKKOD]
+                        ? imageMap[urun.STKKOD]
+                        : "https://caliskanari.com/wp-content/uploads/2022/11/X7-420x420.png.webp"
                     }
-                    alt={"image"}
+                    alt={urun.STKCINSI}
                     className="object-cover w-[140px] md:w-[210px] h-[140px] md:h-[210px]"
                     width={210}
                     height={210}
@@ -268,10 +282,7 @@ function CategoryProducts() {
                 <div className="flex-none">
                   <div>
                     {urun.STKOZKOD5 && (
-                      <p
-                        className="italic text-LightBlue text-[20px] md:text-[23px] sm:pt-[20
-px] font-semibold"
-                      >
+                      <p className="italic text-LightBlue text-[20px] md:text-[23px] sm:pt-[20px] font-semibold">
                         <span>₺</span>
                         {urun.STKOZKOD5}
                       </p>
