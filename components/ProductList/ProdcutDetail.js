@@ -7,6 +7,7 @@ import ProductToggleButton from "./ProductToggleButton";
 
 function ProdcutDetail({ product }) {
   const [purchaseAmount, setPurchaseAmount] = useState(1);
+  // satın alma sayısı arttır/azalt fonksiyonları
   function incrementAmount() {
     if (purchaseAmount < product.stokCount) {
       setPurchaseAmount((state) => state + 1);
@@ -17,6 +18,7 @@ function ProdcutDetail({ product }) {
       setPurchaseAmount((state) => state - 1);
     }
   }
+  // fiyat etiketi
   function PriceTag() {
     return (
       <div>
@@ -28,11 +30,11 @@ function ProdcutDetail({ product }) {
     );
   }
   return (
-    <div className="flex flex-col justify-center items-center bg-[url('/backgroundImage.webp')] bg-no-repeat  bg-contain bg-[#6bcdec]">
+    <div className="flex flex-col justify-center items-center bg-[url('/backgroundImage.webp')] bg-no-repeat min-h-screen  bg-contain bg-[#6bcdec]">
       <div className="bg-gray-50 ">
         <div className="grid grid-rows-2 px-5 lg:w-[1188px]  md:px-14 pt-14 pb-3 mb-2  lg:mx-auto">
           <div className="row-span-1 md:grid md:grid-cols-4 md:grid-flow-col ">
-            <div className="col-span-2 flex md:justify-center border border-dashed ">
+            <div className="col-span-2 flex md:justify-center border border-dashed rounded-lg">
               <div className=" max-w-xl">
                 <img
                   className="max-h-96"
