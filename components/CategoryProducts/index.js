@@ -94,7 +94,6 @@ function CategoryProducts() {
   // Sepete ürün ekleme işlemi
   const handleAddToCart = async (values, urun) => {
     try {
-      // Belirli ürün için yükleme durumu ayarla
       setUrunler((prevUrunler) =>
         prevUrunler.map((item) =>
           item.STKKOD === urun.STKKOD ? { ...item, addingToCart: true } : item
@@ -103,7 +102,6 @@ function CategoryProducts() {
 
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Ürün miktarını güncelle ve yükleme durumunu sıfırla
       const updatedUrunler = urunler.map((item) =>
         item.STKKOD === urun.STKKOD
           ? {
@@ -115,7 +113,6 @@ function CategoryProducts() {
       );
       setUrunler(updatedUrunler);
 
-      // Yeni veya varolan ürünü sepete ekle
       const updatedCart = [...cart];
       const existingItemIndex = updatedCart.findIndex(
         (item) => item.STKKOD === urun.STKKOD
@@ -124,7 +121,13 @@ function CategoryProducts() {
       if (existingItemIndex !== -1) {
         updatedCart[existingItemIndex].quantity += values.quantity;
       } else {
-        updatedCart.push({ ...urun, quantity: values.quantity });
+        updatedCart.push({
+          ...urun,
+          quantity: values.quantity,
+          imagePath:
+            imageMap[urun.STKKOD] ||
+            "https://caliskanari.com/wp-content/uploads/2022/11/X7-420x420.png.webp",
+        });
       }
 
       setCart(updatedCart);

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { IoMdImages } from "react-icons/io";
+import Loading from "../Loading";
 import { MdDeleteForever } from "react-icons/md";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
@@ -17,46 +18,61 @@ import { TbShoppingCartX } from "react-icons/tb";
 import { RxUpdate } from "react-icons/rx";
 
 const ShoppingCart = () => {
-  const [storedCart, setStoredCart] = useState([]); // Sepetteki ürünlerin tutulacağı state
-  const [totalPrice, setTotalPrice] = useState(0); // Sepet toplam tutarının tutulacağı state
-  const [confirmDelete, setConfirmDelete] = useState(false); // Ürün silme onayının tutulacağı state
-  const [deleteIndex, setDeleteIndex] = useState(null); // Silinecek ürünün indexinin tutulacağı state
-  const [updatingIndex, setUpdatingIndex] = useState(null); // Güncellenen ürünün indexinin tutulacağı state
-  const [confirmOrder, setConfirmOrder] = useState(false); // Sipariş onayının tutulacağı state
+  const [storedCart, setStoredCart] = useState([]);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleteIndex, setDeleteIndex] = useState(null);
+  const [updatingIndex, setUpdatingIndex] = useState(null);
+  const [confirmOrder, setConfirmOrder] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [imageMap, setImageMap] = useState({});
 
-  // Sipariş onayı işlevi
   const handleConfirmOrder = () => {
     setConfirmOrder(true);
   };
 
-  // Sipariş onayı kapatma işlevi
   const handleCloseOrderConfirmation = () => {
     setConfirmOrder(false);
   };
 
-  // Komponent ilk yüklendiğinde localStorage'dan sepet verilerini al
   useEffect(() => {
     if (typeof window !== "undefined") {
       const cartData = localStorage.getItem("cart");
       const parsedCart = cartData ? JSON.parse(cartData) : [];
       setStoredCart(parsedCart);
-      updateTotalPrice(parsedCart); // Toplam tutarı güncelle
+      updateTotalPrice(parsedCart);
+      setIsLoading(false);
     }
   }, []);
 
-  // Ürün miktarının değişim işlevi
+  useEffect(() => {
+    const fetchImageData = async () => {
+      try {
+        const response = await fetch("/data.json");
+        const imageData = await response.json();
+        const imgMap = {};
+        imageData.forEach((item) => {
+          imgMap[item.stkkod] = item.path;
+        });
+        setImageMap(imgMap);
+      } catch (error) {
+        console.error("Resim verisi yükleme hatası:", error);
+      }
+    };
+
+    fetchImageData();
+  }, []);
+
   const handleQuantityChange = async (index, quantity) => {
-    setUpdatingIndex(index); // Güncellenen ürün index'i ayarla
+    setUpdatingIndex(index);
     const updatedCart = [...storedCart];
-    updatedCart[index].quantity = quantity; // Yeni miktarı ayarla
-    setStoredCart(updatedCart); // Sepet verilerini güncelle
-    localStorage.setItem("cart", JSON.stringify(updatedCart)); // Güncellenmiş sepet verilerini localStorage'a kaydet
+    updatedCart[index].quantity = quantity;
+    setStoredCart(updatedCart);
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
 
-    // Total fiyatı ve toast bildirimi gösterimini geciktir
     setTimeout(() => {
-      updateTotalPrice(updatedCart); // Toplam tutarı güncelle
+      updateTotalPrice(updatedCart);
 
-      // Başarılı güncelleme bildirimi toast ile göster
       toast.success("Ürün adedi başarıyla güncellendi.", {
         position: "top-right",
         autoClose: 3000,
@@ -67,39 +83,34 @@ const ShoppingCart = () => {
         progress: undefined,
       });
 
-      setUpdatingIndex(null); // Güncelleme durumunu sıfırla
-    }, 2000); // 2 saniye gecikme sonrası işlemleri gerçekleştir
+      setUpdatingIndex(null);
+    }, 2000);
   };
 
-  // Toplam fiyatı güncelleme işlevi
   const updateTotalPrice = (cart) => {
     const totalPrice = cart.reduce((acc, item) => {
-      return acc + item.STKOZKOD5 * item.quantity; // Ürünlerin miktarı ile birim fiyatını çarpıp toplam tutarı hesapla
+      return acc + item.STKOZKOD5 * item.quantity;
     }, 0);
-    setTotalPrice(totalPrice); // Toplam tutarı güncelle
+    setTotalPrice(totalPrice);
   };
 
-  // Ürün silme işlevi
   const handleDeleteItem = (index) => {
-    setDeleteIndex(index); // Silinecek ürün index'ini ayarla
-    setConfirmDelete(true); // Silme onayını göster
+    setDeleteIndex(index);
+    setConfirmDelete(true);
   };
 
-  // Silme işlemini iptal etme işlevi
   const cancelDelete = () => {
-    setConfirmDelete(false); // Silme onayını kapat
-    setDeleteIndex(null); // Silinecek ürün index'ini sıfırla
+    setConfirmDelete(false);
+    setDeleteIndex(null);
   };
 
-  // Ürün silme işlemini onaylama işlevi
   const confirmDeleteItem = () => {
     if (deleteIndex !== null) {
       const updatedCart = [...storedCart];
-      updatedCart.splice(deleteIndex, 1); // İlgili index'teki ürünü sil
-      setStoredCart(updatedCart); // Sepet verilerini güncelle
-      localStorage.setItem("cart", JSON.stringify(updatedCart)); // Güncellenmiş sepet verilerini localStorage'a kaydet
+      updatedCart.splice(deleteIndex, 1);
+      setStoredCart(updatedCart);
+      localStorage.setItem("cart", JSON.stringify(updatedCart));
 
-      // Başarılı silme bildirimi toast ile göster
       toast.success("Ürün sepetten başarıyla silindi.", {
         position: "top-right",
         autoClose: 3000,
@@ -110,12 +121,16 @@ const ShoppingCart = () => {
         progress: undefined,
       });
 
-      updateTotalPrice(updatedCart); // Toplam tutarı güncelle
+      updateTotalPrice(updatedCart);
 
-      setConfirmDelete(false); // Silme onayını kapat
-      setDeleteIndex(null); // Silinecek ürün index'ini sıfırla
+      setConfirmDelete(false);
+      setDeleteIndex(null);
     }
   };
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <div
@@ -178,14 +193,16 @@ const ShoppingCart = () => {
                   {storedCart.map((item, index) => (
                     <tr key={item.STKKOD} className="shadow-sm">
                       <td className="px-2 sm:px-5 py-5 hidden sm:table-cell">
-                        <div className="flex flex-col sm:flex-row items-center text-center ">
+                        <div className="w-24 h-24 mr-4">
                           <Image
                             src={
+                              item.imagePath ||
                               "https://caliskanari.com/wp-content/uploads/2022/11/X7-420x420.png.webp"
                             }
-                            alt={"image"}
-                            width={70}
-                            height={70}
+                            alt={item.STKCINSI}
+                            width={96}
+                            height={96}
+                            className="object-cover rounded"
                           />
                         </div>
                       </td>
