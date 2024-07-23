@@ -5,8 +5,6 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import { IoMdImages } from "react-icons/io";
 import Loading from "../Loading";
 import { MdDeleteForever } from "react-icons/md";
-import { Formik, Form, Field } from "formik";
-import * as Yup from "yup";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -15,14 +13,12 @@ import { RiShoppingCartLine } from "react-icons/ri";
 import OrderConfirmation from "@/components/OrderConfirmation/index.";
 import Link from "next/link";
 import { TbShoppingCartX } from "react-icons/tb";
-import { RxUpdate } from "react-icons/rx";
 
 const ShoppingCart = () => {
   const [storedCart, setStoredCart] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState(null);
-  const [updatingIndex, setUpdatingIndex] = useState(null);
   const [confirmOrder, setConfirmOrder] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [imageMap, setImageMap] = useState({});
@@ -63,14 +59,14 @@ const ShoppingCart = () => {
     fetchImageData();
   }, []);
 
-  const handleQuantityChange = async (index, quantity) => {
-    setUpdatingIndex(index);
+  const handleQuantityChange = (index, change) => {
     const updatedCart = [...storedCart];
-    updatedCart[index].quantity = quantity;
-    setStoredCart(updatedCart);
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
+    const newQuantity = updatedCart[index].quantity + change;
 
-    setTimeout(() => {
+    if (newQuantity >= 1) {
+      updatedCart[index].quantity = newQuantity;
+      setStoredCart(updatedCart);
+      localStorage.setItem("cart", JSON.stringify(updatedCart));
       updateTotalPrice(updatedCart);
 
       toast.success("Ürün adedi başarıyla güncellendi.", {
@@ -82,9 +78,7 @@ const ShoppingCart = () => {
         draggable: true,
         progress: undefined,
       });
-
-      setUpdatingIndex(null);
-    }, 2000);
+    }
   };
 
   const updateTotalPrice = (cart) => {
@@ -122,7 +116,6 @@ const ShoppingCart = () => {
       });
 
       updateTotalPrice(updatedCart);
-
       setConfirmDelete(false);
       setDeleteIndex(null);
     }
@@ -141,7 +134,6 @@ const ShoppingCart = () => {
         Sepet
       </div>
       {storedCart.length === 0 ? (
-        // Sepet boş ise gösterilecek içerik
         <div className="flex items-center  justify-center flex-col">
           <span className="flex items-center justify-center my-[20px]">
             <TbShoppingCartX className="w-[140px] h-[140px] text-CustomGray" />
@@ -156,7 +148,6 @@ const ShoppingCart = () => {
           </Link>
         </div>
       ) : (
-        // Sepet dolu ise gösterilecek içerik
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 ">
             <div className="px-5 sm:px-0">
@@ -235,120 +226,25 @@ const ShoppingCart = () => {
                       </td>
                       <td className="px-2 sm:px-5 py-3">
                         <span className="flex items-center justify-center">
-                          <Formik
-                            key={item.STKKOD} // Unique key for Formik instance
-                            initialValues={{ quantity: item.quantity }}
-                            validationSchema={Yup.object().shape({
-                              quantity: Yup.number()
-                                .min(1, "En az 1 olmalı")
-                                .required("Zorunlu alan"),
-                            })}
-                            onSubmit={(values, { resetForm }) => {
-                              handleQuantityChange(index, values.quantity);
-                              resetForm({ values });
-                            }}
-                          >
-                            {({
-                              values,
-                              handleChange,
-                              handleSubmit,
-                              dirty,
-                              isValid,
-                            }) => (
-                              <Form className="flex items-center">
-                                <div className="border border-CustomGray/25 rounded-full py-2 px-2 flex flex-row items-center justify-center">
-                                  <button
-                                    type="button"
-                                    className="text-sm sm:text-xl text-LightBlue hover:scale-110 transition duration-500 ease-in-out transform"
-                                    onClick={() => {
-                                      if (values.quantity > 1) {
-                                        handleChange({
-                                          target: {
-                                            name: "quantity",
-                                            value: values.quantity - 1,
-                                          },
-                                        });
-                                      }
-                                    }}
-                                  >
-                                    <AiOutlineMinus />
-                                  </button>
-                                  <Field
-                                    min="1"
-                                    name="quantity"
-                                    className="w-6 sm:w-12 p-1 text-center outline-none"
-                                    value={values.quantity}
-                                  />
-                                  <button
-                                    type="button"
-                                    className="text-sm sm:text-xl text-LightBlue hover:scale-110 transition duration-500 ease-in-out transform"
-                                    onClick={() =>
-                                      handleChange({
-                                        target: {
-                                          name: "quantity",
-                                          value: values.quantity + 1,
-                                        },
-                                      })
-                                    }
-                                  >
-                                    <AiOutlinePlus />
-                                  </button>
-                                </div>
-                                <div>
-                                  <button
-                                    id={`updateButton-${index}`} // Unique ID for each update button
-                                    type="submit"
-                                    className={`px-4 ml-2 py-2 rounded-md sm:ml-[24px] w-[101px] h-[40px] hidden sm:flex items-center justify-center ${
-                                      dirty && isValid
-                                        ? "bg-LightBlue text-white hover:scale-105 transition-all duration-700 transform ease-in-out hover:bg-LightBlue"
-                                        : "bg-gray-300 text-white cursor-not-allowed"
-                                    }`}
-                                    onClick={handleSubmit}
-                                    disabled={
-                                      !dirty ||
-                                      !isValid ||
-                                      updatingIndex === index
-                                    }
-                                  >
-                                    {updatingIndex === index ? ( // Render loading animation if updating
-                                      <div className="flex flex-row items-center justify-center gap-1">
-                                        <div className="h-1 w-1 rounded-full animate-pulse bg-LightBlue"></div>
-                                        <div className="h-1 w-1 rounded-full animate-pulse bg-LightBlue"></div>
-                                        <div className="h-1 w-1 rounded-full animate-pulse bg-LightBlue"></div>
-                                      </div>
-                                    ) : (
-                                      "Güncelle"
-                                    )}
-                                  </button>
-                                  <button
-                                    id={`updateButton-${index}`} // Unique ID for each update button
-                                    type="submit"
-                                    className={`flex sm:hidden items-center justify-center w-[20px] ml-2 ${
-                                      dirty && isValid
-                                        ? "text-LightBlue hover:scale-105 transition-all duration-700 transform ease-in-out hover:text-LightBlue"
-                                        : "text-gray-300  cursor-not-allowed"
-                                    }`}
-                                    onClick={handleSubmit}
-                                    disabled={
-                                      !dirty ||
-                                      !isValid ||
-                                      updatingIndex === index
-                                    }
-                                  >
-                                    {updatingIndex === index ? ( // Render loading animation if updating
-                                      <div className="flex flex-row items-center justify-center gap-1 ">
-                                        <div className="h-1 w-1 rounded-full animate-pulse bg-LightBlue"></div>
-                                        <div className="h-1 w-1 rounded-full animate-pulse bg-LightBlue"></div>
-                                        <div className="h-1 w-1 rounded-full animate-pulse bg-LightBlue"></div>
-                                      </div>
-                                    ) : (
-                                      <RxUpdate className={`w-4 h-4 `} />
-                                    )}
-                                  </button>
-                                </div>
-                              </Form>
-                            )}
-                          </Formik>
+                          <div className="border border-CustomGray/25 rounded-full py-2 px-2 flex flex-row items-center justify-center">
+                            <button
+                              type="button"
+                              className="text-sm sm:text-xl text-LightBlue hover:scale-110 transition duration-500 ease-in-out transform"
+                              onClick={() => handleQuantityChange(index, -1)}
+                            >
+                              <AiOutlineMinus />
+                            </button>
+                            <span className="w-6 sm:w-12 p-1 text-center outline-none">
+                              {item.quantity}
+                            </span>
+                            <button
+                              type="button"
+                              className="text-sm sm:text-xl text-LightBlue hover:scale-110 transition duration-500 ease-in-out transform"
+                              onClick={() => handleQuantityChange(index, 1)}
+                            >
+                              <AiOutlinePlus />
+                            </button>
+                          </div>
                         </span>
                       </td>
                       <td className="px-2 sm:px-5 py-3 text-center">
@@ -418,7 +314,7 @@ const ShoppingCart = () => {
                       className="flex flex-row items-center justify-center gap-2 ml-3 text-white font-bold hover:scale-105 transition-all transform ease-out duration-500 cursor-pointer bg-gradient-to-r from-LightBlue to-sky-700 pl-3 pr-11 py-2 rounded-full relative w-[250px] h-[58px] text-[18px]"
                     >
                       Sipariş Ver
-                      <span className="absolute -top-1 -right-2 text-white bg-gradient-to-r from-sky-700 to-LightBlue p-4 border-4 border-white rounded-full transition-all duration-500 ease-out transform group-hover:scale-110">
+                      <span className="absolute -top-1 -right-2 text-white bg-gradient-to-r from-sky-700 to-LightBlue p-4  rounded-full group-hover:scale-110 transition-all duration-500 transform ease-in-out">
                         <RiShoppingCartLine className="w-6 h-6" />
                       </span>
                     </button>
@@ -429,35 +325,35 @@ const ShoppingCart = () => {
           </div>
         </>
       )}
-      {confirmOrder && (
-        <OrderConfirmation onClose={handleCloseOrderConfirmation} />
-      )}
       {confirmDelete && (
-        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center">
-          <div className="absolute w-full h-full bg-gray-900 opacity-50"></div>
-          <div className="bg-white p-8 rounded-lg shadow-lg z-20 mx-5 sm:mx-0 flex flex-col items-center justify-center gap-3">
-            <span>
-              <GiCancel className="fill-BasketRed w-12 h-12" />
-            </span>
-            <p className="text-lg font-semibold my-4 text-center text-CustomGray">
-              Silmek istediğinizden emin misiniz?
-            </p>
-            <div className="flex justify-center items-center gap-12">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h2 className="text-lg font-bold mb-4">
+              Ürünü silmek istediğinize emin misiniz?
+            </h2>
+            <div className="flex justify-end">
               <button
-                className="px-6 py-3 mr-2 bg-gray-300 text-gray-800 rounded-full hover:bg-gray-400 transition duration-500 ease-in-out transform hover:scale-105"
                 onClick={cancelDelete}
+                className="mr-4 px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400"
               >
-                Hayır
+                İptal
               </button>
               <button
-                className="px-6 py-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition duration-500 ease-in-out transform hover:scale-105"
                 onClick={confirmDeleteItem}
+                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
               >
-                Evet
+                Sil
               </button>
             </div>
           </div>
         </div>
+      )}
+      {confirmOrder && (
+        <OrderConfirmation
+          onClose={handleCloseOrderConfirmation}
+          cartItems={storedCart}
+          totalPrice={totalPrice}
+        />
       )}
     </div>
   );
