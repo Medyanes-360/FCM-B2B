@@ -8,7 +8,6 @@ import { MdDeleteForever } from "react-icons/md";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { GiCancel } from "react-icons/gi";
 import { RiShoppingCartLine } from "react-icons/ri";
 import OrderConfirmation from "@/components/OrderConfirmation/index.";
 import Link from "next/link";
@@ -22,6 +21,7 @@ const ShoppingCart = () => {
   const [confirmOrder, setConfirmOrder] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [imageMap, setImageMap] = useState({});
+  const [editingIndex, setEditingIndex] = useState(null);
 
   const handleConfirmOrder = () => {
     setConfirmOrder(true);
@@ -59,11 +59,11 @@ const ShoppingCart = () => {
     fetchImageData();
   }, []);
 
-  const handleQuantityChange = (index, change) => {
+  const handleQuantityChange = (index, newQuantity) => {
     const updatedCart = [...storedCart];
-    const newQuantity = updatedCart[index].quantity + change;
+    newQuantity = parseInt(newQuantity, 10);
 
-    if (newQuantity >= 1) {
+    if (!isNaN(newQuantity) && newQuantity >= 1) {
       updatedCart[index].quantity = newQuantity;
       setStoredCart(updatedCart);
       localStorage.setItem("cart", JSON.stringify(updatedCart));
@@ -79,6 +79,16 @@ const ShoppingCart = () => {
         progress: undefined,
       });
     }
+  };
+
+  const handleQuantityEdit = (index) => {
+    setEditingIndex(index);
+  };
+
+  const handleQuantityEditComplete = (index, event) => {
+    const newQuantity = event.target.value;
+    handleQuantityChange(index, newQuantity);
+    setEditingIndex(null);
   };
 
   const updateTotalPrice = (cart) => {
@@ -226,25 +236,58 @@ const ShoppingCart = () => {
                       </td>
                       <td className="px-2 sm:px-5 py-3">
                         <span className="flex items-center justify-center">
-                          <div className="border border-CustomGray/25 rounded-full py-2 px-2 flex flex-row items-center justify-center">
-                            <button
-                              type="button"
-                              className="text-sm sm:text-xl text-LightBlue hover:scale-110 transition duration-500 ease-in-out transform"
-                              onClick={() => handleQuantityChange(index, -1)}
+                          {editingIndex === index ? (
+                            <input
+                              type="number"
+                              defaultValue={item.quantity}
+                              onBlur={(e) =>
+                                handleQuantityEditComplete(index, e)
+                              }
+                              onKeyPress={(e) => {
+                                if (e.key === "Enter") {
+                                  handleQuantityEditComplete(index, e);
+                                }
+                              }}
+                              className="w-16 p-1 text-center border rounded"
+                              min="1"
+                              autoFocus
+                            />
+                          ) : (
+                            <div
+                              className="border border-CustomGray/25 rounded-full py-2 px-2 flex flex-row items-center justify-center cursor-pointer"
+                              onClick={() => handleQuantityEdit(index)}
                             >
-                              <AiOutlineMinus />
-                            </button>
-                            <span className="w-6 sm:w-12 p-1 text-center outline-none">
-                              {item.quantity}
-                            </span>
-                            <button
-                              type="button"
-                              className="text-sm sm:text-xl text-LightBlue hover:scale-110 transition duration-500 ease-in-out transform"
-                              onClick={() => handleQuantityChange(index, 1)}
-                            >
-                              <AiOutlinePlus />
-                            </button>
-                          </div>
+                              <button
+                                type="button"
+                                className="text-sm sm:text-xl text-LightBlue hover:scale-110 transition duration-500 ease-in-out transform"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleQuantityChange(
+                                    index,
+                                    item.quantity - 1
+                                  );
+                                }}
+                              >
+                                <AiOutlineMinus />
+                              </button>
+                              <span className="w-6 sm:w-12 p-1 text-center outline-none">
+                                {item.quantity}
+                              </span>
+                              <button
+                                type="button"
+                                className="text-sm sm:text-xl text-LightBlue hover:scale-110 transition duration-500 ease-in-out transform"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleQuantityChange(
+                                    index,
+                                    item.quantity + 1
+                                  );
+                                }}
+                              >
+                                <AiOutlinePlus />
+                              </button>
+                            </div>
+                          )}
                         </span>
                       </td>
                       <td className="px-2 sm:px-5 py-3 text-center">

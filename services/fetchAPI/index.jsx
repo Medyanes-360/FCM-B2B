@@ -1,61 +1,62 @@
-// Öğrenci (kayıt) işlemleri için kullanılan servis
-const postAPI = async (URL, body, method="POST", headers = {'Content-Type': 'application/json'}) => {
+// Genel API istek fonksiyonu
+const apiRequest = async (
+  URL,
+  method = "GET",
+  body = null,
+  headers = { "Content-Type": "application/json" }
+) => {
+  try {
+    if (!process.env.NEXT_PUBLIC_API_URL || !URL) {
+      throw new Error("URL bulunamadı!");
+    }
 
+    const options = {
+      method: method,
+      headers: headers,
+      cache: "no-store",
+    };
+    // cache önemli! her çalıştığında cache'deki veri yerine -> güncel veriyi almasını sağlar.
+    // bu olmaz ise üncel veriyi almayabiliyor dikkat et.
+    // Dinamik sayfalarda burası kullanılıyorsa o sayfalara -> export const dynamic = 'force-dynamic' ekle!
 
-    try {
-        if(!process.env.NEXT_PUBLIC_API_URL || !URL){
-            throw new Error("URL bulunamadı!");
-        }
-        const data = await fetch (`${process.env.NEXT_PUBLIC_API_URL + URL}`,{
-            method: method,
-            headers: headers,
-            body: JSON.stringify(body),
-            cache: 'no-store' 
-            // cache önemli! her çalıştığında cache'deki veri yerine -> güncel veriyi almasını sağlar. 
-            // bu olmaz ise üncel veriyi almayabiliyor dikkat et.
-            // Dinamik sayfalarda burası kullanılıyorsa o sayfalara -> export const dynamic = 'force-dynamic' ekle! 
+    if (body && (method === "POST" || method === "PUT" || method === "PATCH")) {
+      options.body = JSON.stringify(body);
+    }
 
-        }).then(res =>{
-            if(res.url.includes("/notification") && res.redirected){
-                return window.location.href = res.url;
-            }
-            else{
-                return res.json();
-            }
-            
-        }).catch(err => console.log(err))
-        
-        return data;
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL + URL}`,
+      options
+    );
 
-    } catch (err) {
-        throw new Error(`API request failed: ${err}`);
-    }        
-}
+    if (response.url.includes("/notification") && response.redirected) {
+      if (typeof window !== "undefined") {
+        window.location.href = response.url;
+        return;
+      }
+    }
 
-// Öğrenci (kayıt) işlemleri için kullanılan servis
-const getAPI = async (URL, headers = {'Content-Type': 'application/json'}) => {
-
-    const data = await fetch (`${process.env.NEXT_PUBLIC_API_URL + URL}`,{
-        method: "GET",
-        headers:headers,
-        cache: 'no-store'
-
-    }).then(res =>{
-        if(res.redirected){
-            
-            // bazı yerlerde window'u bulamıyor kontrol et
-            //return window.location.href = res.url;
-        }
-        else{
-            return res.json();
-        }
-        
-    }).catch(err => console.log(err))
-
+    const data = await response.json();
     return data;
-}
+  } catch (err) {
+    console.error(`API request failed: ${err}`);
+    throw err;
+  }
+};
 
-export {postAPI, getAPI}
+// GET isteği için yardımcı fonksiyon
+const getAPI = (URL, headers) => apiRequest(URL, "GET", null, headers);
 
+// POST isteği için yardımcı fonksiyon
+const postAPI = (URL, body, headers) => apiRequest(URL, "POST", body, headers);
 
+// PUT isteği için yardımcı fonksiyon
+const putAPI = (URL, body, headers) => apiRequest(URL, "PUT", body, headers);
 
+// PATCH isteği için yardımcı fonksiyon
+const patchAPI = (URL, body, headers) =>
+  apiRequest(URL, "PATCH", body, headers);
+
+// DELETE isteği için yardımcı fonksiyon
+const deleteAPI = (URL, headers) => apiRequest(URL, "DELETE", null, headers);
+
+export { getAPI, postAPI, putAPI, patchAPI, deleteAPI };
