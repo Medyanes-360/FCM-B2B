@@ -12,6 +12,7 @@ import { RiShoppingCartLine } from "react-icons/ri";
 import OrderConfirmation from "@/components/OrderConfirmation/index.";
 import Link from "next/link";
 import { TbShoppingCartX } from "react-icons/tb";
+import OrderSummary from "./OrderSummary";
 
 const ShoppingCart = () => {
   const [storedCart, setStoredCart] = useState([]);
@@ -161,7 +162,7 @@ const ShoppingCart = () => {
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 ">
             <div className="px-5 sm:px-0">
-              <table className="w-full lg:w-[1188px] px-5 py-3 text-[12px] md:text-[14px] lg:text-[16px] mx-auto sm:mx-0 shadow-lg rounded-md">
+              <table className="w-full md:w-[960px] lg:w-[1188px] px-5 py-3 text-[12px] md:text-[14px] lg:text-[16px] mx-auto sm:mx-0 shadow-lg rounded-md">
                 <thead className="px-5 py-3 bg-DarkBlue text-white tracking-wide">
                   <tr>
                     <th className="px-5 py-3 hidden sm:table-cell">
@@ -304,67 +305,12 @@ const ShoppingCart = () => {
               </table>
             </div>
           </div>
-          <div className="w-full lg:w-1/2 mt-24 ">
-            <div className="flex flex-col items-center ">
-              <div className="flex flex-col items-center justify-center bg-slate-100 w-[350px] sm:w-[450px] rounded-2xl shadow-lg p-10">
-                <div className="flex items-center justify-end">
-                  {" "}
-                  <h1 className="text-[20px] md:text-[32px] font-bold text-CustomGray flex items-center justify-center ">
-                    Sipariş Özeti
-                  </h1>
-                </div>
-                <div className="flex justify-center sm:justify-end mb-12 text-[16px]">
-                  <div className="flex flex-col gap-3">
-                    <div className="flex flex-row gap-12 border-b border-slate-200 py-4">
-                      <p className="w-[100px] flex justify-start font-bold text-CustomGray">
-                        <span className="">Ara Toplam</span>
-                      </p>
-                      <p className="w-[100px] flex justify-end font-bold text-CustomGray">
-                        <span className="">₺{totalPrice}</span>
-                      </p>
-                    </div>
-                    <div className="flex flex-row gap-12">
-                      <p className="w-[100px] flex justify-start font-medium text-slate-400">
-                        <span className="">İndirim</span>
-                      </p>
-                      <p className="w-[100px] flex justify-end font-medium text-slate-400">
-                        <span className="">₺0</span>
-                      </p>
-                    </div>
-                    <div className="flex flex-row gap-12 ">
-                      <p className="w-[100px] flex justify-start font-medium text-slate-400">
-                        <span className="">KDV</span>
-                      </p>
-                      <p className="w-[100px] flex justify-end font-medium text-slate-400">
-                        <span className="">₺0,00 </span>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex flex-row gap-12 text-[24px] mb-12">
-                  <p className="w-[150px] flex justify-start font-extrabold text-CustomGray">
-                    <span className="">Toplam</span>
-                  </p>
-                  <p className="w-[100px] flex justify-end font-extrabold text-CustomGray">
-                    <span className="">₺{totalPrice}</span>
-                  </p>
-                </div>
-                <div className="flex flex-row items-center gap-5 mt-12 mb-8">
-                  <div className="group">
-                    <button
-                      type="button"
-                      onClick={handleConfirmOrder}
-                      className="flex flex-row items-center justify-center gap-2 ml-3 text-white font-bold hover:scale-105 transition-all transform ease-out duration-500 cursor-pointer bg-gradient-to-r from-LightBlue to-sky-700 pl-3 pr-11 py-2 rounded-full relative w-[250px] h-[58px] text-[18px]"
-                    >
-                      Sipariş Ver
-                      <span className="absolute -top-1 -right-2 text-white bg-gradient-to-r from-sky-700 to-LightBlue p-4  rounded-full group-hover:scale-110 transition-all duration-500 transform ease-in-out">
-                        <RiShoppingCartLine className="w-6 h-6" />
-                      </span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div className="w-screen lg:w-[1188px] mt-16">
+            <OrderSummary
+              storedCart={storedCart}
+              totalPrice={totalPrice}
+              handleConfirmOrder={handleConfirmOrder}
+            />
           </div>
         </>
       )}
