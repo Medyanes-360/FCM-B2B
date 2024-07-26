@@ -23,6 +23,7 @@ const ShoppingCart = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [imageMap, setImageMap] = useState({});
   const [editingIndex, setEditingIndex] = useState(null);
+  const [confirmClearCart, setConfirmClearCart] = useState(false);
 
   const handleConfirmOrder = () => {
     setConfirmOrder(true);
@@ -80,6 +81,30 @@ const ShoppingCart = () => {
         progress: undefined,
       });
     }
+  };
+
+  const handleClearCart = () => {
+    setConfirmClearCart(true);
+  };
+
+  const confirmClearCartAction = () => {
+    setStoredCart([]);
+    localStorage.setItem("cart", JSON.stringify([]));
+    updateTotalPrice([]);
+    setConfirmClearCart(false);
+    toast.success("Sepet başarıyla temizlendi.", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  };
+
+  const cancelClearCart = () => {
+    setConfirmClearCart(false);
   };
 
   const handleQuantityEdit = (index) => {
@@ -305,6 +330,14 @@ const ShoppingCart = () => {
               </table>
             </div>
           </div>
+          <div className="w-screen lg:w-[1188px] mt-8 flex justify-center lg:justify-end px-8">
+            <button
+              onClick={handleClearCart}
+              className="bg-BasketRed text-white px-2 py-1 md:px-4 md:py-2 rounded-md font-bold text-[14px] hover:bg-red-600 transition-all duration-300"
+            >
+              Sepeti Temizle
+            </button>
+          </div>
           <div className="w-screen lg:w-[1188px] mt-16">
             <OrderSummary
               storedCart={storedCart}
@@ -337,6 +370,30 @@ const ShoppingCart = () => {
           </div>
         </div>
       )}
+      {confirmClearCart && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h2 className="text-lg font-bold mb-4">
+              Sepeti tamamen temizlemek istediğinize emin misiniz?
+            </h2>
+            <div className="flex justify-end">
+              <button
+                onClick={cancelClearCart}
+                className="mr-4 px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400"
+              >
+                İptal
+              </button>
+              <button
+                onClick={confirmClearCartAction}
+                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+              >
+                Temizle
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {confirmOrder && (
         <OrderConfirmation
           onClose={handleCloseOrderConfirmation}
