@@ -59,6 +59,7 @@ model FATFIS {
 }
 
 
+
 model FATHAR {
   FATHARCARKOD     String @id
   FATHARREFNO      Int?
@@ -71,10 +72,194 @@ model FATHAR {
   FATHARTUTAR      Int?
 }
 
-//Yeni modeller Kontrol edilecek.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//SIPARIS MODELLERI
 model STKFIS{
   STKFISTAR          DateTime?
-  STKFISREFNO        Int @id @default(autoincrement()) 
+  STKFISREFNO        Int @id @default(autoincrement())
   STKFISTIPI         Int?
   STKFISGCFLAG       Int?
   STKFISKAYONC       Int?
@@ -116,7 +301,7 @@ model STKFIS{
   STKFISTRNREFNO     Int?
   STKFISTRNTIPI      Int?
   STKFISDISTIP       Int?
-  STKFISDISKOD       Int?
+  STKFISDISKOD       String?
   STKFISMUHREFNO     Int?
 }
 

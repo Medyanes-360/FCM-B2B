@@ -8,13 +8,12 @@ import { MdDeleteForever } from "react-icons/md";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { RiShoppingCartLine } from "react-icons/ri";
 import OrderConfirmation from "@/components/OrderConfirmation/index.";
 import Link from "next/link";
 import Lottie from "lottie-react";
 import BoxAnimation from "../../public/boxanimation.json";
-import { TbShoppingCartX } from "react-icons/tb";
 import OrderSummary from "./OrderSummary";
+import { getAPI } from "@/services/fetchAPI";
 
 const ShoppingCart = () => {
   const [storedCart, setStoredCart] = useState([]);
@@ -27,6 +26,22 @@ const ShoppingCart = () => {
   const [editingIndex, setEditingIndex] = useState(null);
   const [confirmClearCart, setConfirmClearCart] = useState(false);
 
+  // useEffect(() => {
+  //   const fetchIRSHARData = async () => {
+  //     try {
+  //       const response = await getAPI("/cart-api");
+  //       console.log("IRSHAR Data:", response.data.IRSHAR);
+  //       // console.log("IRSFIS Data:", response.data.IRSFIS);
+  //       // console.log("STKFIS Data:", response.data.STKFIS);
+  //       // console.log("STKHAR Data:", response.data.STKHAR);
+  //       // console.log("SIRKETLOG Data:", response.data.SIRKETLOG);
+  //     } catch (error) {
+  //       console.error("IRSHAR veri çekme hatası:", error);
+  //     }
+  //   };
+
+  //   fetchIRSHARData();
+  // }, []);
   const handleConfirmOrder = () => {
     setConfirmOrder(true);
   };
@@ -377,11 +392,11 @@ const ShoppingCart = () => {
       )}
       {confirmClearCart && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
+          <div className="bg-white text-sm md:text-base p-6 rounded-lg shadow-lg">
             <h2 className="text-lg font-bold mb-4">
               Sepeti tamamen temizlemek istediğinize emin misiniz?
             </h2>
-            <div className="flex justify-end">
+            <div className="flex justify-center md:justify-end">
               <button
                 onClick={cancelClearCart}
                 className="mr-4 px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400"
