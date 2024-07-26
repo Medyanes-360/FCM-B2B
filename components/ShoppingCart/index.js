@@ -11,6 +11,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { RiShoppingCartLine } from "react-icons/ri";
 import OrderConfirmation from "@/components/OrderConfirmation/index.";
 import Link from "next/link";
+import Lottie from "lottie-react";
+import BoxAnimation from "../../public/boxanimation.json";
 import { TbShoppingCartX } from "react-icons/tb";
 import OrderSummary from "./OrderSummary";
 
@@ -170,13 +172,16 @@ const ShoppingCart = () => {
         Sepet
       </div>
       {storedCart.length === 0 ? (
-        <div className="flex items-center  justify-center flex-col">
-          <span className="flex items-center justify-center my-[20px]">
-            <TbShoppingCartX className="w-[140px] h-[140px] text-CustomGray" />
-          </span>
-          <span className="text-[20px] text-CustomGray font-bold my-[20px]">
-            Sepetiniz şu anda boş.
-          </span>
+        <div className="flex items-center justify-center flex-col">
+          <div className="flex items-center justify-center flex-col">
+            <span className="text-[20px] text-CustomGray font-bold my-[20px]">
+              Sepetiniz şu anda boş.
+            </span>
+            <span>
+              <Lottie className="w-[300px]" animationData={BoxAnimation} />
+            </span>
+          </div>
+
           <Link href={"/"}>
             <button className="bg-LightBlue text-white px-[24px] py-[10px] rounded-md font-bold text-[14px] mt-[50px] mb-[15px] hover:scale-105 transition-all duration-500 transform ease-in-out hover:bg-LightBlue/50">
               Mağazaya geri dön
