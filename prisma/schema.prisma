@@ -359,7 +359,7 @@ model STKMIZDEGER {
 model EVRAKNO {
   EVRNOMODUL     Int
   EVRSIRANO      Int
-  EVRACIKLAMA    String
+  EVRACIKLAMA    String @unique
   EVRONTAKI      String
   EVRNO          Int
   EVRHANEBOY     Int

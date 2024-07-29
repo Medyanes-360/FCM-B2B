@@ -21,7 +21,7 @@ const Header = () => {
 
   const { data: session } = useSession();
   const user = session?.user;
-  console.log(user);
+  // console.log(user);
   const [currentPath, setCurrentPath] = useState("");
 
   useEffect(() => {

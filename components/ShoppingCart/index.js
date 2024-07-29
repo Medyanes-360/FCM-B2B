@@ -15,7 +15,6 @@ import BoxAnimation from "../../public/boxanimation.json";
 import OrderSummary from "./OrderSummary";
 import { getAPI, postAPI } from "@/services/fetchAPI";
 import { useSession } from "next-auth/react";
-import prepareOrderData from "./prepareOrderData";
 
 const ShoppingCart = () => {
   const [storedCart, setStoredCart] = useState([]);
@@ -30,39 +29,43 @@ const ShoppingCart = () => {
   const [editingIndex, setEditingIndex] = useState(null);
   const [confirmClearCart, setConfirmClearCart] = useState(false);
 
-  useEffect(() => {
-    const fetchIRSHARData = async () => {
-      try {
-        const response = await getAPI("/cart-api/");
-        console.log("ALLORDERS Data:", response.data.ALLORDERS);
-        console.log("IRSFIS Data:", response.data.IRSFIS);
-        // console.log("STKFIS Data:", response.data.STKFIS);
-        // console.log("SIRKETLOG Data:", response.data.SIRKETLOG);
-      } catch (error) {
-        console.error("IRSHAR veri çekme hatası:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchIRSHARData = async () => {
+  //     try {
+  //       const response = await getAPI("/cart-api/");
+  //       console.log("ALLORDERS Data:", response.data.ALLORDERS);
+  //       console.log("IRSFIS Data:", response.data.IRSFIS);
+  //       // console.log("STKFIS Data:", response.data.STKFIS);
+  //       // console.log("SIRKETLOG Data:", response.data.SIRKETLOG);
+  //     } catch (error) {
+  //       console.error("IRSHAR veri çekme hatası:", error);
+  //     }
+  //   };
 
-    fetchIRSHARData();
-  }, []);
+  //   fetchIRSHARData();
+  // }, []);
   const handleConfirmOrder = async () => {
     if (session?.user?.id) {
       try {
         setIsOrderLoading(true);
-        const orderItems = await prepareOrderData(
-          storedCart,
-          totalPrice,
-          session.user.id,
-          session.user.name
-        );
+        const orderData = {
+          cartItems: storedCart,
+          totalPrice: totalPrice,
+          userId: session.user.id,
+          userName: session.user.name,
+        };
 
-        console.log("Hazırlanan sipariş verileri:", orderItems);
+        const response = await fetch("/api/orders", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(orderData),
+        });
 
-        // Tüm sipariş öğelerini tek bir API çağrısıyla gönder
-        const response = await postAPI("/orders", orderItems);
-        console.log("API yanıtı:", response);
+        const result = await response.json();
 
-        if (response.success) {
+        if (result.success) {
           toast.success("Sipariş başarıyla oluşturuldu!");
           setConfirmOrder(true);
           setStoredCart([]);
@@ -70,8 +73,9 @@ const ShoppingCart = () => {
           updateTotalPrice([]);
 
           // Tüm siparişleri getir ve kontrol et
-          const allOrdersResponse = await getAPI("/orders");
-          console.log("Tüm siparişler:", allOrdersResponse);
+          const allOrdersResponse = await fetch("/api/orders");
+          const allOrdersData = await allOrdersResponse.json();
+          console.log("Tüm siparişler:", allOrdersData);
         } else {
           toast.error("Sipariş oluşturulamadı. Lütfen tekrar deneyin.");
         }
@@ -87,7 +91,6 @@ const ShoppingCart = () => {
       toast.error("Kullanıcı oturumu bulunamadı. Lütfen giriş yapın.");
     }
   };
-
   const handleCloseOrderConfirmation = () => {
     setConfirmOrder(false);
   };

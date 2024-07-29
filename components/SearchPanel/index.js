@@ -49,7 +49,7 @@ function SearchPanel({ toggleSearchPanel }) {
       .replace(/ş/g, "s")
       .replace(/ö/g, "o")
       .replace(/ç/g, "c")
-      .replace(/\s+/g, "");// boşlukları kaldırma
+      .replace(/\s+/g, ""); // boşlukları kaldırma
   };
 
   // Arama işlemi

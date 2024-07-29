@@ -78,8 +78,12 @@ const OrderListTable = ({ orders, setSelectedOrders, selectedOrders }) => {
               <th className="px-6 py-3 text-left text-base font-medium">
                 Bayi Adı
               </th>
-              <th className="px-6 py-3 text-left text-base font-medium">Tarih</th>
-              <th className="px-6 py-3 text-left text-base font-medium">Durum</th>
+              <th className="px-6 py-3 text-left text-base font-medium">
+                Tarih
+              </th>
+              <th className="px-6 py-3 text-left text-base font-medium">
+                Durum
+              </th>
               <th className="px-6 py-3 text-left text-base font-medium">
                 Toplam
               </th>
@@ -129,10 +133,16 @@ const OrderListTable = ({ orders, setSelectedOrders, selectedOrders }) => {
                 <td className="px-6 py-4 whitespace-nowrap">{order.total}₺</td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex space-x-3">
-                    <button onClick={() => handleEditOpenModal(order)} className="bg-[#f8dda5] p-2 flex items-center space-x-3 rounded-lg hover:bg-[#efc777]">
+                    <button
+                      onClick={() => handleEditOpenModal(order)}
+                      className="bg-[#f8dda5] p-2 flex items-center space-x-3 rounded-lg hover:bg-[#efc777]"
+                    >
                       <span>Düzenle</span> <FaPencilAlt />
                     </button>
-                    <button onClick={() => handleDeleteOpenModal(order)} className="bg-red-400 p-2 text-white rounded-lg hover:bg-red-500">
+                    <button
+                      onClick={() => handleDeleteOpenModal(order)}
+                      className="bg-red-400 p-2 text-white rounded-lg hover:bg-red-500"
+                    >
                       <FaTrashAlt />
                     </button>
                   </div>
