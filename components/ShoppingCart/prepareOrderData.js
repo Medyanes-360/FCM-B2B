@@ -1,4 +1,6 @@
-import { getAPI } from "@/services/fetchAPI";
+import { getAPI, putAPI } from "@/services/fetchAPI";
+import { updateDataByAny } from "@/services/serviceOperations";
+
 const now = new Date();
 
 const generateOrderNo = (userId) => {
@@ -15,63 +17,104 @@ const generateOrderNo = (userId) => {
   return `${day}-${month}-${year}-${hour}-${minute}-${userId}-${randomLetters}-${randomNumber}`;
 };
 
+const getAndUpdateReferences = async () => {
+  try {
+    // Önce mevcut değerleri alalım
+    const cartApiResponse = await getAPI("/cart-api");
+    const harrefnoData = cartApiResponse?.data?.HARREFNO || [];
+    const evraknoData = cartApiResponse?.data?.EVRAKNO || [];
+
+    // HARREFNO işlemleri
+    const harrefModule6 = harrefnoData.find((item) => item.HARREFMODUL === 6);
+    let newHarRefDeger = harrefModule6 ? harrefModule6.HARREFDEGER + 1 : 1;
+
+    // EVRAKNO işlemleri
+    const cikisFisEvrako = evraknoData.find(
+      (item) => item.EVRACIKLAMA === "Çıkış Fişleri"
+    );
+    let newCikisFisEvrNo = cikisFisEvrako ? cikisFisEvrako.EVRNO + 1 : 1;
+
+    // Şimdi güncellemeleri yapalım
+    const updatePromises = [
+      updateDataByAny(
+        "HARREFNO",
+        { HARREFMODUL: 6 },
+        { HARREFDEGER: newHarRefDeger }
+      ),
+      updateDataByAny(
+        "EVRAKNO",
+        { EVRACIKLAMA: "Çıkış Fişleri" },
+        { EVRNO: newCikisFisEvrNo }
+      ),
+    ];
+
+    await Promise.all(updatePromises);
+    console.log("All Order Data Updated:", updatePromises);
+
+    return {
+      harRefDeger: newHarRefDeger,
+      cikisFisEvrNo: newCikisFisEvrNo,
+    };
+  } catch (error) {
+    console.error("Referans değerlerini güncellerken hata oluştu:", error);
+    throw error;
+  }
+};
+
 const prepareOrderData = async (cartItems, totalPrice, userId, userName) => {
-  const orderNo = generateOrderNo(userId);
+  try {
+    const orderNo = generateOrderNo(userId);
 
-  // Cart API'den tüm gerekli verileri çekelim
-  const cartApiResponse = await getAPI("/cart-api");
+    // Referans değerlerini güncelleyelim ve alalım
+    const { harRefDeger, cikisFisEvrNo } = await getAndUpdateReferences();
 
-  console.log("Cart API Response:", cartApiResponse);
+    // Cart API'den diğer gerekli verileri çekelim
+    const cartApiResponse = await getAPI("/cart-api");
+    const stkfisData = cartApiResponse?.data?.STKFIS?.[0] || {};
+    const stkFisRefNo = (stkfisData?.STKFISREFNO || 0) + 1;
 
-  // API'den gelen verileri güvenli bir şekilde alın
-  const evraknoData = cartApiResponse?.data?.EVRAKNO?.[0] || {};
-  const harrefnoData = cartApiResponse?.data?.HARREFNO?.[0] || {};
-  const stkfisData = cartApiResponse?.data?.STKFIS?.[0] || {};
+    const baseOrderData = {
+      ORDERNO: orderNo,
+      CARKOD: userId,
+      CARUNVAN: userName,
+      ORDERFIYATTOPLAM: totalPrice,
+      CIKISFISEVRNO: cikisFisEvrNo,
+      SATISIRSEVRNO: cikisFisEvrNo,
+      HARREFDEGER1: harRefDeger,
+      STKFISREFNO: stkFisRefNo,
+      ORDERYIL: now.getFullYear(),
+      ORDERAY: now.getMonth() + 1,
+      ORDERGUN: now.getDate(),
+      ORDERSAAT: now.toTimeString().split(" ")[0],
+      STKFISEVRAKNO1: null,
+      STKFISEVRAKNO2: null,
+      ACIKLAMA: null,
+      EKXTRA1: null,
+      EKXTRA2: null,
+      EKXTRA3: null,
+      EKXTRA4: null,
+      EKXTRA5: null,
+      EKXTRA6: null,
+      EKXTRA7: null,
+      EKXTRA8: null,
+      EKXTRA9: null,
+    };
 
-  // Gerekli değerleri hesaplayın, varsayılan değerler kullanarak
-  const cikisFisEvrNo = (evraknoData?.CIKISFISEVRNO || 0) + 1;
-  const satisIrsEvrNo = (evraknoData?.SATISIRSEVRNO || 0) + 1;
-  const harRefDeger1 = (harrefnoData?.HARREFDEGER || 0) + 1;
-  const stkFisRefNo = (stkfisData?.STKFISREFNO || 0) + 1;
+    const orderItems = cartItems.map((item) => ({
+      ...baseOrderData,
+      STKKOD: item.STKKOD,
+      STKNAME: item.STKCINSI || null,
+      STKCINSI: item.STKCINSI || null,
+      STKADET: item.quantity,
+      STKBIRIMFIYAT: parseFloat(item.STKOZKOD5) || 0,
+      STKBIRIMFIYATTOPLAM: (parseFloat(item.STKOZKOD5) || 0) * item.quantity,
+    }));
 
-  const baseOrderData = {
-    ORDERNO: orderNo,
-    CARKOD: userId,
-    CARUNVAN: userName,
-    ORDERFIYATTOPLAM: totalPrice,
-    CIKISFISEVRNO: cikisFisEvrNo,
-    SATISIRSEVRNO: satisIrsEvrNo,
-    HARREFDEGER1: harRefDeger1,
-    STKFISREFNO: stkFisRefNo,
-    ORDERYIL: now.getFullYear(),
-    ORDERAY: now.getMonth() + 1,
-    ORDERGUN: now.getDate(),
-    ORDERSAAT: now.toTimeString().split(" ")[0],
-    STKFISEVRAKNO1: null,
-    STKFISEVRAKNO2: null,
-    ACIKLAMA: null,
-    EKXTRA1: null,
-    EKXTRA2: null,
-    EKXTRA3: null,
-    EKXTRA4: null,
-    EKXTRA5: null,
-    EKXTRA6: null,
-    EKXTRA7: null,
-    EKXTRA8: null,
-    EKXTRA9: null,
-  };
-
-  const orderItems = cartItems.map((item) => ({
-    ...baseOrderData,
-    STKKOD: item.STKKOD,
-    STKNAME: item.STKCINSI || null,
-    STKCINSI: item.STKCINSI || null,
-    STKADET: item.quantity,
-    STKBIRIMFIYAT: parseFloat(item.STKOZKOD5) || 0,
-    STKBIRIMFIYATTOPLAM: (parseFloat(item.STKOZKOD5) || 0) * item.quantity,
-  }));
-
-  return orderItems;
+    return orderItems;
+  } catch (error) {
+    console.error("Sipariş verilerini hazırlarken hata oluştu:", error);
+    throw error;
+  }
 };
 
 export default prepareOrderData;
