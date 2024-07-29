@@ -259,7 +259,7 @@ model FATHAR {
 //SIPARIS MODELLERI
 model STKFIS{
   STKFISTAR          DateTime?
-  STKFISREFNO        Int @id @default(autoincrement())
+  STKFISREFNO        Int
   STKFISTIPI         Int?
   STKFISGCFLAG       Int?
   STKFISKAYONC       Int?
@@ -267,7 +267,7 @@ model STKFIS{
   STKFISOZELFIS      Int?
   STKFISIADE         Int?
   STKFISKAYNAK       Int?
-  STKFISCARKOD       String?
+  STKFISCARKOD       String
   STKFISREFNO2       Int?
   STKFISANADEPO      String?
   STKFISKARDEPO      String?
@@ -277,7 +277,7 @@ model STKFIS{
   STKFISACIKLAMA1    String?
   STKFISACIKLAMA2    String?
   STKFISACIKLAMA3    String?
-  STKFISEVRAKNO1     String?
+  STKFISEVRAKNO1     String
   STKFISEVRAKNO2     String?
   STKFISEVRAKNO3     String?
   STKFISDOVTAR       DateTime?
@@ -303,11 +303,79 @@ model STKFIS{
   STKFISDISTIP       Int?
   STKFISDISKOD       String?
   STKFISMUHREFNO     Int?
+
+  @@id([STKFISCARKOD, STKFISEVRAKNO1])
+}
+
+model ALLORDERS {
+  DATE                     DateTime?
+  ORDERNO                  String @id
+  CARKOD                   String
+  CARUNVAN                 String
+  ID                       Int?
+  STKKOD                   String
+  STKNAME                  String?
+  STKCINSI                 String?
+  STKADET                  Int
+  STKBIRIMFIYAT            Float
+  STKBIRIMFIYATTOPLAM      Float
+  ORDERFIYATTOPLAM         Float
+  ACIKLAMA                 String?
+  CIKISFISEVRNO            Int
+  SATISIRSEVRNO            Int
+  HARREFDEGER1             Int
+  STKFISREFNO              Int
+  ORDERYIL                 Int
+  ORDERAY                  Int
+  ORDERGUN                 Int
+  ORDERSAAT                String
+  STKFISEVRAKNO1           String?
+  STKFISEVRAKNO2           String?
+  EKXTRA1                  String?
+  EKXTRA2                  String?
+  EKXTRA3                  String?
+  EKXTRA4                  Int? 
+  EKXTRA5                  Int?
+  EKXTRA6                  Int?
+  EKXTRA7                  Float?
+  EKXTRA8                  Float?
+  EKXTRA9                  Float?
+}
+
+
+model STKMIZDEGER {
+  STKKOD      String
+  STKYIL      Int?
+  STKAY       Int?
+  STKRAKTIP   Int
+  STKDOVKOD   String?
+  STKBORC     Float
+  STKALACAK   Float
+  STKDEPO     String?
+
+  @@id([STKKOD, STKRAKTIP])
+}
+
+model EVRAKNO {
+  EVRNOMODUL     Int
+  EVRSIRANO      Int
+  EVRACIKLAMA    String
+  EVRONTAKI      String
+  EVRNO          Int
+  EVRHANEBOY     Int
+
+@@id([EVRNOMODUL, EVRACIKLAMA, EVRONTAKI])
+}
+
+model HARREFNO {
+  HARREFMODUL  Int @id
+  HARREFKONU   Int
+  HARREFDEGER  Int
 }
 
 
 model IRSFIS {
-  IRSFISREFNO           Int      @id @default(autoincrement())
+  IRSFISREFNO           Int      @id
   IRSFISTAR             DateTime 
   IRSFISTIPI            Int      
   IRSFISGCFLAG          Int      
@@ -409,7 +477,7 @@ model IRSFIS {
 
 model STKHAR {
   STKHARTAR           DateTime
-  STKHARREFNO         Int     @id
+  STKHARREFNO         Int     
   STKHARTIPI          Int
   STKHARGCFLAG        Int
   STKHARKAYONC        Int
@@ -507,6 +575,7 @@ model STKHAR {
   STKHARDOVKUR        Float
   STKHARDISTIP        Int
   STKHARDISKOD        String?
+  @@id([STKHARCARKOD, STKHARSTKKOD])
 }
 
 
@@ -516,7 +585,7 @@ model SIRKETLOG {
   SIRLOGKYTTIPI   Int
   SIRLOGKYTKODU   String?
   SIRLOGKYTKODU2  String?
-  SIRLOGKYTREFNO  Int  @id
+  SIRLOGKYTREFNO  Int
   SIRLOGKYTREFNO2 Int
   SIRLOGILKKULKOD String
   SIRLOGILKTAR    DateTime
@@ -542,6 +611,8 @@ model SIRKETLOG {
   SIRLOGMUHACK3   String?
   SIRLOGMUHACK4   String?
   SIRLOGMUHACK5   String?
+
+  @@id([SIRLOGMODUL, SIRLOGKONU, SIRLOGKYTTIPI, SIRLOGKYTREFNO])
 }
 
 

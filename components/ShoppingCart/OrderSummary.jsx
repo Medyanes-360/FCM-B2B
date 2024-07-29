@@ -1,7 +1,12 @@
 import React from "react";
 import { RiShoppingCartLine } from "react-icons/ri";
 
-const OrderSummary = ({ storedCart, totalPrice, handleConfirmOrder }) => {
+const OrderSummary = ({
+  storedCart,
+  totalPrice,
+  handleConfirmOrder,
+  isLoading,
+}) => {
   return (
     <div className="flex flex-col items-center justify-center w-[400px] md:w-[600px] lg:w-[960px] mx-auto bg-slate-100 rounded-2xl shadow-lg p-10">
       <div className="flex items-center justify-end">
@@ -60,10 +65,14 @@ const OrderSummary = ({ storedCart, totalPrice, handleConfirmOrder }) => {
         <div className="group">
           <button
             type="button"
+            disabled={isLoading}
             onClick={handleConfirmOrder}
-            className="flex flex-row items-center justify-center gap-2 ml-3 text-white font-bold hover:scale-105 transition-all transform ease-out duration-500 cursor-pointer bg-gradient-to-r from-LightBlue to-sky-700 pl-3 pr-11 py-2 rounded-full relative w-[250px] h-[58px] text-[18px]"
+            className={`flex flex-row items-center justify-center gap-2 ml-3 text-white font-bold hover:scale-105 transition-all transform ease-out duration-500 cursor-pointer bg-gradient-to-r from-LightBlue
+             to-sky-700 pl-3 pr-11 py-2 rounded-full relative w-[250px] h-[58px] text-[18px] ${
+               isLoading ? "cursor-not-allowed animate-bounce" : ""
+             }`}
           >
-            Sipariş Ver
+            {isLoading ? "Siparişiniz alınıyor..." : "Sipariş Oluştur"}
             <span className="absolute -right-2 text-white bg-gradient-to-r from-sky-700 to-LightBlue p-4  rounded-full group-hover:scale-110 transition-all duration-500 transform ease-in-out">
               <RiShoppingCartLine className="w-6 h-6" />
             </span>

@@ -4,29 +4,37 @@ import {
   updateDataByAny,
 } from "@/services/serviceOperations";
 
-const tables = ["IRSHAR", "SIRKETLOG", "STKHAR", "IRSFIS", "STKFIS"];
+const tables = [
+  "IRSHAR",
+  "SIRKETLOG",
+  "IRSFIS",
+  "STKFIS",
+  "HARREFNO",
+  "EVRAKNO",
+  "ALLORDERS",
+];
 
 const handler = async (req, res) => {
-  //GET ISLEMI API
   if (req.method === "GET") {
     try {
-      const results = {};
+      // Fetch data from all tables concurrently
+      const promises = tables.map((table) => getAllData(table));
+      const results = await Promise.all(promises);
 
-      for (const table of tables) {
-        const data = await getAllData(table);
-        results[table] = data;
-      }
+      const data = tables.reduce((acc, table, index) => {
+        acc[table] = results[index];
+        return acc;
+      }, {});
 
-      console.log("GET results: ", results);
+      console.log("GET results: ", data);
 
-      return res.status(200).json({ message: "Method GET", data: results });
+      return res.status(200).json({ message: "Method GET", data });
     } catch (error) {
       console.error("Error fetching data:", error);
       return res
         .status(500)
         .json({ message: "Internal Server Error", error: error.message });
     }
-    //POST ISLEMI API
   } else if (req.method === "POST") {
     try {
       const { table, data } = req.body;
@@ -54,17 +62,14 @@ const handler = async (req, res) => {
         .status(500)
         .json({ message: "Internal Server Error", error: error.message });
     }
-    //PUT ISLEMI API
   } else if (req.method === "PUT") {
     try {
       const { table, where, data } = req.body;
 
       if (!table || !where || !data) {
-        return res
-          .status(400)
-          .json({
-            message: "Table name, where condition, and data are required",
-          });
+        return res.status(400).json({
+          message: "Table name, where condition, and data are required",
+        });
       }
 
       if (!tables.includes(table)) {

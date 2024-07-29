@@ -13,37 +13,79 @@ import Link from "next/link";
 import Lottie from "lottie-react";
 import BoxAnimation from "../../public/boxanimation.json";
 import OrderSummary from "./OrderSummary";
-import { getAPI } from "@/services/fetchAPI";
+import { getAPI, postAPI } from "@/services/fetchAPI";
+import { useSession } from "next-auth/react";
+import prepareOrderData from "./prepareOrderData";
 
 const ShoppingCart = () => {
   const [storedCart, setStoredCart] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
+  const { data: session } = useSession();
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState(null);
   const [confirmOrder, setConfirmOrder] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isOrderLoading, setIsOrderLoading] = useState(false);
   const [imageMap, setImageMap] = useState({});
   const [editingIndex, setEditingIndex] = useState(null);
   const [confirmClearCart, setConfirmClearCart] = useState(false);
 
-  // useEffect(() => {
-  //   const fetchIRSHARData = async () => {
-  //     try {
-  //       const response = await getAPI("/cart-api");
-  //       console.log("IRSHAR Data:", response.data.IRSHAR);
-  //       // console.log("IRSFIS Data:", response.data.IRSFIS);
-  //       // console.log("STKFIS Data:", response.data.STKFIS);
-  //       // console.log("STKHAR Data:", response.data.STKHAR);
-  //       // console.log("SIRKETLOG Data:", response.data.SIRKETLOG);
-  //     } catch (error) {
-  //       console.error("IRSHAR veri çekme hatası:", error);
-  //     }
-  //   };
+  useEffect(() => {
+    const fetchIRSHARData = async () => {
+      try {
+        const response = await getAPI("/cart-api/");
+        console.log("ALLORDERS Data:", response.data.ALLORDERS);
+        console.log("IRSFIS Data:", response.data.IRSFIS);
+        // console.log("STKFIS Data:", response.data.STKFIS);
+        // console.log("SIRKETLOG Data:", response.data.SIRKETLOG);
+      } catch (error) {
+        console.error("IRSHAR veri çekme hatası:", error);
+      }
+    };
 
-  //   fetchIRSHARData();
-  // }, []);
-  const handleConfirmOrder = () => {
-    setConfirmOrder(true);
+    fetchIRSHARData();
+  }, []);
+  const handleConfirmOrder = async () => {
+    if (session?.user?.id) {
+      try {
+        setIsOrderLoading(true);
+        const orderItems = await prepareOrderData(
+          storedCart,
+          totalPrice,
+          session.user.id,
+          session.user.name
+        );
+
+        console.log("Hazırlanan sipariş verileri:", orderItems);
+
+        // Tüm sipariş öğelerini tek bir API çağrısıyla gönder
+        const response = await postAPI("/orders", orderItems);
+        console.log("API yanıtı:", response);
+
+        if (response.success) {
+          toast.success("Sipariş başarıyla oluşturuldu!");
+          setConfirmOrder(true);
+          setStoredCart([]);
+          localStorage.setItem("cart", JSON.stringify([]));
+          updateTotalPrice([]);
+
+          // Tüm siparişleri getir ve kontrol et
+          const allOrdersResponse = await getAPI("/orders");
+          console.log("Tüm siparişler:", allOrdersResponse);
+        } else {
+          toast.error("Sipariş oluşturulamadı. Lütfen tekrar deneyin.");
+        }
+      } catch (error) {
+        console.error("Sipariş gönderme hatası:", error);
+        toast.error(
+          "Sipariş gönderilirken bir hata oluştu. Lütfen tekrar deneyin."
+        );
+      } finally {
+        setIsOrderLoading(false);
+      }
+    } else {
+      toast.error("Kullanıcı oturumu bulunamadı. Lütfen giriş yapın.");
+    }
   };
 
   const handleCloseOrderConfirmation = () => {
@@ -363,7 +405,9 @@ const ShoppingCart = () => {
               storedCart={storedCart}
               totalPrice={totalPrice}
               handleConfirmOrder={handleConfirmOrder}
+              isLoading={isOrderLoading}
             />
+            {/* <button onClick={handleConfirmOrder}>Siparişi Onayla</button> */}
           </div>
         </>
       )}
