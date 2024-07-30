@@ -32,7 +32,7 @@ const authOptions = {
           loginPageRoute = data.findUser.CARYETKILI;
         }
 
-        console.log("########## DATA: ", data);
+        // console.log("########## DATA: ", data);
 
         if (!data || data.error || data == null) {
           throw new Error(

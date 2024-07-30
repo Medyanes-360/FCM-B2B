@@ -35,7 +35,7 @@ const LoginComponent = ({ pageRole }) => {
       redirect: false,
     }).then((res) => {
       setIsLoading(false);
-      console.log("RES: ", res);
+      // console.log("RES: ", res);
       if (!res) {
         // toast.error('Bir hata oluştu. Lütfen tekrar deneyiniz.');
         console.log("Bir hata oluştu. Lütfen tekrar deneyiniz.");

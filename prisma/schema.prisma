@@ -16,7 +16,7 @@ model CARKART {
   CARKOD           String     @id
   CARBAKIYE        Float
   CARBORCTOP       Float
-  CARCIKIRSTOP     Float?
+  CARCIKIRSTOP     Float?    @unique
   CARALACAKTOP     Float
   CARYETKILI       String?
   CARUNVAN         String?
@@ -258,51 +258,51 @@ model FATHAR {
 
 //SIPARIS MODELLERI
 model STKFIS{
-  STKFISTAR          DateTime?
+  STKFISTAR          DateTime
   STKFISREFNO        Int
-  STKFISTIPI         Int?
-  STKFISGCFLAG       Int?
-  STKFISKAYONC       Int?
-  STKFISDEPO         Int?
-  STKFISOZELFIS      Int?
-  STKFISIADE         Int?
-  STKFISKAYNAK       Int?
+  STKFISTIPI         Int
+  STKFISGCFLAG       Int
+  STKFISKAYONC       Int
+  STKFISDEPO         Int
+  STKFISOZELFIS      Int
+  STKFISIADE         Int
+  STKFISKAYNAK       Int
   STKFISCARKOD       String
-  STKFISREFNO2       Int?
+  STKFISREFNO2       Int
   STKFISANADEPO      String?
   STKFISKARDEPO      String?
   STKFISOZKOD1       String?
   STKFISOZKOD2       String?
   STKFISOZKOD3       String?
-  STKFISACIKLAMA1    String?
+  STKFISACIKLAMA1    String
   STKFISACIKLAMA2    String?
   STKFISACIKLAMA3    String?
   STKFISEVRAKNO1     String
-  STKFISEVRAKNO2     String?
+  STKFISEVRAKNO2     String
   STKFISEVRAKNO3     String?
-  STKFISDOVTAR       DateTime?
+  STKFISDOVTAR       DateTime
   STKFISPARTIKOD     String?
   STKFISMASMER       String?
-  STKFISTOPBTUT      Float?
-  STKFISTOPISK       Int?
-  STKFISTOPNTUT      Float?
-  STKFISTOPKDV       Int?
-  STKFISTOPKTUT      Float?
-  STKFISSEVNO        Int?
-  STKFISISYKOD       String?
-  STKFISOTVFLAG      Int?
-  STKFISTOPOTV       Int?
-  STKFISTOPOTUT      Float?
+  STKFISTOPBTUT      Float
+  STKFISTOPISK       Int
+  STKFISTOPNTUT      Float
+  STKFISTOPKDV       Int
+  STKFISTOPKTUT      Float
+  STKFISSEVNO        Int
+  STKFISISYKOD       String
+  STKFISOTVFLAG      Int
+  STKFISTOPOTV       Int
+  STKFISTOPOTUT      Float
   STKFISDOVKOD       String?
   STKFISDOVTUR       String?
-  STKFISDOVKUR       Int?
-  STKFISDOVTOP       Int?
-  STKFISTRNTAR       DateTime?
-  STKFISTRNREFNO     Int?
-  STKFISTRNTIPI      Int?
-  STKFISDISTIP       Int?
-  STKFISDISKOD       String?
-  STKFISMUHREFNO     Int?
+  STKFISDOVKUR       Int
+  STKFISDOVTOP       Int
+  STKFISTRNTAR       DateTime
+  STKFISTRNREFNO     Int
+  STKFISTRNTIPI      Int
+  STKFISDISTIP       Int
+  STKFISDISKOD       String
+  STKFISMUHREFNO     Int
 
   @@id([STKFISCARKOD, STKFISEVRAKNO1])
 }

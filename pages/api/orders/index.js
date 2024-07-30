@@ -3,6 +3,7 @@ import {
   createNewData,
   getAllData,
   updateDataByAny,
+  getDataByUnique,
 } from "@/services/serviceOperations";
 
 const now = new Date();
@@ -95,10 +96,6 @@ const getAndUpdateReferences = async () => {
       { EVRNO: newSatisIrsaliyesiEvrNo }
     );
 
-    console.log("HARREFNO:", newHarRefDeger);
-    console.log("EVRAKNO (Çıkış Fişleri):", newCikisFisEvrNo);
-    console.log("EVRAKNO (Satış İrsaliyeleri):", newSatisIrsaliyesiEvrNo);
-
     return {
       harRefDeger: newHarRefDeger,
       cikisFisEvrNo: newCikisFisEvrNo,
@@ -107,6 +104,43 @@ const getAndUpdateReferences = async () => {
   } catch (error) {
     console.error("Referans değerlerini güncellerken hata oluştu:", error);
     throw error;
+  }
+};
+
+const updateSTKKART = async (STKKOD, quantity) => {
+  try {
+    const stkKart = await getDataByUnique("STKKART", { STKKOD: STKKOD });
+    console.log(`STKKART güncelleme başlıyor: ${STKKOD}`);
+    console.log("Mevcut STKKART verisi:", stkKart);
+
+    if (stkKart && typeof stkKart === "object" && !stkKart.error) {
+      const currentSTKBAKIYE = parseFloat(stkKart.STKBAKIYE) || 0;
+      const newSTKBAKIYE = Math.max(currentSTKBAKIYE - quantity, 0); // Negatif bakiye olmaması için
+
+      console.log(`STKKOD: ${STKKOD}`);
+      console.log(`Mevcut STKBAKIYE: ${currentSTKBAKIYE}`);
+      console.log(`Sipariş miktarı: ${quantity}`);
+      console.log(`Hesaplanan yeni STKBAKIYE: ${newSTKBAKIYE}`);
+
+      await updateDataByAny(
+        "STKKART",
+        { STKKOD: STKKOD },
+        { STKBAKIYE: newSTKBAKIYE }
+      );
+
+      const updatedStkKart = await getDataByUnique("STKKART", {
+        STKKOD: STKKOD,
+      });
+      console.log("Güncellenmiş STKKART verisi:", updatedStkKart);
+      console.log(
+        `STKKART güncellendi: ${STKKOD}, Yeni STKBAKIYE: ${updatedStkKart.STKBAKIYE}`
+      );
+    } else {
+      console.log(`STKKART verisi bulunamadı veya hatalı: ${STKKOD}`);
+      console.log("Hata detayı:", stkKart.error);
+    }
+  } catch (error) {
+    console.error(`STKKART güncellenirken hata oluştu (${STKKOD}):`, error);
   }
 };
 
@@ -157,10 +191,46 @@ export default async function handler(req, res) {
         console.log("Veri tabanına yazma sonucu:", result);
 
         createdOrders.push(entry);
+
+        console.log(
+          `STKKART güncelleme öncesi - STKKOD: ${item.STKKOD}, Miktar: ${item.STKADET}`
+        );
+        await updateSTKKART(item.STKKOD, item.STKADET);
+        console.log(`STKKART güncelleme sonrası - STKKOD: ${item.STKKOD}`);
+      }
+
+      // CARKART tablosundaki CARCIKIRSTOP değerini güncelle
+      const userCARKART = await getDataByUnique("CARKART", { CARKOD: userId });
+      console.log("Mevcut CARKART verisi:", userCARKART);
+
+      if (
+        userCARKART &&
+        typeof userCARKART === "object" &&
+        !userCARKART.error
+      ) {
+        const currentCARCIKIRSTOP = parseFloat(userCARKART.CARCIKIRSTOP) || 0;
+        const newCARCIKIRSTOP = currentCARCIKIRSTOP + totalPrice;
+
+        console.log("Mevcut CARCIKIRSTOP:", currentCARCIKIRSTOP);
+        console.log("Yeni sipariş tutarı:", totalPrice);
+        console.log("Güncellenecek CARCIKIRSTOP:", newCARCIKIRSTOP);
+
+        await updateDataByAny(
+          "CARKART",
+          { CARKOD: userId },
+          { CARCIKIRSTOP: newCARCIKIRSTOP }
+        );
+
+        console.log("CARKART güncelleme sonucu:", {
+          CARKOD: userId,
+          CARCIKIRSTOP: newCARCIKIRSTOP,
+        });
+      } else {
+        console.log("CARKART verisi bulunamadı veya hata oluştu:", userId);
+        console.log("Hata detayı:", userCARKART.error);
       }
 
       const allOrders = await getAllData("ALLORDERS");
-      console.log("Veri tabanındaki tüm siparişler:", allOrders);
 
       res.status(200).json({
         success: true,

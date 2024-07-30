@@ -26,7 +26,7 @@ const handler = async (req, res) => {
         return acc;
       }, {});
 
-      console.log("GET results: ", data);
+      // console.log("GET results: ", data);
 
       return res.status(200).json({ message: "Method GET", data });
     } catch (error) {
@@ -51,7 +51,7 @@ const handler = async (req, res) => {
 
       const result = await createNewData(table, data);
 
-      console.log("POST result: ", result);
+      // console.log("POST result: ", result);
 
       return res
         .status(201)
@@ -78,7 +78,7 @@ const handler = async (req, res) => {
 
       const result = await updateDataByAny(table, where, data);
 
-      console.log("PUT result: ", result);
+      // console.log("PUT result: ", result);
 
       return res
         .status(200)

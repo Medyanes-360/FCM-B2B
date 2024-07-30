@@ -12,7 +12,7 @@ const roles = {
 export default async function middleware(req) {
   // Tüm istekleri burada yakalarız.
   const { pathname } = new URL(req.url) || new URL(req.nextUrl);
-  console.log(`PATH : "${pathname}" ######`);
+  // console.log(`PATH : "${pathname}" ######`);
 
   //########################################################################################################
   // Sistemin kendi API isteklerini görmezden gelir.########################################################
