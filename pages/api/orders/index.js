@@ -27,7 +27,8 @@ const prepareOrderData = (
   userId,
   userName,
   harRefDeger,
-  cikisFisEvrNo
+  cikisFisEvrNo,
+  satisIrsaliyesiEvrNo
 ) => {
   const orderNo = generateOrderNo(userId);
 
@@ -51,7 +52,7 @@ const prepareOrderData = (
     STKBIRIMFIYAT: parseFloat(item.STKOZKOD5) || 0,
     STKBIRIMFIYATTOPLAM: (parseFloat(item.STKOZKOD5) || 0) * item.quantity,
     CIKISFISEVRNO: cikisFisEvrNo,
-    SATISIRSEVRNO: cikisFisEvrNo,
+    SATISIRSEVRNO: satisIrsaliyesiEvrNo,
     HARREFDEGER1: harRefDeger,
   }));
 
@@ -71,6 +72,13 @@ const getAndUpdateReferences = async () => {
     );
     let newCikisFisEvrNo = cikisFisEvrako ? cikisFisEvrako.EVRNO + 1 : 1;
 
+    const satisIrsaliyesiEvrako = evraknoData.find(
+      (item) => item.EVRACIKLAMA === "Satış İrsaliyeleri"
+    );
+    let newSatisIrsaliyesiEvrNo = satisIrsaliyesiEvrako
+      ? satisIrsaliyesiEvrako.EVRNO + 1
+      : 1;
+
     await updateDataByAny(
       "HARREFNO",
       { HARREFMODUL: 6 },
@@ -81,13 +89,20 @@ const getAndUpdateReferences = async () => {
       { EVRACIKLAMA: "Çıkış Fişleri" },
       { EVRNO: newCikisFisEvrNo }
     );
+    await updateDataByAny(
+      "EVRAKNO",
+      { EVRACIKLAMA: "Satış İrsaliyeleri" },
+      { EVRNO: newSatisIrsaliyesiEvrNo }
+    );
 
     console.log("HARREFNO:", newHarRefDeger);
-    console.log("EVRAKNO:", newCikisFisEvrNo);
+    console.log("EVRAKNO (Çıkış Fişleri):", newCikisFisEvrNo);
+    console.log("EVRAKNO (Satış İrsaliyeleri):", newSatisIrsaliyesiEvrNo);
 
     return {
       harRefDeger: newHarRefDeger,
       cikisFisEvrNo: newCikisFisEvrNo,
+      satisIrsaliyesiEvrNo: newSatisIrsaliyesiEvrNo,
     };
   } catch (error) {
     console.error("Referans değerlerini güncellerken hata oluştu:", error);
@@ -100,7 +115,8 @@ export default async function handler(req, res) {
     try {
       const { cartItems, totalPrice, userId, userName } = req.body;
 
-      const { harRefDeger, cikisFisEvrNo } = await getAndUpdateReferences();
+      const { harRefDeger, cikisFisEvrNo, satisIrsaliyesiEvrNo } =
+        await getAndUpdateReferences();
 
       const stkfisData = await getAllData("STKFIS");
       const stkFisRefNo = (stkfisData[0]?.STKFISREFNO || 0) + 1;
@@ -111,7 +127,8 @@ export default async function handler(req, res) {
         userId,
         userName,
         harRefDeger,
-        cikisFisEvrNo
+        cikisFisEvrNo,
+        satisIrsaliyesiEvrNo
       );
 
       const createdOrders = [];
