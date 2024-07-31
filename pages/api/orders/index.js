@@ -1,4 +1,3 @@
-// pages/api/orders.js
 import {
   createNewData,
   getAllData,
@@ -115,7 +114,7 @@ const updateSTKKART = async (STKKOD, quantity) => {
 
     if (stkKart && typeof stkKart === "object" && !stkKart.error) {
       const currentSTKBAKIYE = parseFloat(stkKart.STKBAKIYE) || 0;
-      const newSTKBAKIYE = Math.max(currentSTKBAKIYE - quantity, 0); // Negatif bakiye olmaması için
+      const newSTKBAKIYE = Math.max(currentSTKBAKIYE - quantity, 0);
 
       console.log(`STKKOD: ${STKKOD}`);
       console.log(`Mevcut STKBAKIYE: ${currentSTKBAKIYE}`);
@@ -144,6 +143,368 @@ const updateSTKKART = async (STKKOD, quantity) => {
   }
 };
 
+const getLastSTKFIS = async () => {
+  const allSTKFIS = await getAllData("STKFIS");
+  const reducedSTKFIS = allSTKFIS.reduce(
+    (max, current) => (current.STKFISREFNO > max.STKFISREFNO ? current : max),
+    {
+      STKFISREFNO: 0,
+      STKFISEVRAKNO1: "SF-000000",
+      STKFISEVRAKNO2: "WEB-000000",
+    }
+  );
+  console.log("Önceki DBDE OLAN STKFIS:", reducedSTKFIS);
+
+  return reducedSTKFIS;
+};
+
+const createSTKFIS = async (orderData, lastSTKFIS) => {
+  const newSTKFISREFNO = lastSTKFIS.STKFISREFNO + 1;
+  const newSFNumber = parseInt(lastSTKFIS.STKFISEVRAKNO1.split("-")[1]) + 1;
+  const newWEBNumber = parseInt(lastSTKFIS.STKFISEVRAKNO2.split("-")[1]) + 1;
+
+  const stkfisEntry = {
+    STKFISTAR: new Date(),
+    STKFISREFNO: newSTKFISREFNO,
+    STKFISTIPI: 3,
+    STKFISGCFLAG: 2,
+    STKFISKAYONC: 2,
+    STKFISDEPO: 0,
+    STKFISOZELFIS: 0,
+    STKFISIADE: 0,
+    STKFISKAYNAK: 3,
+    STKFISCARKOD: orderData.CARKOD,
+    STKFISREFNO2: 0,
+    STKFISANADEPO: " ",
+    STKFISKARDEPO: " ",
+    STKFISOZKOD1: " ",
+    STKFISOZKOD2: " ",
+    STKFISOZKOD3: " ",
+    STKFISACIKLAMA1: orderData.STKCINSI,
+    STKFISACIKLAMA2: " ",
+    STKFISACIKLAMA3: " ",
+    STKFISEVRAKNO1: `SF-${newSFNumber.toString().padStart(6, "0")}`,
+    STKFISEVRAKNO2: `WEB-${newWEBNumber.toString().padStart(6, "0")}`,
+    STKFISEVRAKNO3: " ",
+    STKFISDOVTAR: new Date(),
+    STKFISPARTIKOD: " ",
+    STKFISMASMER: " ",
+    STKFISTOPBTUT: orderData.ORDERFIYATTOPLAM,
+    STKFISTOPISK: 0,
+    STKFISTOPNTUT: orderData.ORDERFIYATTOPLAM,
+    STKFISTOPKDV: 0,
+    STKFISTOPKTUT: orderData.ORDERFIYATTOPLAM,
+    STKFISSEVNO: 1,
+    STKFISISYKOD: "MERKEZ",
+    STKFISOTVFLAG: 0,
+    STKFISTOPOTV: 0,
+    STKFISTOPOTUT: orderData.ORDERFIYATTOPLAM,
+    STKFISDOVKOD: " ",
+    STKFISDOVTUR: " ",
+    STKFISDOVKUR: 0,
+    STKFISDOVTOP: 0,
+    STKFISTRNTAR: new Date("1900-01-01"),
+    STKFISTRNREFNO: 0,
+    STKFISTRNTIPI: 0,
+    STKFISDISTIP: 0,
+    STKFISDISKOD: "0",
+    STKFISMUHREFNO: 0,
+  };
+
+  console.log("STKFIS verisi:", stkfisEntry);
+
+  const newSkfisData = await createNewData("STKFIS", stkfisEntry);
+  console.log("Yeni STKFIS verisi:", newSkfisData);
+
+  // SIRKETLOG oluştur
+  await createSIRKETLOG(newSTKFISREFNO, new Date());
+
+  return newSTKFISREFNO;
+};
+
+const createSIRKETLOG = async (stkfisRefNo, orderDate) => {
+  const sirketlogEntry = {
+    SIRLOGMODUL: 1,
+    SIRLOGKONU: 2,
+    SIRLOGKYTTIPI: 3,
+    SIRLOGKYTKODU: " ",
+    SIRLOGKYTKODU2: " ",
+    SIRLOGKYTREFNO: stkfisRefNo,
+    SIRLOGKYTREFNO2: 0,
+    SIRLOGILKKULKOD: "ETA",
+    SIRLOGILKTAR: orderDate,
+    SIRLOGSONKULKOD: "ETA",
+    SIRLOGSONTAR: orderDate,
+    SIRLOGMUHINT1: 0,
+    SIRLOGMUHINT2: 0,
+    SIRLOGMUHINT3: 0,
+    SIRLOGMUHINT4: 0,
+    SIRLOGMUHINT5: 0,
+    SIRLOGMUHNUM1: 0,
+    SIRLOGMUHNUM2: 0,
+    SIRLOGMUHNUM3: 0,
+    SIRLOGMUHNUM4: 0,
+    SIRLOGMUHNUM5: 0,
+    SIRLOGMUHTAR1: new Date("1900-01-01"),
+    SIRLOGMUHTAR2: new Date("1900-01-01"),
+    SIRLOGMUHTAR3: new Date("1900-01-01"),
+    SIRLOGMUHTAR4: new Date("1900-01-01"),
+    SIRLOGMUHTAR5: new Date("1900-01-01"),
+    SIRLOGMUHACK1: " ",
+    SIRLOGMUHACK2: " ",
+    SIRLOGMUHACK3: "ANAMAK\\adnan",
+    SIRLOGMUHACK4: "ANAMAK\\adnan",
+    SIRLOGMUHACK5: " ",
+  };
+
+  console.log("SIRKETLOG verisi:", sirketlogEntry);
+
+  const newSirketlogData = await createNewData("SIRKETLOG", sirketlogEntry);
+  console.log("Yeni SIRKETLOG verisi:", newSirketlogData);
+};
+
+const createSTKHAR = async (orderItem, createdSTKFISREFNO) => {
+  const stkharEntry = {
+    STKHARTAR: now,
+    STKHARREFNO: createdSTKFISREFNO,
+    STKHARTIPI: 3,
+    STKHARGCFLAG: 2,
+    STKHARKAYONC: 2,
+    STKHARDEPO: 0,
+    STKHAROZELFIS: 0,
+    STKHARIADE: 0,
+    STKHARKAYNAK: 6,
+    STKHARCARKOD: orderItem.CARKOD,
+    STKHARREFNO2: 0,
+    STKHARANADEPO: " ",
+    STKHARKARDEPO: " ",
+    STKHARSTKKOD: orderItem.STKKOD,
+    STKHARSTKCINS: orderItem.STKNAME,
+    STKHARSTKBRM: " ",
+    STKHARBARKOD: " ",
+    STKHAROZDESKOD: " ",
+    STKHARBENZERKOD: " ",
+    STKHARMIKTAR: orderItem.STKADET,
+    STKHARMIKTAR2: 0,
+    STKHARMIKTAR3: 0,
+    STKHARMIKTAR4: 0,
+    STKHARMIKTAR5: 0,
+    STKHARFIYAT: orderItem.STKBIRIMFIYAT,
+    STKHARTUTAR: orderItem.STKBIRIMFIYATTOPLAM,
+    STKHARDOVKOD: " ",
+    STKHARDOVTUR: " ",
+    STKHARDOVTUTAR: 0,
+    STKHAROZKOD: " ",
+    STKHARACIKLAMA: " ",
+    STKHARKDVYUZ: 0,
+    STKHARISKYUZ1: 0,
+    STKHARISKYUZ2: 0,
+    STKHARISKYUZ3: 0,
+    STKHARISKYUZ4: 0,
+    STKHARISKYUZ5: 0,
+    STKHARISKYTUT1: 0,
+    STKHARISKYTUT2: 0,
+    STKHARISKYTUT3: 0,
+    STKHARISKYTUT4: 0,
+    STKHARISKYTUT5: 0,
+    STKHARISKGTUT1: 0,
+    STKHARISKGTUT2: 0,
+    STKHARISKGTUT3: 0,
+    STKHARISKGTUT4: 0,
+    STKHARISKGTUT5: 0,
+    STKHARDIGERIND: 0,
+    STKHARTOPLAMIND: 0,
+    STKHARKDVMATRAH: orderItem.STKBIRIMFIYATTOPLAM,
+    STKHARKDVTUTAR: 0,
+    STKHARTOPLAMTUT: orderItem.STKBIRIMFIYATTOPLAM,
+    STKHARVADETAR: new Date("1900-01-01"),
+    STKHARACIKLAMA1: " ",
+    STKHARACIKLAMA2: " ",
+    STKHARACIKLAMA3: " ",
+    STKHARPARTINO: " ",
+    STKHARMASMER: " ",
+    STKHARSERINO1: " ",
+    STKHARSERINO2: " ",
+    STKHARRB1: 0,
+    STKHARRB2: 0,
+    STKHARRB3: 0,
+    STKHARRB4: 0,
+    STKHARRB5: 0,
+    STKHARFIYTIP: " ",
+    STKHARSIRANO: 0,
+    STKHARTOPLAMMAS: 0,
+    STKHARNETTUTAR: orderItem.STKBIRIMFIYATTOPLAM,
+    STKHARNETFIYAT: orderItem.STKBIRIMFIYAT,
+    STKHARMALIYET: 0,
+    STKHAROTVMATRAH: orderItem.STKBIRIMFIYATTOPLAM,
+    STKHAROTVORAN: 0,
+    STKHAROTVFIYAT: 0,
+    STKHARTOPOTV: 0,
+    STKHAROTVTUTAR: orderItem.STKBIRIMFIYATTOPLAM,
+    STKHARDOVFIYAT: 0,
+    STKHAREBTEN: 0,
+    STKHAREBTBOY: 0,
+    STKHAREBTYUK: 0,
+    STKHAREBTHCM: 0,
+    STKHAREBTAGR: 0,
+    STKHAREKCHAR1: " ",
+    STKHAREKCHAR2: " ",
+    STKHAREKINT1: 0,
+    STKHAREKINT2: 0,
+    STKHAREKDATE1: new Date("1900-01-01"),
+    STKHAREKDATE2: new Date("1900-01-01"),
+    STKHAREKTUT1: 0,
+    STKHAREKTUT2: 0,
+    STKHAREKMIK1: 0,
+    STKHAREKMIK2: 0,
+    STKHAREKDOVTUT1: 0,
+    STKHAREKDOVTUT2: 0,
+    STKHAREKORAN1: 0,
+    STKHAREKORAN2: 0,
+    STKHARDOVKUR: 0,
+    STKHARDISTIP: 0,
+    STKHARDISKOD: " ",
+  };
+
+  console.log("STKHAR verisi oluşturuluyor:", stkharEntry);
+
+  const newStkharData = await createNewData("STKHAR", stkharEntry);
+  console.log("Yeni STKHAR verisi oluşturuldu:", newStkharData);
+
+  return newStkharData;
+};
+
+const getLastIRSFIS = async () => {
+  const allIRSFIS = await getAllData("IRSFIS");
+  const reducedIRSFIS = allIRSFIS.reduce(
+    (max, current) => (current.IRSFISREFNO > max.IRSFISREFNO ? current : max),
+    { IRSFISREFNO: 0 }
+  );
+  console.log("Önceki DBDE OLAN IRSFIS:", reducedIRSFIS);
+  return reducedIRSFIS;
+};
+
+const createIRSFIS = async (
+  orderData,
+  lastIRSFIS,
+  createdSTKFISREFNO,
+  lastSTKFIS
+) => {
+  const newIRSFISREFNO = lastIRSFIS.IRSFISREFNO + 1;
+  const irsFisDate = new Date();
+  const irsFisHour = irsFisDate.getHours().toString().padStart(2, "0");
+  const irsFisMinute = irsFisDate.getMinutes().toString().padStart(2, "0");
+  const irsFisTimeInfo = `${irsFisHour}:${irsFisMinute}`;
+
+  const irsfisEntry = {
+    IRSFISREFNO: newIRSFISREFNO,
+    IRSFISTAR: now,
+    IRSFISTIPI: 3,
+    IRSFISGCFLAG: 2,
+    IRSFISKAYONC: 1,
+    IRSFISIPTALFLAG: 0,
+    IRSFISKAYNAK: 6,
+    IRSFISSTKREFNO: createdSTKFISREFNO,
+    IRSFISFATREFNO: 0,
+    IRSFISFATTAR: new Date("1900-01-01"),
+    IRSFISFATKONT: 1,
+    IRSFISFATFLAG: 0,
+    IRSFISKAPFLAG: 0,
+    IRSFISBASFLAG: 0,
+    IRSFISOZELFIS: 0,
+    IRSFISDEPOFLAG: 0,
+    IRSFISIADEFLAG: 0,
+    IRSFISKDVDAHILFLAG: 0,
+    IRSFISTEVKIFATFLAG: 0,
+    IRSFISANADEPO: " ",
+    IRSFISPARTIKOD: " ",
+    IRSFISODEMEKOD: " ",
+    IRSFISSATKOD: " ",
+    IRSFISMASMER: " ",
+    IRSFISCARKOD: orderData.CARKOD,
+    IRSFISCARUNVAN: orderData.CARUNVAN,
+    IRSFISSAAT: irsFisTimeInfo,
+    IRSFISADRESNO: 2,
+    IRSFISADRES1: " ",
+    IRSFISADRES2: " ",
+    IRSFISADRES3: " ",
+    IRSFISPOSTAKOD: " ",
+    IRSFISULKE: " ",
+    IRSFISIL: " ",
+    IRSFISILCE: " ",
+    IRSFISVERDAIRE: " ",
+    IRSFISVERHESNO: " ",
+    IRSFISVADETAR: new Date("1900-01-01"),
+    IRSFISKDVVADETAR: new Date("1900-01-01"),
+    IRSFISFATURATAR: new Date("1900-01-01"),
+    IRSFISFATURANO: " ",
+    IRSFISEVRAKNO1: lastSTKFIS.STKFISEVRAKNO2,
+    IRSFISEVRAKNO2: " ",
+    IRSFISEVRAKNO3: " ",
+    IRSFISOZKOD1: " ",
+    IRSFISOZKOD2: " ",
+    IRSFISOZKOD3: " ",
+    IRSFISACIKLAMA1: " ",
+    IRSFISACIKLAMA2: " ",
+    IRSFISACIKLAMA3: " ",
+    IRSFISHAZKOD: " ",
+    IRSFISHAZTAR: new Date("1900-01-01"),
+    IRSFISHAZNOT: " ",
+    IRSFISKONTKOD: " ",
+    IRSFISKONTTAR: new Date("1900-01-01"),
+    IRSFISKONTNOT: " ",
+    IRSFISONAYKOD: " ",
+    IRSFISONAYTAR: new Date("1900-01-01"),
+    IRSFISONAYNOT: " ",
+    IRSFISKDVORANI: 0,
+    IRSFISMALTOP: orderData.ORDERFIYATTOPLAM,
+    IRSFISKALINDYTOP: 0,
+    IRSFISKALINDTTOP: 0,
+    IRSFISSATINDTOP: 0,
+    IRSFISGENINDTOP: 0,
+    IRSFISSATMASTOP: 0,
+    IRSFISGENMASTOP: 0,
+    IRSFISBRUTTOPLAM: orderData.ORDERFIYATTOPLAM,
+    IRSFISKDVMATRAHI: orderData.ORDERFIYATTOPLAM,
+    IRSFISKDVTUTARI: 0,
+    IRSFISARATOPLAM: orderData.ORDERFIYATTOPLAM,
+    IRSFISKDVALTIINDTOP: 0,
+    IRSFISKDVALTIEKTOP: 0,
+    IRSFISGENTOPLAM: orderData.ORDERFIYATTOPLAM,
+    IRSFISTEVTUTAR: 0,
+    IRSFISDOVTAR: now,
+    IRSFISDOVKOD: " ",
+    IRSFISDOVTUR: " ",
+    IRSFISDOVKUR: 0,
+    IRSFISGENDOVTOP: 0,
+    IRSFISTEVNO: 1000,
+    IRSFISTEVORAN: 0,
+    IRSFISSEVNO: 1,
+    IRSFISISYKOD: "MERKEZ",
+    IRSFISOTVFLAG: 0,
+    IRSFISOTVKDVBLOKAJ: 0,
+    IRSFISTOPOTV: 0,
+    IRSFISTOPOTUT: orderData.ORDERFIYATTOPLAM,
+    IRSFISTCKIMLIKNO: " ",
+    IRSFISTRNTAR: new Date("1900-01-01"),
+    IRSFISTRNREFNO: 0,
+    IRSFISTRNTIPI: 0,
+    IRSFISEFATFLAG: 0,
+    IRSFISEKVERGIINDTOP: 0,
+    IRSFISEKVERGIILVTOP: 0,
+    IRSFISEKVERGITOP: 0,
+    IRSFISDISTIP: 0,
+    IRSFISDISKOD: " ",
+  };
+
+  console.log("IRSFIS verisi oluşturuluyor:", irsfisEntry);
+
+  const newIrsfisData = await createNewData("IRSFIS", irsfisEntry);
+  console.log("Yeni IRSFIS verisi oluşturuldu:", newIrsfisData);
+
+  return newIRSFISREFNO;
+};
+
 export default async function handler(req, res) {
   if (req.method === "POST") {
     try {
@@ -151,9 +512,6 @@ export default async function handler(req, res) {
 
       const { harRefDeger, cikisFisEvrNo, satisIrsaliyesiEvrNo } =
         await getAndUpdateReferences();
-
-      const stkfisData = await getAllData("STKFIS");
-      const stkFisRefNo = (stkfisData[0]?.STKFISREFNO || 0) + 1;
 
       const orderItems = prepareOrderData(
         cartItems,
@@ -167,10 +525,15 @@ export default async function handler(req, res) {
 
       const createdOrders = [];
 
+      const lastSTKFIS = await getLastSTKFIS();
+      const lastIRSFIS = await getLastIRSFIS();
+
+      console.log("Sipariş oluşturma işlemi başlıyor");
+
       for (const item of orderItems) {
         const entry = {
           ...item,
-          STKFISREFNO: stkFisRefNo,
+          STKFISREFNO: lastSTKFIS.STKFISREFNO + 1,
           STKFISEVRAKNO1: null,
           STKFISEVRAKNO2: null,
           ACIKLAMA: null,
@@ -185,18 +548,34 @@ export default async function handler(req, res) {
           EKXTRA9: null,
         };
 
-        console.log("Veri tabanına yazılacak veri:", entry);
+        console.log("ALLORDERS tablosuna yazılacak veri:", entry);
 
         const result = await createNewData("ALLORDERS", entry);
-        console.log("Veri tabanına yazma sonucu:", result);
+        console.log("ALLORDERS tablosuna yazma sonucu:", result);
 
         createdOrders.push(entry);
 
-        console.log(
-          `STKKART güncelleme öncesi - STKKOD: ${item.STKKOD}, Miktar: ${item.STKADET}`
-        );
         await updateSTKKART(item.STKKOD, item.STKADET);
-        console.log(`STKKART güncelleme sonrası - STKKOD: ${item.STKKOD}`);
+      }
+
+      // STKFIS ve SIRKETLOG oluştur
+      const createdSTKFISREFNO = await createSTKFIS(orderItems[0], lastSTKFIS);
+
+      // IRSFIS oluştur
+      const createdIRSFISREFNO = await createIRSFIS(
+        orderItems[0],
+        lastIRSFIS,
+        createdSTKFISREFNO,
+        lastSTKFIS
+      );
+
+      // STKHAR oluştur
+      const createdSTKHARs = [];
+      for (const item of orderItems) {
+        const createdSTKHAR = await createSTKHAR(item, createdSTKFISREFNO);
+        createdSTKHARs.push(createdSTKHAR);
+
+        console.log("STKHAR tablosuna yazma sonucu:", createdSTKHAR);
       }
 
       // CARKART tablosundaki CARCIKIRSTOP değerini güncelle
@@ -232,11 +611,15 @@ export default async function handler(req, res) {
 
       const allOrders = await getAllData("ALLORDERS");
 
+      console.log("Sipariş oluşturma işlemi tamamlandı");
+
       res.status(200).json({
         success: true,
         message: "Order items created successfully",
         createdOrders: createdOrders,
         allOrders: allOrders,
+        createdSTKFISREFNO: createdSTKFISREFNO,
+        createdIRSFISREFNO: createdIRSFISREFNO,
       });
     } catch (error) {
       console.error("Order creation error:", error);

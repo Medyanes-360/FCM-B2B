@@ -376,32 +376,32 @@ model HARREFNO {
 
 model IRSFIS {
   IRSFISREFNO           Int      @id
-  IRSFISTAR             DateTime 
-  IRSFISTIPI            Int      
-  IRSFISGCFLAG          Int      
-  IRSFISKAYONC          Int      
-  IRSFISIPTALFLAG       Int      
-  IRSFISKAYNAK          Int      
-  IRSFISSTKREFNO        Int
-  IRSFISFATREFNO        Int     
-  IRSFISFATTAR          DateTime 
-  IRSFISFATKONT         Int      
-  IRSFISFATFLAG         Int      
-  IRSFISKAPFLAG         Int      
-  IRSFISBASFLAG         Int      
-  IRSFISOZELFIS         Int      
-  IRSFISDEPOFLAG        Int      
-  IRSFISIADEFLAG        Int      
-  IRSFISKDVDAHILFLAG    Int      
-  IRSFISTEVKIFATFLAG    Int      
+  IRSFISTAR             DateTime?
+  IRSFISTIPI            Int?      
+  IRSFISGCFLAG          Int?     
+  IRSFISKAYONC          Int?      
+  IRSFISIPTALFLAG       Int?      
+  IRSFISKAYNAK          Int?      
+  IRSFISSTKREFNO        Int?
+  IRSFISFATREFNO        Int?     
+  IRSFISFATTAR          DateTime? 
+  IRSFISFATKONT         Int?      
+  IRSFISFATFLAG         Int?      
+  IRSFISKAPFLAG         Int?      
+  IRSFISBASFLAG         Int?      
+  IRSFISOZELFIS         Int?      
+  IRSFISDEPOFLAG        Int?      
+  IRSFISIADEFLAG        Int?      
+  IRSFISKDVDAHILFLAG    Int?      
+  IRSFISTEVKIFATFLAG    Int?      
   IRSFISANADEPO         String?
   IRSFISPARTIKOD        String?
   IRSFISODEMEKOD        String?
   IRSFISSATKOD          String?
   IRSFISMASMER          String?
-  IRSFISCARKOD          String
-  IRSFISCARUNVAN        String
-  IRSFISADRESNO         Int      
+  IRSFISCARKOD          String?
+  IRSFISCARUNVAN        String?
+  IRSFISADRESNO         Int?      
   IRSFISADRES1          String?
   IRSFISADRES2          String?
   IRSFISADRES3          String?
@@ -409,14 +409,14 @@ model IRSFIS {
   IRSFISULKE            String?
   IRSFISIL              String?
   IRSFISILCE            String?
-  IRSFISVERDAIRE        String
+  IRSFISVERDAIRE        String?
   IRSFISVERHESNO        String?
-  IRSFISSAAT            String
-  IRSFISVADETAR         DateTime 
-  IRSFISKDVVADETAR      DateTime 
-  IRSFISFATURATAR       DateTime 
+  IRSFISSAAT            String?
+  IRSFISVADETAR         DateTime?
+  IRSFISKDVVADETAR      DateTime? 
+  IRSFISFATURATAR       DateTime? 
   IRSFISFATURANO        String?
-  IRSFISEVRAKNO1        String
+  IRSFISEVRAKNO1        String?
   IRSFISEVRAKNO2        String?
   IRSFISEVRAKNO3        String?
   IRSFISOZKOD1          String?
@@ -426,52 +426,52 @@ model IRSFIS {
   IRSFISACIKLAMA2       String?
   IRSFISACIKLAMA3       String?
   IRSFISHAZKOD          String?
-  IRSFISHAZTAR          DateTime 
+  IRSFISHAZTAR          DateTime? 
   IRSFISHAZNOT          String?
   IRSFISKONTKOD         String?
-  IRSFISKONTTAR         DateTime 
+  IRSFISKONTTAR         DateTime? 
   IRSFISKONTNOT         String?
   IRSFISONAYKOD         String?
-  IRSFISONAYTAR         DateTime 
+  IRSFISONAYTAR         DateTime? 
   IRSFISONAYNOT         String?
-  IRSFISKDVORANI        Float
-  IRSFISMALTOP          Float
-  IRSFISKALINDYTOP      Float
-  IRSFISKALINDTTOP      Float
-  IRSFISSATINDTOP       Float
-  IRSFISGENINDTOP       Float
-  IRSFISSATMASTOP       Float
-  IRSFISGENMASTOP       Float
-  IRSFISBRUTTOPLAM      Float
-  IRSFISKDVMATRAHI      Float
-  IRSFISKDVTUTARI       Float
-  IRSFISARATOPLAM       Float
-  IRSFISKDVALTIINDTOP   Float
-  IRSFISKDVALTIEKTOP    Float
-  IRSFISGENTOPLAM       Float
-  IRSFISTEVTUTAR        Float
-  IRSFISDOVTAR          DateTime @default(now())
+  IRSFISKDVORANI        Float?
+  IRSFISMALTOP          Float?
+  IRSFISKALINDYTOP      Float?
+  IRSFISKALINDTTOP      Float?
+  IRSFISSATINDTOP       Float?
+  IRSFISGENINDTOP       Float?
+  IRSFISSATMASTOP       Float?
+  IRSFISGENMASTOP       Float?
+  IRSFISBRUTTOPLAM      Float?
+  IRSFISKDVMATRAHI      Float?
+  IRSFISKDVTUTARI       Float?
+  IRSFISARATOPLAM       Float?
+  IRSFISKDVALTIINDTOP   Float?
+  IRSFISKDVALTIEKTOP    Float?
+  IRSFISGENTOPLAM       Float?
+  IRSFISTEVTUTAR        Float?
+  IRSFISDOVTAR          DateTime?
   IRSFISDOVKOD          String?
   IRSFISDOVTUR          String?
-  IRSFISDOVKUR          Float    
-  IRSFISGENDOVTOP       Float    
-  IRSFISTEVNO           Int      
-  IRSFISTEVORAN         Float    
-  IRSFISSEVNO           Int      
-  IRSFISISYKOD          String   
-  IRSFISOTVFLAG         Int      
-  IRSFISOTVKDVBLOKAJ    Int      
-  IRSFISTOPOTV          Float    
-  IRSFISTOPOTUT         Float
+  IRSFISDOVKUR          Float?    
+  IRSFISGENDOVTOP       Float?    
+  IRSFISTEVNO           Int?      
+  IRSFISTEVORAN         Float?    
+  IRSFISSEVNO           Int?      
+  IRSFISISYKOD          String?  
+  IRSFISOTVFLAG         Int?      
+  IRSFISOTVKDVBLOKAJ    Int?      
+  IRSFISTOPOTV          Float?    
+  IRSFISTOPOTUT         Float?
   IRSFISTCKIMLIKNO      String?
-  IRSFISTRNTAR          DateTime 
-  IRSFISTRNREFNO        Int      
-  IRSFISTRNTIPI         Int      
-  IRSFISEFATFLAG        Int      
-  IRSFISEKVERGIINDTOP   Float    
-  IRSFISEKVERGIILVTOP   Float    
-  IRSFISEKVERGITOP      Float    
-  IRSFISDISTIP          Int      
+  IRSFISTRNTAR          DateTime? 
+  IRSFISTRNREFNO        Int?      
+  IRSFISTRNTIPI         Int?      
+  IRSFISEFATFLAG        Int?      
+  IRSFISEKVERGIINDTOP   Float?    
+  IRSFISEKVERGIILVTOP   Float?    
+  IRSFISEKVERGITOP      Float?    
+  IRSFISDISTIP          Int?      
   IRSFISDISKOD          String?
 }
 
