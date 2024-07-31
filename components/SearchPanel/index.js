@@ -4,12 +4,14 @@ import * as Yup from "yup";
 import { FaSearch, FaTimes } from "react-icons/fa";
 import Image from "next/image";
 import { getAPI } from "@/services/fetchAPI";
+import Link from "next/link";
 
 function SearchPanel({ toggleSearchPanel }) {
   const [searchResults, setSearchResults] = useState([]); // Arama sonuçları state'i
   const [searchNoResults, setSearchNoResults] = useState(null); // Arama sonuçları yoksa durumu
   const [searchInput, setSearchInput] = useState(""); // Arama input değeri
   const [products, setProducts] = useState([]); // Ürünlerin tutulduğu state
+  const [imageMap, setImageMap] = useState({}); // Resim eşleştirmeleri için state
 
   // Formik validasyon şeması
   const validationSchema = Yup.object().shape({
@@ -36,8 +38,25 @@ function SearchPanel({ toggleSearchPanel }) {
     }
   };
 
+  const fetchImages = async () => {
+    try {
+      const imageResponse = await fetch("/data.json");
+      const imageData = await imageResponse.json();
+
+      // Resim eşleştirmelerini oluştur
+      const imgMap = {};
+      imageData.forEach((item) => {
+        imgMap[item.stkkod] = item.path;
+      });
+      setImageMap(imgMap);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     fetchProducts(); // Component yüklendiğinde ürünleri getirme işlemi
+    fetchImages(); // Component yüklendiğinde resimleri getirme işlemi
   }, []);
 
   // Türkçe karakterleri normalize eden fonksiyon
@@ -153,28 +172,32 @@ function SearchPanel({ toggleSearchPanel }) {
             <ul>
               {/* Her bir ürün için liste elemanı */}
               {searchResults.map((product) => (
-                <li
-                  className="p-5 shadow-b shadow-sm flex flex-row justify-start gap-4"
-                  key={product.STKKOD}
-                >
-                  {/* Ürün resmi */}
-                  <Image
-                    src={
-                      "https://caliskanari.com/wp-content/uploads/2022/11/X7-420x420.png.webp"
-                    }
-                    alt={"image"}
-                    width={70}
-                    height={70}
-                  />
-                  {/* Ürün bilgileri */}
-                  <div className="flex items-center">
-                    <span className="flex text-start">
-                      <p className="font-bold text-[16px] text-CustomGray hover:scale-105 hover:text-LightBlue transition-all transform easy-in-out duration-500">
-                        {product.STKCINSI} {/* Ürün ismi */}
-                      </p>
-                    </span>
-                  </div>
-                </li>
+                <Link href={`/products/${product.STKKOD}`}>
+                  <li
+                    className="p-5 shadow-b shadow-sm flex flex-row justify-start gap-4"
+                    key={product.STKKOD}
+                  >
+                    {/* Ürün resmi */}
+                    <Image
+                      src={
+                        imageMap[product.STKKOD]
+                          ? imageMap[product.STKKOD]
+                          : "https://caliskanari.com/wp-content/uploads/2022/11/X7-420x420.png.webp"
+                      }
+                      alt={"image"}
+                      width={70}
+                      height={70}
+                    />
+                    {/* Ürün bilgileri */}
+                    <div className="flex items-center">
+                      <span className="flex text-start">
+                        <p className="font-bold text-[16px] text-CustomGray hover:scale-105 hover:text-LightBlue transition-all transform easy-in-out duration-500">
+                          {product.STKCINSI} {/* Ürün ismi */}
+                        </p>
+                      </span>
+                    </div>
+                  </li>
+                </Link>
               ))}
             </ul>
           </div>

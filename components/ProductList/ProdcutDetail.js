@@ -5,7 +5,7 @@ import { FaPlus } from "react-icons/fa";
 import { IoArrowBackCircleSharp } from "react-icons/io5";
 import ProductToggleButton from "./ProductToggleButton";
 
-function ProdcutDetail({ product }) {
+function ProdcutDetail({ product,img }) {
   const [purchaseAmount, setPurchaseAmount] = useState(1);
   // satın alma sayısı arttır/azalt fonksiyonları
   function incrementAmount() {
@@ -22,8 +22,8 @@ function ProdcutDetail({ product }) {
   function PriceTag() {
     return (
       <div>
-        <div className="flex relative justify-between  bg-LightBlue/75 text-white w-32 my-4  h-10 p-1 px-2">
-          <span className="font-medium text-lg">Fiyat: ₺{product.price}</span>
+        <div className="flex relative justify-between  bg-LightBlue/75 text-white w-[134px] my-4  h-10 p-1 px-2">
+          <span className="font-medium text-lg">Fiyat: ₺{product.STKOZKOD5}</span>
           <span className="h-7 w-7 absolute top-1 right-[-14px] rotate-45 bg-gray-50"></span>
         </div>
       </div>
@@ -38,14 +38,14 @@ function ProdcutDetail({ product }) {
               <div className=" max-w-xl">
                 <img
                   className="max-h-96"
-                  src={product.imgPath}
-                  alt={product.name}
+                  src={img}
+                  alt={img}
                 />
               </div>
             </div>
             <div className=" flex flex-col justify-center col-span-2 md:ml-5  pt-5">
               <div className="font-bold text-3xl md:mt-0 mt-6 pb-3 px-3">
-                {product.name}
+                {product.STKCINSI}
               </div>
               <div className="flex flex-col   mt-5 px-3">
                 <div className="flex space-x-2">
@@ -55,10 +55,11 @@ function ProdcutDetail({ product }) {
                   </div>
                   <div className="flex flex-col space-y-4  justify-evenly ">
                     <div className="text-LightBlue inline p-0 text-lg ">
-                      {product.publisher}
+                      {/** Yayınevi değerinin gelmesi gereken yer */}&nbsp;
                     </div>
                     <div className="text-LightBlue inline p-0 text-lg ">
-                      {product.category.subCategory}
+                      {/** kategori */}
+                    { product.STKOZKOD3 + ' ' + product.STKOZKOD2}
                     </div>
                   </div>
                 </div>
