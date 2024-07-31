@@ -148,7 +148,7 @@ const updateSTKMIZDEGER = async (orderItems, currentDate) => {
 
   // En güncel STKMIZDEGER verilerini çek
   const latestSTKMIZDEGER = await getAllData("STKMIZDEGER");
-  console.log("Mevcut STKMIZDEGER verileri:", latestSTKMIZDEGER);
+  // console.log("Mevcut STKMIZDEGER verileri:", latestSTKMIZDEGER);
 
   for (const item of orderItems) {
     const { STKKOD, STKADET, STKBIRIMFIYATTOPLAM } = item;
@@ -170,9 +170,9 @@ const updateSTKMIZDEGER = async (orderItems, currentDate) => {
       if (existingRecord) {
         // Veri varsa güncelle
         let newSTKALACAK = existingRecord.STKALACAK;
-        console.log(
-          `Mevcut kayıt bulundu: STKKOD ${STKKOD}, STKRAKTIP ${STKRAKTIP}, Mevcut STKALACAK: ${existingRecord.STKALACAK}`
-        );
+        // console.log(
+        //   `Mevcut kayıt bulundu: STKKOD ${STKKOD}, STKRAKTIP ${STKRAKTIP}, Mevcut STKALACAK: ${existingRecord.STKALACAK}`
+        // );
 
         switch (STKRAKTIP) {
           case 1:
@@ -765,8 +765,8 @@ export default async function handler(req, res) {
         const entry = {
           ...item,
           STKFISREFNO: lastSTKFIS.STKFISREFNO + 1,
-          STKFISEVRAKNO1: null,
-          STKFISEVRAKNO2: null,
+          STKFISEVRAKNO1: lastSTKFIS.STKFISEVRAKNO1,
+          STKFISEVRAKNO2: lastSTKFIS.STKFISEVRAKNO2,
           ACIKLAMA: null,
           EKXTRA1: null,
           EKXTRA2: null,
@@ -779,10 +779,10 @@ export default async function handler(req, res) {
           EKXTRA9: null,
         };
 
-        // console.log("ALLORDERS tablosuna yazılacak veri:", entry);
+        console.log("ALLORDERS tablosuna yazılacak veri:", entry);
 
         const result = await createNewData("ALLORDERS", entry);
-        // console.log("ALLORDERS tablosuna yazma sonucu:", result);
+        console.log("ALLORDERS tablosuna yazma sonucu:", result);
 
         createdOrders.push(entry);
 
