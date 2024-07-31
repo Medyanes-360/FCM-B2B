@@ -282,7 +282,7 @@ function CategoryProducts() {
               <div className="w-3/5 sm:w-full flex flex-col justify-between">
                 <div className={`text-left md:pt-[15px] min-h-12 md:min-h-20 `}>
                   <Link
-                    href={""}
+                    href={`/products/${urun.STKKOD}`}
                     className="font-bold text-[14px] md:text-[16px] text-CustomGray leading-tight"
                   >
                     <p>{urun.STKCINSI}</p>
