@@ -142,6 +142,107 @@ const updateSTKKART = async (STKKOD, quantity) => {
     console.error(`STKKART güncellenirken hata oluştu (${STKKOD}):`, error);
   }
 };
+const updateSTKMIZDEGER = async (orderItems, currentDate) => {
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth() + 1;
+
+  // En güncel STKMIZDEGER verilerini çek
+  const latestSTKMIZDEGER = await getAllData("STKMIZDEGER");
+  console.log("Mevcut STKMIZDEGER verileri:", latestSTKMIZDEGER);
+
+  for (const item of orderItems) {
+    const { STKKOD, STKADET, STKBIRIMFIYATTOPLAM } = item;
+    console.log(
+      `İşleniyor: STKKOD ${STKKOD}, Miktar: ${STKADET}, Toplam Fiyat: ${STKBIRIMFIYATTOPLAM}`
+    );
+
+    // STKRAKTIP değerleri için döngü
+    for (const STKRAKTIP of [1, 6, 8]) {
+      // Mevcut ayda bu STKKOD ve STKRAKTIP için veri var mı kontrol et
+      const existingRecord = latestSTKMIZDEGER.find(
+        (record) =>
+          record.STKKOD === STKKOD &&
+          record.STKRAKTIP === STKRAKTIP &&
+          record.STKYIL === currentYear &&
+          record.STKAY === currentMonth
+      );
+
+      if (existingRecord) {
+        // Veri varsa güncelle
+        let newSTKALACAK = existingRecord.STKALACAK;
+        console.log(
+          `Mevcut kayıt bulundu: STKKOD ${STKKOD}, STKRAKTIP ${STKRAKTIP}, Mevcut STKALACAK: ${existingRecord.STKALACAK}`
+        );
+
+        switch (STKRAKTIP) {
+          case 1:
+            newSTKALACAK += STKADET;
+            break;
+          case 6:
+            newSTKALACAK += STKBIRIMFIYATTOPLAM;
+            break;
+          case 8:
+            newSTKALACAK += 1;
+            break;
+        }
+
+        console.log(
+          `Güncelleniyor: STKKOD ${STKKOD}, STKRAKTIP ${STKRAKTIP}, Yeni STKALACAK: ${newSTKALACAK}`
+        );
+
+        await updateDataByAny(
+          "STKMIZDEGER",
+          { STKKOD, STKRAKTIP, STKYIL: currentYear, STKAY: currentMonth },
+          { STKALACAK: newSTKALACAK }
+        );
+
+        console.log(
+          `Güncelleme tamamlandı: STKKOD ${STKKOD}, STKRAKTIP ${STKRAKTIP}`
+        );
+      } else {
+        // Veri yoksa yeni kayıt oluştur
+        console.log(
+          `Kayıt bulunamadı, yeni oluşturuluyor: STKKOD ${STKKOD}, STKRAKTIP ${STKRAKTIP}`
+        );
+
+        const newSTKALACAK =
+          STKRAKTIP === 1
+            ? STKADET
+            : STKRAKTIP === 6
+            ? STKBIRIMFIYATTOPLAM
+            : STKRAKTIP === 8
+            ? 1
+            : 0;
+
+        const newRecord = {
+          STKKOD,
+          STKYIL: currentYear,
+          STKAY: currentMonth,
+          STKRAKTIP,
+          STKDOVKOD: "",
+          STKBORC: 0,
+          STKALACAK: newSTKALACAK,
+          STKDEPO: "",
+        };
+
+        console.log(`Yeni kayıt oluşturuluyor:`, newRecord);
+
+        await createNewData("STKMIZDEGER", newRecord);
+
+        console.log(
+          `Yeni kayıt oluşturuldu: STKKOD ${STKKOD}, STKRAKTIP ${STKRAKTIP}`
+        );
+      }
+    }
+  }
+
+  // Güncellemelerden sonra son durumu göster
+  const updatedSTKMIZDEGER = await getAllData("STKMIZDEGER");
+  console.log(
+    "Güncellenmiş STKMIZDEGER verileri:",
+    updatedSTKMIZDEGER.STKAY === currentMonth
+  );
+};
 
 const getLastSTKFIS = async () => {
   const allSTKFIS = await getAllData("STKFIS");
@@ -153,7 +254,7 @@ const getLastSTKFIS = async () => {
       STKFISEVRAKNO2: "WEB-000000",
     }
   );
-  console.log("Önceki DBDE OLAN STKFIS:", reducedSTKFIS);
+  // console.log("Önceki DBDE OLAN STKFIS:", reducedSTKFIS);
 
   return reducedSTKFIS;
 };
@@ -211,10 +312,10 @@ const createSTKFIS = async (orderData, lastSTKFIS) => {
     STKFISMUHREFNO: 0,
   };
 
-  console.log("STKFIS verisi:", stkfisEntry);
+  // console.log("STKFIS verisi:", stkfisEntry);
 
   const newSkfisData = await createNewData("STKFIS", stkfisEntry);
-  console.log("Yeni STKFIS verisi:", newSkfisData);
+  // console.log("Yeni STKFIS verisi:", newSkfisData);
 
   // SIRKETLOG oluştur
   await createSIRKETLOG(newSTKFISREFNO, new Date());
@@ -257,10 +358,10 @@ const createSIRKETLOG = async (stkfisRefNo, orderDate) => {
     SIRLOGMUHACK5: " ",
   };
 
-  console.log("SIRKETLOG verisi:", sirketlogEntry);
+  // console.log("SIRKETLOG verisi:", sirketlogEntry);
 
   const newSirketlogData = await createNewData("SIRKETLOG", sirketlogEntry);
-  console.log("Yeni SIRKETLOG verisi:", newSirketlogData);
+  // console.log("Yeni SIRKETLOG verisi:", newSirketlogData);
 };
 
 const createSTKHAR = async (orderItem, createdSTKFISREFNO) => {
@@ -366,12 +467,141 @@ const createSTKHAR = async (orderItem, createdSTKFISREFNO) => {
     STKHARDISKOD: " ",
   };
 
-  console.log("STKHAR verisi oluşturuluyor:", stkharEntry);
+  // console.log("STKHAR verisi oluşturuluyor:", stkharEntry);
 
   const newStkharData = await createNewData("STKHAR", stkharEntry);
-  console.log("Yeni STKHAR verisi oluşturuldu:", newStkharData);
+  // console.log("Yeni STKHAR verisi oluşturuldu:", newStkharData);
 
   return newStkharData;
+};
+
+const getLastIRSHAR = async () => {
+  const allIRSHAR = await getAllData("IRSHAR");
+  const reducedIRSHAR = allIRSHAR.reduce(
+    (max, current) => (current.IRSHARREFNO > max.IRSHARREFNO ? current : max),
+    { IRSHARREFNO: 0 }
+  );
+  // console.log("Önceki DBDE OLAN IRSHAR:", reducedIRSHAR);
+  return reducedIRSHAR;
+};
+
+const createIRSHAR = async (orderItem, createdIRSFISREFNO, lastIRSHAR) => {
+  const newIRSHARREFNO = lastIRSHAR.IRSHARREFNO + 1;
+
+  const irsharEntry = {
+    IRSHARTAR: now,
+    IRSHARREFNO: newIRSHARREFNO,
+    IRSHARTIPI: 3,
+    IRSHARGCFLAG: 2,
+    IRSHARKAYONC: 1,
+    IRSHARIPTALFLAG: 0,
+    IRSHARKAYNAK: 6,
+    IRSHARIADE: 0,
+    IRSHARCARKOD: orderItem.CARKOD,
+    IRSHARSIRANO: 0,
+    IRSHARKODTIP: 1,
+    IRSHARSTKKOD: orderItem.STKKOD,
+    IRSHARSTKCINS: orderItem.STKNAME,
+    IRSHARSTKBRM: " ",
+    IRSHARDEPOKOD: " ",
+    IRSHARBARKOD: " ",
+    IRSHAROZDESKOD: " ",
+    IRSHARBENZERKOD: " ",
+    IRSHARMIKTAR: orderItem.STKADET,
+    IRSHARMIKTAR2: 0,
+    IRSHARMIKTAR3: 0,
+    IRSHARMIKTAR4: 0,
+    IRSHARMIKTAR5: 0,
+    IRSHARFIYTIP: " ",
+    IRSHARFIYAT: orderItem.STKBIRIMFIYAT,
+    IRSHARTUTAR: orderItem.STKBIRIMFIYATTOPLAM,
+    IRSHARDOVKOD: " ",
+    IRSHARDOVTUR: " ",
+    IRSHARDOVTUTAR: 0,
+    IRSHAROZKOD: " ",
+    IRSHARACIKLAMA: " ",
+    IRSHARKDVYUZ: 0,
+    IRSHARISKYUZ1: 0,
+    IRSHARISKYUZ2: 0,
+    IRSHARISKYUZ3: 0,
+    IRSHARISKYUZ4: 0,
+    IRSHARISKYUZ5: 0,
+    IRSHARISKYTUT1: 0,
+    IRSHARISKYTUT2: 0,
+    IRSHARISKYTUT3: 0,
+    IRSHARISKYTUT4: 0,
+    IRSHARISKYTUT5: 0,
+    IRSHARISKGTUT1: 0,
+    IRSHARISKGTUT2: 0,
+    IRSHARISKGTUT3: 0,
+    IRSHARISKGTUT4: 0,
+    IRSHARISKGTUT5: 0,
+    IRSHARDIGERIND: 0,
+    IRSHARTOPLAMIND: 0,
+    IRSHARKDVMATRAH: orderItem.STKBIRIMFIYATTOPLAM,
+    IRSHARKDVTUTAR: 0,
+    IRSHARTOPLAMTUT: orderItem.STKBIRIMFIYATTOPLAM,
+    IRSHARVADETAR: new Date("1900-01-01"),
+    IRSHARACIKLAMA1: " ",
+    IRSHARACIKLAMA2: " ",
+    IRSHARACIKLAMA3: " ",
+    IRSHARPARTINO: " ",
+    IRSHARMASMER: " ",
+    IRSHARSERINO1: " ",
+    IRSHARSERINO2: " ",
+    IRSHARRB1: 0,
+    IRSHARRB2: 0,
+    IRSHARRB3: 0,
+    IRSHARRB4: 0,
+    IRSHARRB5: 0,
+    IRSHARSATKOD: " ",
+    IRSHARODEMEKOD: "",
+    IRSHARTOPLAMMAS: 0,
+    IRSHARNETTUTAR: orderItem.STKBIRIMFIYATTOPLAM,
+    IRSHARNETFIYAT: orderItem.STKBIRIMFIYAT,
+    IRSHARMALIYET: 0,
+    IRSHAROTVMATRAH: orderItem.STKBIRIMFIYATTOPLAM,
+    IRSHAROTVORAN: 0,
+    IRSHAROTVFIYAT: 0,
+    IRSHARTOPOTV: 0,
+    IRSHAROTVTUTAR: orderItem.STKBIRIMFIYATTOPLAM,
+    IRSHARMUHKOD: " ",
+    IRSHARMUHYANIND: 0,
+    IRSHARMUHYANMAS: 0,
+    IRSHARDOVFIYAT: 0,
+    IRSHAREBTEN: 0,
+    IRSHAREBTBOY: 0,
+    IRSHAREBTYUK: 0,
+    IRSHAREBTHCM: 0,
+    IRSHAREBTAGR: 0,
+    IRSHAREKCHAR1: " ",
+    IRSHAREKCHAR2: " ",
+    IRSHAREKINT1: 0,
+    IRSHAREKINT2: 0,
+    IRSHAREKDATE1: new Date("1900-01-01"),
+    IRSHAREKDATE2: new Date("1900-01-01"),
+    IRSHAREKTUT1: 0,
+    IRSHAREKTUT2: 0,
+    IRSHAREKMIK1: 0,
+    IRSHAREKMIK2: 0,
+    IRSHAREKDOVTUT1: 0,
+    IRSHAREKDOVTUT2: 0,
+    IRSHAREKORAN1: 0,
+    IRSHAREKORAN2: 0,
+    IRSHARDOVKUR: 0,
+    IRSHAREFATFLAG: 0,
+    IRSHAROTVVERKOD: " ",
+    IRSHAREKVERGI: " ",
+    IRSHARDISTIP: 0,
+    IRSHARDISKOD: " ",
+  };
+
+  // console.log("IRSHAR verisi oluşturuluyor:", irsharEntry);
+
+  const newIrsharData = await createNewData("IRSHAR", irsharEntry);
+  // console.log("Yeni IRSHAR verisi oluşturuldu:", newIrsharData);
+
+  return newIRSHARREFNO;
 };
 
 const getLastIRSFIS = async () => {
@@ -380,7 +610,7 @@ const getLastIRSFIS = async () => {
     (max, current) => (current.IRSFISREFNO > max.IRSFISREFNO ? current : max),
     { IRSFISREFNO: 0 }
   );
-  console.log("Önceki DBDE OLAN IRSFIS:", reducedIRSFIS);
+  // console.log("Önceki DBDE OLAN IRSFIS:", reducedIRSFIS);
   return reducedIRSFIS;
 };
 
@@ -497,10 +727,10 @@ const createIRSFIS = async (
     IRSFISDISKOD: " ",
   };
 
-  console.log("IRSFIS verisi oluşturuluyor:", irsfisEntry);
+  // console.log("IRSFIS verisi oluşturuluyor:", irsfisEntry);
 
   const newIrsfisData = await createNewData("IRSFIS", irsfisEntry);
-  console.log("Yeni IRSFIS verisi oluşturuldu:", newIrsfisData);
+  // console.log("Yeni IRSFIS verisi oluşturuldu:", newIrsfisData);
 
   return newIRSFISREFNO;
 };
@@ -527,8 +757,9 @@ export default async function handler(req, res) {
 
       const lastSTKFIS = await getLastSTKFIS();
       const lastIRSFIS = await getLastIRSFIS();
+      const lastIRSHAR = await getLastIRSHAR();
 
-      console.log("Sipariş oluşturma işlemi başlıyor");
+      // console.log("Sipariş oluşturma işlemi başlıyor");
 
       for (const item of orderItems) {
         const entry = {
@@ -548,15 +779,19 @@ export default async function handler(req, res) {
           EKXTRA9: null,
         };
 
-        console.log("ALLORDERS tablosuna yazılacak veri:", entry);
+        // console.log("ALLORDERS tablosuna yazılacak veri:", entry);
 
         const result = await createNewData("ALLORDERS", entry);
-        console.log("ALLORDERS tablosuna yazma sonucu:", result);
+        // console.log("ALLORDERS tablosuna yazma sonucu:", result);
 
         createdOrders.push(entry);
 
         await updateSTKKART(item.STKKOD, item.STKADET);
       }
+      console.log("STKMIZDEGER güncellemesi başlıyor");
+      // STKMIZDEGER tablosunu güncelle
+      await updateSTKMIZDEGER(orderItems, now);
+      console.log("STKMIZDEGER güncellemesi tamamlandı");
 
       // STKFIS ve SIRKETLOG oluştur
       const createdSTKFISREFNO = await createSTKFIS(orderItems[0], lastSTKFIS);
@@ -569,13 +804,21 @@ export default async function handler(req, res) {
         lastSTKFIS
       );
 
-      // STKHAR oluştur
+      // STKHAR ve IRSHAR oluştur
       const createdSTKHARs = [];
+      const createdIRSHARs = [];
       for (const item of orderItems) {
         const createdSTKHAR = await createSTKHAR(item, createdSTKFISREFNO);
         createdSTKHARs.push(createdSTKHAR);
-
         console.log("STKHAR tablosuna yazma sonucu:", createdSTKHAR);
+
+        const createdIRSHAR = await createIRSHAR(
+          item,
+          createdIRSFISREFNO,
+          lastIRSHAR
+        );
+        createdIRSHARs.push(createdIRSHAR);
+        console.log("IRSHAR tablosuna yazma sonucu:", createdIRSHAR);
       }
 
       // CARKART tablosundaki CARCIKIRSTOP değerini güncelle
