@@ -331,7 +331,7 @@ model ALLORDERS {
   ORDERSAAT                String
   STKFISEVRAKNO1           String?
   STKFISEVRAKNO2           String?
-  EKXTRA1                  String?
+  ORDERSTATUS              String?
   EKXTRA2                  String?
   EKXTRA3                  String?
   EKXTRA4                  Int? 

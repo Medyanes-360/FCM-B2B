@@ -16,7 +16,7 @@ const generateOrderNo = (userId) => {
   const randomLetters =
     String.fromCharCode(65 + Math.floor(Math.random() * 26)) +
     String.fromCharCode(65 + Math.floor(Math.random() * 26));
-  const randomNumber = Math.floor(Math.random() * 10) + 1;
+  const randomNumber = Math.floor(Math.random() * 89) + 10;
 
   return `${day}-${month}-${year}-${hour}-${minute}-${userId}-${randomLetters}-${randomNumber}`;
 };
@@ -66,6 +66,8 @@ const getAndUpdateReferences = async () => {
 
     const harrefModule6 = harrefnoData.find((item) => item.HARREFMODUL === 6);
     let newHarRefDeger = harrefModule6 ? harrefModule6.HARREFDEGER + 1 : 1;
+    const harrefModule1 = harrefnoData.find((item) => item.HARREFMODUL === 1);
+    let newHarRefDeger1 = harrefModule1 ? harrefModule1.HARREFDEGER + 1 : 1;
 
     const cikisFisEvrako = evraknoData.find(
       (item) => item.EVRACIKLAMA === "Çıkış Fişleri"
@@ -85,16 +87,22 @@ const getAndUpdateReferences = async () => {
       { HARREFDEGER: newHarRefDeger }
     );
     await updateDataByAny(
+      "HARREFNO",
+      { HARREFMODUL: 1 },
+      { HARREFDEGER: newHarRefDeger1 }
+    );
+    const updatedEVRAKNO1 = await updateDataByAny(
       "EVRAKNO",
       { EVRACIKLAMA: "Çıkış Fişleri" },
       { EVRNO: newCikisFisEvrNo }
     );
-    await updateDataByAny(
+    const updatedEVRAKNO2 = await updateDataByAny(
       "EVRAKNO",
       { EVRACIKLAMA: "Satış İrsaliyeleri" },
       { EVRNO: newSatisIrsaliyesiEvrNo }
     );
 
+    console.log("EVRAKNO:", updatedEVRAKNO1, updatedEVRAKNO2);
     return {
       harRefDeger: newHarRefDeger,
       cikisFisEvrNo: newCikisFisEvrNo,
@@ -315,7 +323,7 @@ const createSTKFIS = async (orderData, lastSTKFIS) => {
   // console.log("STKFIS verisi:", stkfisEntry);
 
   const newSkfisData = await createNewData("STKFIS", stkfisEntry);
-  // console.log("Yeni STKFIS verisi:", newSkfisData);
+  console.log("Yeni STKFIS verisi:", newSkfisData);
 
   // SIRKETLOG oluştur
   await createSIRKETLOG(newSTKFISREFNO, new Date());
@@ -469,10 +477,15 @@ const createSTKHAR = async (orderItem, createdSTKFISREFNO) => {
 
   // console.log("STKHAR verisi oluşturuluyor:", stkharEntry);
 
-  const newStkharData = await createNewData("STKHAR", stkharEntry);
-  // console.log("Yeni STKHAR verisi oluşturuldu:", newStkharData);
+  try {
+    const newStkharData = await createNewData("STKHAR", stkharEntry);
+    console.log("Yeni STKHAR verisi oluşturuldu:", newStkharData);
 
-  return newStkharData;
+    return newStkharData;
+  } catch (error) {
+    console.error("Yeni STKHAR verisi oluşturulamadı:", error);
+    throw error;
+  }
 };
 
 const getLastIRSHAR = async () => {
@@ -625,6 +638,7 @@ const createIRSFIS = async (
   const irsFisHour = irsFisDate.getHours().toString().padStart(2, "0");
   const irsFisMinute = irsFisDate.getMinutes().toString().padStart(2, "0");
   const irsFisTimeInfo = `${irsFisHour}:${irsFisMinute}`;
+  const newWEBNumber = parseInt(lastSTKFIS.STKFISEVRAKNO2.split("-")[1]) + 1;
 
   const irsfisEntry = {
     IRSFISREFNO: newIRSFISREFNO,
@@ -668,7 +682,7 @@ const createIRSFIS = async (
     IRSFISKDVVADETAR: new Date("1900-01-01"),
     IRSFISFATURATAR: new Date("1900-01-01"),
     IRSFISFATURANO: " ",
-    IRSFISEVRAKNO1: lastSTKFIS.STKFISEVRAKNO2,
+    IRSFISEVRAKNO1: `WEB-${newWEBNumber.toString().padStart(6, "0")}`,
     IRSFISEVRAKNO2: " ",
     IRSFISEVRAKNO3: " ",
     IRSFISOZKOD1: " ",
@@ -730,7 +744,7 @@ const createIRSFIS = async (
   // console.log("IRSFIS verisi oluşturuluyor:", irsfisEntry);
 
   const newIrsfisData = await createNewData("IRSFIS", irsfisEntry);
-  // console.log("Yeni IRSFIS verisi oluşturuldu:", newIrsfisData);
+  console.log("Yeni IRSFIS verisi oluşturuldu:", newIrsfisData);
 
   return newIRSFISREFNO;
 };
@@ -768,7 +782,7 @@ export default async function handler(req, res) {
           STKFISEVRAKNO1: lastSTKFIS.STKFISEVRAKNO1,
           STKFISEVRAKNO2: lastSTKFIS.STKFISEVRAKNO2,
           ACIKLAMA: null,
-          EKXTRA1: null,
+          ORDERSTATUS: "Sipariş Oluşturuldu",
           EKXTRA2: null,
           EKXTRA3: null,
           EKXTRA4: null,

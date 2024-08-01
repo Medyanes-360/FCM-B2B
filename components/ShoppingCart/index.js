@@ -13,7 +13,7 @@ import Link from "next/link";
 import Lottie from "lottie-react";
 import BoxAnimation from "../../public/boxanimation.json";
 import OrderSummary from "./OrderSummary";
-import { getAPI, postAPI } from "@/services/fetchAPI";
+import { getAPI } from "@/services/fetchAPI";
 import { useSession } from "next-auth/react";
 
 const ShoppingCart = () => {
@@ -28,22 +28,24 @@ const ShoppingCart = () => {
   const [imageMap, setImageMap] = useState({});
   const [editingIndex, setEditingIndex] = useState(null);
   const [confirmClearCart, setConfirmClearCart] = useState(false);
+  const [orders, setOrders] = useState([]);
 
   // useEffect(() => {
-  //   const fetchIRSHARData = async () => {
+  //   const fetchOrders = async () => {
   //     try {
-  //       const response = await getAPI("/cart-api/");
-  //       console.log("ALLORDERS Data:", response.data.ALLORDERS);
-  //       console.log("IRSFIS Data:", response.data.IRSFIS);
-  //       // console.log("STKFIS Data:", response.data.STKFIS);
-  //       // console.log("SIRKETLOG Data:", response.data.SIRKETLOG);
-  //     } catch (error) {
-  //       console.error("IRSHAR veri çekme hatası:", error);
+  //       const data = await getAPI("/allorders");
+  //       setOrders(data);
+  //       console.log("Siparişler:", data);
+  //       setIsLoading(false);
+  //     } catch (err) {
+  //       console.error(err);
+  //       setIsLoading(false);
   //     }
   //   };
 
-  //   fetchIRSHARData();
+  //   fetchOrders();
   // }, []);
+
   const handleConfirmOrder = async () => {
     if (session?.user?.id) {
       try {
