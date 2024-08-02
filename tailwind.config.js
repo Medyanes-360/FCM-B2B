@@ -42,6 +42,9 @@ module.exports = {
         BaşarısızOlanBg: "#eaa4a4",
         BaşarısızOlanText: "#762024",
       },
+      height: {
+        'screen-minus-50': 'calc(100vh - 50px)',
+      }
     },
   },
   plugins: [],

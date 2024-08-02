@@ -30,10 +30,10 @@ function ProdcutDetail({ product,img }) {
     );
   }
   return (
-    <div className="flex flex-col justify-center items-center bg-[url('/backgroundImage.webp')] bg-no-repeat min-h-screen  bg-contain bg-[#6bcdec]">
-      <div className="bg-gray-50 ">
+    <div className="flex flex-col justify-center items-center bg-[url('/backgroundImage.webp')] bg-no-repeat   bg-contain bg-[#6bcdec]">
+      <div className="bg-gray-50 h-screen-minus-50">
         <div className="grid grid-rows-2 px-5 lg:w-[1188px]  md:px-14 pt-14 pb-3 mb-2  lg:mx-auto">
-          <div className="row-span-1 md:grid md:grid-cols-4 md:grid-flow-col ">
+          <div className={`md:grid md:grid-cols-4 md:grid-flow-col ${product.desc && product.bookDetail ? 'row-span-1':'row-span-2'}`}>
             <div className="col-span-2 flex md:justify-center border border-dashed rounded-lg bg-white">
               <div className=" max-w-xl">
                 <img
@@ -97,8 +97,7 @@ function ProdcutDetail({ product,img }) {
               </div>
             </div>
           </div>
-          <div className=" row-span-1 hidden">
-            {/** şimdilik gizlendi */}
+          <div className={`${product.desc && product.bookDetail ? 'row-span-1 ' : 'hidden'}`}>
             <ProductToggleButton product={product} />
           </div>
         </div>

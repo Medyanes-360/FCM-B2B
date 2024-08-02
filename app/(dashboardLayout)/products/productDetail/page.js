@@ -3,12 +3,14 @@ import ProductDetail from "@/components/ProductList/ProdcutDetail";
 import React, { useEffect, useState } from "react";
 import { getAPI } from "@/services/fetchAPI";
 import Loading from "@/components/Loading";
+import useProductDetailStore from "@/utils/productDetailStore";
 
-function Page({ params: { productDetail } }) {
+function Page() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [img, setImg] = useState(""); // resim path'i
+  const {productDetail} = useProductDetailStore();
 
   useEffect(() => {
     const fetchData = async () => {

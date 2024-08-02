@@ -9,6 +9,7 @@ import { FaCheck, FaMinus, FaPlus, FaShoppingCart } from "react-icons/fa";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getAPI } from "@/services/fetchAPI";
+import useProductDetailStore from "@/utils/productDetailStore"; // ürün detayına gitmek için
 
 function CategoryProducts() {
   const [urunler, setUrunler] = useState([]); // Ürünler için state
@@ -17,6 +18,7 @@ function CategoryProducts() {
   const [dropdownOpen, setDropdownOpen] = useState({}); // Dropdown açılış durumu için state
   const [cart, setCart] = useState([]); // Sepet ürünleri için state
   const [imageMap, setImageMap] = useState({}); // Resim eşleştirmeleri için state
+  const {productDetail,changeProductDetail} = useProductDetailStore() // productDetail STKKOD değeri alır,changeProductDetail productDetail'i değiştirir
 
   // Komponent yüklendiğinde API'den ürünleri getir ve resim eşleştirmelerini oluştur
   useEffect(() => {
@@ -281,8 +283,9 @@ function CategoryProducts() {
               </div>
               <div className="w-3/5 sm:w-full flex flex-col justify-between">
                 <div className={`text-left md:pt-[15px] min-h-12 md:min-h-20 `}>
-                  <Link
-                    href={`/products/${urun.STKKOD}`}
+                <Link
+                    onClick={()=>changeProductDetail(urun.STKKOD)}
+                    href={`/products/productDetail`}
                     className="font-bold text-[14px] md:text-[16px] text-CustomGray leading-tight"
                   >
                     <p>{urun.STKCINSI}</p>

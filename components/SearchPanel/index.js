@@ -5,6 +5,7 @@ import { FaSearch, FaTimes } from "react-icons/fa";
 import Image from "next/image";
 import { getAPI } from "@/services/fetchAPI";
 import Link from "next/link";
+import useProductDetailStore from "@/utils/productDetailStore"; // ürün detayına gitmek için
 
 function SearchPanel({ toggleSearchPanel }) {
   const [searchResults, setSearchResults] = useState([]); // Arama sonuçları state'i
@@ -12,6 +13,7 @@ function SearchPanel({ toggleSearchPanel }) {
   const [searchInput, setSearchInput] = useState(""); // Arama input değeri
   const [products, setProducts] = useState([]); // Ürünlerin tutulduğu state
   const [imageMap, setImageMap] = useState({}); // Resim eşleştirmeleri için state
+  const { productDetail, changeProductDetail } = useProductDetailStore(); // productDetail STKKOD değeri alır,changeProductDetail productDetail'i değiştirir
 
   // Formik validasyon şeması
   const validationSchema = Yup.object().shape({
@@ -172,7 +174,10 @@ function SearchPanel({ toggleSearchPanel }) {
             <ul>
               {/* Her bir ürün için liste elemanı */}
               {searchResults.map((product) => (
-                <Link href={`/products/${product.STKKOD}`}>
+                <Link
+                  onClick={() => changeProductDetail(product.STKKOD)}
+                  href={`/products/productDetail`}
+                >
                   <li
                     className="p-5 shadow-b shadow-sm flex flex-row justify-start gap-4"
                     key={product.STKKOD}
