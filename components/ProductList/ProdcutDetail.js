@@ -34,7 +34,7 @@ function ProdcutDetail({ product,img }) {
       <div className="bg-gray-50 ">
         <div className="grid grid-rows-2 px-5 lg:w-[1188px]  md:px-14 pt-14 pb-3 mb-2  lg:mx-auto">
           <div className="row-span-1 md:grid md:grid-cols-4 md:grid-flow-col ">
-            <div className="col-span-2 flex md:justify-center border border-dashed rounded-lg">
+            <div className="col-span-2 flex md:justify-center border border-dashed rounded-lg bg-white">
               <div className=" max-w-xl">
                 <img
                   className="max-h-96"
@@ -50,8 +50,8 @@ function ProdcutDetail({ product,img }) {
               <div className="flex flex-col   mt-5 px-3">
                 <div className="flex space-x-2">
                   <div className="flex flex-col space-y-4 justify-evenly   text-gray-500 ">
-                    <div className="pb-[1px]">Yayınevi:</div>
-                    <div className="pt-[1px]">Kategori:</div>
+                  <div className="pb-[1px]">{/** Yayınevi yazması gereken yer */}&nbsp;</div>
+                  <div className="pt-[1px]">Kategori:</div>
                   </div>
                   <div className="flex flex-col space-y-4  justify-evenly ">
                     <div className="text-LightBlue inline p-0 text-lg ">
