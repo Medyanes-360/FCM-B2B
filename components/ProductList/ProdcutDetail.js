@@ -97,7 +97,8 @@ function ProdcutDetail({ product,img }) {
               </div>
             </div>
           </div>
-          <div className=" row-span-1">
+          <div className=" row-span-1 hidden">
+            {/** şimdilik gizlendi */}
             <ProductToggleButton product={product} />
           </div>
         </div>
