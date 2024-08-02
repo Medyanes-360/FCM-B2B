@@ -5,7 +5,7 @@ import {
   getDataByUnique,
 } from "@/services/serviceOperations";
 
-const now = new Date();
+const now = new Date(new Date().getTime() + 3 * 60 * 60 * 1000);
 
 const generateOrderNo = (userId) => {
   const day = now.getDate().toString().padStart(2, "0");
@@ -132,7 +132,10 @@ const updateSTKKART = async (STKKOD, quantity) => {
       await updateDataByAny(
         "STKKART",
         { STKKOD: STKKOD },
-        { STKBAKIYE: newSTKBAKIYE }
+        {
+          STKBAKIYE: newSTKBAKIYE,
+          STKEKDATE1: now, // Sipariş oluşturulma tarihini ekliyoruz
+        }
       );
 
       const updatedStkKart = await getDataByUnique("STKKART", {
@@ -140,7 +143,7 @@ const updateSTKKART = async (STKKOD, quantity) => {
       });
       console.log("Güncellenmiş STKKART verisi:", updatedStkKart);
       console.log(
-        `STKKART güncellendi: ${STKKOD}, Yeni STKBAKIYE: ${updatedStkKart.STKBAKIYE}`
+        `STKKART güncellendi: ${STKKOD}, Yeni STKBAKIYE: ${updatedStkKart.STKBAKIYE}, STKEKDATE1: ${updatedStkKart.STKEKDATE1}`
       );
     } else {
       console.log(`STKKART verisi bulunamadı veya hatalı: ${STKKOD}`);
@@ -150,6 +153,7 @@ const updateSTKKART = async (STKKOD, quantity) => {
     console.error(`STKKART güncellenirken hata oluştu (${STKKOD}):`, error);
   }
 };
+
 const updateSTKMIZDEGER = async (orderItems, currentDate) => {
   const currentYear = currentDate.getFullYear();
   const currentMonth = currentDate.getMonth() + 1;
@@ -263,12 +267,16 @@ const getLastSTKFIS = async () => {
     }
   );
   // console.log("Önceki DBDE OLAN STKFIS:", reducedSTKFIS);
-
   return reducedSTKFIS;
 };
 
-const createSTKFIS = async (orderData, lastSTKFIS) => {
-  const newSTKFISREFNO = lastSTKFIS.STKFISREFNO + 1;
+const getStkFisRefNo = async () => {
+  const allSTKFIS = await getLastSTKFIS();
+  return allSTKFIS.STKFISREFNO + 1;
+};
+
+const createSTKFIS = async (orderData, lastSTKFIS, lastSTKFISREFNO) => {
+  const newSTKFISREFNO = lastSTKFISREFNO;
   const newSFNumber = parseInt(lastSTKFIS.STKFISEVRAKNO1.split("-")[1]) + 1;
   const newWEBNumber = parseInt(lastSTKFIS.STKFISEVRAKNO2.split("-")[1]) + 1;
 
@@ -372,10 +380,15 @@ const createSIRKETLOG = async (stkfisRefNo, orderDate) => {
   // console.log("Yeni SIRKETLOG verisi:", newSirketlogData);
 };
 
-const createSTKHAR = async (orderItem, createdSTKFISREFNO) => {
+const createSTKHAR = async (
+  orderItem,
+  createdSTKFISREFNO,
+  lastSTKFISREFNO,
+  siraNo
+) => {
   const stkharEntry = {
     STKHARTAR: now,
-    STKHARREFNO: createdSTKFISREFNO,
+    STKHARREFNO: lastSTKFISREFNO,
     STKHARTIPI: 3,
     STKHARGCFLAG: 2,
     STKHARKAYONC: 2,
@@ -440,7 +453,7 @@ const createSTKHAR = async (orderItem, createdSTKFISREFNO) => {
     STKHARRB4: 0,
     STKHARRB5: 0,
     STKHARFIYTIP: " ",
-    STKHARSIRANO: 0,
+    STKHARSIRANO: siraNo,
     STKHARTOPLAMMAS: 0,
     STKHARNETTUTAR: orderItem.STKBIRIMFIYATTOPLAM,
     STKHARNETFIYAT: orderItem.STKBIRIMFIYAT,
@@ -498,7 +511,13 @@ const getLastIRSHAR = async () => {
   return reducedIRSHAR;
 };
 
-const createIRSHAR = async (orderItem, createdIRSFISREFNO, lastIRSHAR) => {
+const createIRSHAR = async (
+  orderItem,
+  createdIRSFISREFNO,
+  lastIRSHAR,
+  siraNo
+) => {
+  console.log(`createIRSHAR çağrıldı. Sıra No: ${siraNo}`);
   const newIRSHARREFNO = lastIRSHAR.IRSHARREFNO + 1;
 
   const irsharEntry = {
@@ -511,7 +530,7 @@ const createIRSHAR = async (orderItem, createdIRSFISREFNO, lastIRSHAR) => {
     IRSHARKAYNAK: 6,
     IRSHARIADE: 0,
     IRSHARCARKOD: orderItem.CARKOD,
-    IRSHARSIRANO: 0,
+    IRSHARSIRANO: siraNo,
     IRSHARKODTIP: 1,
     IRSHARSTKKOD: orderItem.STKKOD,
     IRSHARSTKCINS: orderItem.STKNAME,
@@ -611,10 +630,14 @@ const createIRSHAR = async (orderItem, createdIRSFISREFNO, lastIRSHAR) => {
 
   // console.log("IRSHAR verisi oluşturuluyor:", irsharEntry);
 
-  const newIrsharData = await createNewData("IRSHAR", irsharEntry);
-  // console.log("Yeni IRSHAR verisi oluşturuldu:", newIrsharData);
-
-  return newIRSHARREFNO;
+  try {
+    const newIrsharData = await createNewData("IRSHAR", irsharEntry);
+    console.log("Yeni IRSHAR verisi oluşturuldu:", newIrsharData);
+    return newIRSHARREFNO;
+  } catch (error) {
+    console.error("Yeni IRSHAR verisi oluşturulamadı:", error);
+    throw error;
+  }
 };
 
 const getLastIRSFIS = async () => {
@@ -772,15 +795,19 @@ export default async function handler(req, res) {
       const lastSTKFIS = await getLastSTKFIS();
       const lastIRSFIS = await getLastIRSFIS();
       const lastIRSHAR = await getLastIRSHAR();
+      const lastSTKFISREFNO = await getStkFisRefNo();
 
       // console.log("Sipariş oluşturma işlemi başlıyor");
+      const newSFNumber = parseInt(lastSTKFIS.STKFISEVRAKNO1.split("-")[1]) + 1;
+      const newWEBNumber =
+        parseInt(lastSTKFIS.STKFISEVRAKNO2.split("-")[1]) + 1;
 
       for (const item of orderItems) {
         const entry = {
           ...item,
-          STKFISREFNO: lastSTKFIS.STKFISREFNO + 1,
-          STKFISEVRAKNO1: lastSTKFIS.STKFISEVRAKNO1,
-          STKFISEVRAKNO2: lastSTKFIS.STKFISEVRAKNO2,
+          STKFISREFNO: lastSTKFISREFNO,
+          STKFISEVRAKNO1: `SF-${newSFNumber.toString().padStart(6, "0")}`,
+          STKFISEVRAKNO2: `WEB-${newWEBNumber.toString().padStart(6, "0")}`,
           ACIKLAMA: null,
           ORDERSTATUS: "Sipariş Oluşturuldu",
           EKXTRA2: null,
@@ -808,7 +835,11 @@ export default async function handler(req, res) {
       console.log("STKMIZDEGER güncellemesi tamamlandı");
 
       // STKFIS ve SIRKETLOG oluştur
-      const createdSTKFISREFNO = await createSTKFIS(orderItems[0], lastSTKFIS);
+      const createdSTKFISREFNO = await createSTKFIS(
+        orderItems[0],
+        lastSTKFIS,
+        lastSTKFISREFNO
+      );
 
       // IRSFIS oluştur
       const createdIRSFISREFNO = await createIRSFIS(
@@ -821,15 +852,25 @@ export default async function handler(req, res) {
       // STKHAR ve IRSHAR oluştur
       const createdSTKHARs = [];
       const createdIRSHARs = [];
+      let siraNo = 0;
       for (const item of orderItems) {
-        const createdSTKHAR = await createSTKHAR(item, createdSTKFISREFNO);
+        siraNo++;
+        console.log(`İşleniyor: Ürün ${siraNo}, STKKOD: ${item.STKKOD}`);
+
+        const createdSTKHAR = await createSTKHAR(
+          item,
+          createdSTKFISREFNO,
+          lastSTKFISREFNO,
+          siraNo
+        );
         createdSTKHARs.push(createdSTKHAR);
         console.log("STKHAR tablosuna yazma sonucu:", createdSTKHAR);
 
         const createdIRSHAR = await createIRSHAR(
           item,
           createdIRSFISREFNO,
-          lastIRSHAR
+          lastIRSHAR,
+          siraNo
         );
         createdIRSHARs.push(createdIRSHAR);
         console.log("IRSHAR tablosuna yazma sonucu:", createdIRSHAR);

@@ -30,21 +30,21 @@ const ShoppingCart = () => {
   const [confirmClearCart, setConfirmClearCart] = useState(false);
   const [orders, setOrders] = useState([]);
 
-  // useEffect(() => {
-  //   const fetchOrders = async () => {
-  //     try {
-  //       const data = await getAPI("/allorders");
-  //       setOrders(data);
-  //       console.log("Siparişler:", data);
-  //       setIsLoading(false);
-  //     } catch (err) {
-  //       console.error(err);
-  //       setIsLoading(false);
-  //     }
-  //   };
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const data = await getAPI("/allorders");
+        setOrders(data);
+        console.log("Siparişler:", data);
+        setIsLoading(false);
+      } catch (err) {
+        console.error(err);
+        setIsLoading(false);
+      }
+    };
 
-  //   fetchOrders();
-  // }, []);
+    fetchOrders();
+  }, []);
 
   const handleConfirmOrder = async () => {
     if (session?.user?.id) {
