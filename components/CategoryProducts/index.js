@@ -18,8 +18,7 @@ function CategoryProducts() {
   const [dropdownOpen, setDropdownOpen] = useState({}); // Dropdown açılış durumu için state
   const [cart, setCart] = useState([]); // Sepet ürünleri için state
   const [imageMap, setImageMap] = useState({}); // Resim eşleştirmeleri için state
-  const {productDetail,changeProductDetail} = useProductDetailStore() // productDetail STKKOD değeri alır,changeProductDetail productDetail'i değiştirir
-    
+  const { productDetail, changeProductDetail } = useProductDetailStore(); // productDetail STKKOD değeri alır,changeProductDetail productDetail'i değiştirir
 
   // Komponent yüklendiğinde API'den ürünleri getir ve resim eşleştirmelerini oluştur
   useEffect(() => {
@@ -109,7 +108,7 @@ function CategoryProducts() {
       );
 
       await new Promise((resolve) => setTimeout(resolve, 1000));
-   
+
       const updatedUrunler = urunler.map((item) =>
         item.STKKOD === urun.STKKOD
           ? {
@@ -166,7 +165,8 @@ function CategoryProducts() {
   // Kitapları render et
   const renderBooks = () => {
     let filteredUrunler = urunler.filter(
-      (urun) => urun.STKOZKOD3 === selectedClass
+      (urun) =>
+        urun.STKOZKOD3 === selectedClass && parseFloat(urun.STKOZKOD5) > 0
     );
 
     // ANASINIFI ve İNGİLİZCE dışında bir sınıf seçildiyse
@@ -285,8 +285,8 @@ function CategoryProducts() {
               </div>
               <div className="w-3/5 sm:w-full flex flex-col justify-between">
                 <div className={`text-left md:pt-[15px] min-h-12 md:min-h-20 `}>
-                <Link
-                    onClick={()=>changeProductDetail(urun.STKKOD)}
+                  <Link
+                    onClick={() => changeProductDetail(urun.STKKOD)}
                     href={`/products/productDetail`}
                     className="font-bold text-[14px] md:text-[16px] text-CustomGray leading-tight"
                   >

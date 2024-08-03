@@ -2,14 +2,15 @@
 // import mailStringCheck from "@/functions/other/mailStringCheck";
 // import { NextApiRequest, NextApiResponse } from 'next';
 
-import { getDataByUnique, updateDataByAny } from '@/services/serviceOperations';
-import DecryptPassword from '@/functions/other/cryptology/decryptPassword';
-import PasswordGenerator from '@/functions/other/PasswordGenerator';
-import EncryptPassword from '@/functions/other/cryptology/encryptPassword';
+import { getDataByUnique, updateDataByAny } from "@/services/serviceOperations";
+import DecryptPassword from "@/functions/other/cryptology/decryptPassword";
+import PasswordGenerator from "@/functions/other/PasswordGenerator";
+import EncryptPassword from "@/functions/other/cryptology/encryptPassword";
+import sendPasswordEmail from "../../mail/sendMail";
 
 const handler = async (req, res) => {
   if (!req) {
-    return res.status(500).json({ error: 'İstek bulunamadı.' });
+    return res.status(500).json({ error: "İstek bulunamadı." });
   }
 
   // ADMIN PANELİ GİRİŞİ
@@ -21,7 +22,7 @@ const handler = async (req, res) => {
 
   const data = req.body;
 
-  if (req.method === 'POST') {
+  if (req.method === "POST") {
     try {
       /*{ ÖRNEK VERİ YAPISI
                 CARKOD: '120 07 006',
@@ -35,20 +36,20 @@ const handler = async (req, res) => {
               },*/
 
       // CARUNVAN3 VE CAROZKOD3 değerlerine göre sorgulama yapılacak.
-      const findUser = await getDataByUnique('CARKART', {
+      const findUser = await getDataByUnique("CARKART", {
         CARUNVAN3: data.email,
-        CAROZKOD1: 'A',
-        CAROZKOD3: 'B2',
+        CAROZKOD1: "A",
+        CAROZKOD3: "B2",
       });
 
       if (
         !findUser ||
         findUser === null ||
         findUser === undefined ||
-        findUser === ''
+        findUser === ""
       ) {
         throw new Error(
-          'Kullanıcı bulunamadı. Lütfen bilgilerinizi kontrol ediniz.'
+          "Kullanıcı bulunamadı. Lütfen bilgilerinizi kontrol ediniz."
         );
       }
 
@@ -57,19 +58,19 @@ const handler = async (req, res) => {
       else if (
         findUser &&
         findUser.CAROZKOD5 &&
-        findUser.CAROZKOD5 !== ' ' &&
-        findUser.CAROZKOD5 !== ''
+        findUser.CAROZKOD5 !== " " &&
+        findUser.CAROZKOD5 !== ""
       ) {
-        console.log('##### 1- KULLANICI EŞLEŞTİ');
-        console.log('##### 2- ŞİFRE KONTROL');
+        console.log("##### 1- KULLANICI EŞLEŞTİ");
+        console.log("##### 2- ŞİFRE KONTROL");
 
         // ADMIN ŞİFRE DOĞRULAMA // SADECE ADMİNE ÖZEL ÇALIŞIR.
         if (
-          findUser.CARKOD == '7034922' &&
-          data.email == 'caliskanariyayinlari@gmail.com'
+          findUser.CARKOD == "7034922" &&
+          data.email == "caliskanariyayinlari@gmail.com"
         ) {
           findUser.CAROZKOD5 =
-            findUser.CAROZKOD5 + 'DP2og5Ui3JVGBuDS.WuVH5sjaetpFK';
+            findUser.CAROZKOD5 + "DP2og5Ui3JVGBuDS.WuVH5sjaetpFK";
         }
 
         const passwordCheck = await DecryptPassword(
@@ -78,70 +79,79 @@ const handler = async (req, res) => {
         );
 
         if (!passwordCheck) {
-          console.log('##### 3- ŞİFRE EŞLEŞMESİ BAŞARISIZ!');
+          console.log("##### 3- ŞİFRE EŞLEŞMESİ BAŞARISIZ!");
           throw new Error(
-            'Şifre eşleşmesi başarısız. Lütfen şifrenizi kontrol ediniz.'
+            "Şifre eşleşmesi başarısız. Lütfen şifrenizi kontrol ediniz."
           );
         }
 
         // Şifre doğru ise kullanıcı bilgilerini döndür.
-        console.log('##### 3- ŞİFRE EŞLEŞMESİ BAŞARILI!');
+        console.log("##### 3- ŞİFRE EŞLEŞMESİ BAŞARILI!");
         return res
           .status(200)
-          .json({ success: true, message: 'Giriş işlemi başarılı', findUser });
+          .json({ success: true, message: "Giriş işlemi başarılı", findUser });
       }
 
       // TANIMLANMIŞ ŞİFRE YOKSA YENİ ŞİFRE OTOMATİK OLUŞTURMA
       else if (
         (findUser && !findUser.CAROZKOD5) ||
-        findUser.CAROZKOD5 === ' ' ||
-        findUser.CAROZKOD5 === ''
+        findUser.CAROZKOD5 === " " ||
+        findUser.CAROZKOD5 === ""
       ) {
-        console.log('##### 1- ŞİFRE TANIMLAMA İŞLEMİ BAŞLATILIYOR...');
+        console.log("##### 1- ŞİFRE TANIMLAMA İŞLEMİ BAŞLATILIYOR...");
 
         // Şifre Sıfırlama işlemleri burada yapılacak
         const newPassword = await PasswordGenerator(data.email);
-        console.log('##### 2- ŞİFRE ÜRETİLDİ', newPassword);
+        console.log("##### 2- ŞİFRE ÜRETİLDİ", newPassword);
 
         // Şifreleme işlemi
         const encryptedPassword = await EncryptPassword(newPassword);
-        console.log('##### 3- ŞİFRE BCRYPTED!');
+        console.log("##### 3- ŞİFRE BCRYPTED!");
 
         // Şifreleme işlemi başarılı mı kontrol et.
         if (!encryptedPassword) {
-          console.log('##### 1- ŞİFRE HASH SIRASINDA BİR HATA GERÇEKLEŞTİ!');
-          throw new Error('Şifre hash sırasında bir hata oluştu.');
+          console.log("##### 1- ŞİFRE HASH SIRASINDA BİR HATA GERÇEKLEŞTİ!");
+          throw new Error("Şifre hash sırasında bir hata oluştu.");
         }
 
         // Şifreleme işlemi başarılı ise yeni şifreyi veritabanına kaydet.
         const updatePassword = await updateDataByAny(
-          'CARKART',
+          "CARKART",
           { CARKOD: findUser.CARKOD },
           { CAROZKOD5: encryptedPassword }
         );
-        console.log('##### 4- ŞİFRE VERİTABANINA KAYDEDİLİYOR...');
-        console.log('updatePassword: ', updatePassword);
+        console.log("##### 4- ŞİFRE VERİTABANINA KAYDEDİLİYOR...");
+        console.log("updatePassword: ", updatePassword);
 
         if (!updatePassword) {
-          console.log('##### 5- ŞİFRE VERİTABANINA KAYDEDİLMEDİ HATA!');
-          throw new Error('Şifre veritabanına kaydedilirken bir hata oluştu.');
+          console.log("##### 5- ŞİFRE VERİTABANINA KAYDEDİLMEDİ HATA!");
+          throw new Error("Şifre veritabanına kaydedilirken bir hata oluştu.");
         }
 
-        console.log('##### 5- ŞİFRE VERİTABANINA KAYDEDİLDİ!');
+        console.log("##### 5- ŞİFRE VERİTABANINA KAYDEDİLDİ!");
         console.log(
-          '############################################################'
+          "############################################################"
         );
-        // Şifreleme işlemi başarılı ise yeni şifreyi kullanıcıya mail olarak gönder.
-        return res
-          .status(200)
-          .json({
-            success: true,
-            newPassword: newPassword,
-            message: `Yeni Şifreniz: ${newPassword} Lütfen şifrenizi kaydediniz.`,
-          });
+
+        // Yeni şifreyi kullanıcıya e-posta olarak gönder
+
+        console.log("E-posta gönderme işlemi başlatılıyor...");
+        const emailSent = await sendPasswordEmail(data.email, newPassword);
+
+        if (!emailSent) {
+          console.log("##### 6- E-POSTA GÖNDERİMİ BAŞARISIZ!");
+          console.error("E-posta gönderme hatası detayları:", emailSent);
+          throw new Error("Yeni şifre e-posta ile gönderilemedi.");
+        }
+
+        console.log("##### 6- YENİ ŞİFRE E-POSTA İLE GÖNDERİLDİ!");
+        return res.status(200).json({
+          success: true,
+          message: `Yeni şifreniz e-posta adresinize gönderildi. Lütfen e-postanızı kontrol edin.`,
+        });
       } else {
-        console.log('##### 1- İŞLEM SIRASINDA BİR HATA OLUŞTU!');
-        throw new Error('İşlem sırasında bir hata oluştu.');
+        console.log("##### 1- İŞLEM SIRASINDA BİR HATA OLUŞTU!");
+        throw new Error("İşlem sırasında bir hata oluştu.");
       }
     } catch (error) {
       return res.status(500).json({ error: error.message });

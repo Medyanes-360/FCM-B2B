@@ -1,6 +1,6 @@
 "use client";
-import Link from "next/link";
 import React, { useState } from "react";
+import Link from "next/link";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { signIn } from "next-auth/react";
@@ -9,6 +9,8 @@ import Loading from "../Loading";
 
 const LoginComponent = ({ pageRole }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
+  const [messageType, setMessageType] = useState("");
 
   const initialValues = {
     email: "",
@@ -23,40 +25,51 @@ const LoginComponent = ({ pageRole }) => {
     password: Yup.string().required("Parola zorunludur"),
   });
 
-  const handleSubmit = (values) => {
+  const handleSubmit = async (values) => {
     setIsLoading(true);
+    setStatusMessage("");
 
-    // signIn içine hangi provider ile giriş yapılacağı ve giriş bilgileri gönderilir.
-    const result = signIn("credentials", {
-      email: values.email,
-      password: values.password,
-      role: pageRole,
-      callbackUrl: "/",
-      redirect: false,
-    }).then((res) => {
-      setIsLoading(false);
-      // console.log("RES: ", res);
-      if (!res) {
-        // toast.error('Bir hata oluştu. Lütfen tekrar deneyiniz.');
-        console.log("Bir hata oluştu. Lütfen tekrar deneyiniz.");
-        // setIsloading(false);
-      } else if (!res.ok) {
-        // toast.error(res.error);
-        console.log(res.error);
-        // setIsloading(false);
-      } else {
-        // BİR PROBLEM YOKSA GİRİŞ BAŞARILI BİLGİSİ VERİRİZ.
-        // setIsAccessing(true);
-        // setIsloading(false);
-        // toast.success('Giriş Başarılı (Yönlendiriliyorsunuz...)');
-        console.log("Giriş Başarılı Yönlendiriliyorsunuz...");
+    try {
+      const result = await signIn("credentials", {
+        email: values.email,
+        password: values.password,
+        role: pageRole,
+        callbackUrl: "/",
+        redirect: false,
+      });
 
-        const timeOut = setInterval(() => {
+      if (result.error) {
+        if (result.error.includes("Kullanıcı bulunamadı")) {
+          setStatusMessage("Kullanıcı bulunamadı. Lütfen tekrar deneyiniz.");
+          setMessageType("error");
+        } else if (result.error.includes("Şifre eşleşmesi başarısız")) {
+          setStatusMessage("Şifre eşleşmiyor. Lütfen tekrar deneyiniz.");
+          setMessageType("error");
+        } else if (
+          result.error.includes("Yeni şifreniz e-posta adresinize gönderildi")
+        ) {
+          setStatusMessage(
+            "Şifreniz oluşturuldu. Lütfen mailinizi kontrol ediniz."
+          );
+          setMessageType("success");
+        } else {
+          setStatusMessage("Bir hata oluştu. Lütfen tekrar deneyiniz.");
+          setMessageType("error");
+        }
+      } else if (result.ok) {
+        setStatusMessage("Başarıyla giriş yaptınız. Yönlendiriliyorsunuz.");
+        setMessageType("success");
+        setTimeout(() => {
           router.push("/");
-          clearInterval(timeOut);
         }, 2000);
       }
-    });
+    } catch (error) {
+      console.error("Login error:", error);
+      setStatusMessage("Bir hata oluştu. Lütfen tekrar deneyiniz.");
+      setMessageType("error");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const router = useRouter();
@@ -125,6 +138,15 @@ const LoginComponent = ({ pageRole }) => {
         )}
       </Formik>
       {isLoading && <Loading />}
+      {statusMessage && (
+        <div
+          className={`mt-4 text-${
+            messageType === "success" ? "green" : "red"
+          }-500 font-bold`}
+        >
+          {statusMessage}
+        </div>
+      )}
       <div className="clear" />
       <p className="mt-4 text-CustomRed/75 text-[14px] hover:text-CustomRed  transition-all ease-in-out duration-700 transform ">
         <Link href="https://caliskanari.com/my-account/lost-password/">
