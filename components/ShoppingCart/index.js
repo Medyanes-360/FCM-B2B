@@ -131,11 +131,33 @@ const ShoppingCart = () => {
 
     if (!isNaN(newQuantity) && newQuantity >= 1) {
       updatedCart[index].quantity = newQuantity;
+
+      // STKOZKOD5'i sayıya çevir
+      const price = parseFloat(updatedCart[index].STKOZKOD5);
+      if (isNaN(price)) {
+        console.error(`Geçersiz fiyat değeri: ${updatedCart[index].STKOZKOD5}`);
+        toast.error(
+          "Ürün fiyatı geçersiz. Lütfen yöneticiyle iletişime geçin."
+        );
+        return;
+      }
+      updatedCart[index].STKOZKOD5 = price;
+
       setStoredCart(updatedCart);
       localStorage.setItem("cart", JSON.stringify(updatedCart));
       updateTotalPrice(updatedCart);
 
       toast.success("Ürün adedi başarıyla güncellendi.", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    } else {
+      toast.error("Geçersiz miktar. Lütfen pozitif bir tam sayı girin.", {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -183,7 +205,10 @@ const ShoppingCart = () => {
 
   const updateTotalPrice = (cart) => {
     const totalPrice = cart.reduce((acc, item) => {
-      return acc + item.STKOZKOD5 * item.quantity;
+      // STKOZKOD5 değerini sayıya çevir
+      const price = parseFloat(item.STKOZKOD5);
+      // Eğer geçerli bir sayı değilse, 0 kullan
+      return acc + (isNaN(price) ? 0 : price) * item.quantity;
     }, 0);
     setTotalPrice(totalPrice);
   };
