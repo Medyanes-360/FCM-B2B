@@ -9,7 +9,7 @@ import {
   MdKeyboardDoubleArrowRight,
 } from "react-icons/md";
 
-const OrderList = () => {
+const OrderList = ({order}) => {
   const [filteredOrders, setFilteredOrders] = useState(orders);
   const [searchValue, setSearchValue] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("Tümü");
@@ -319,7 +319,7 @@ const OrderList = () => {
           </div>
         </div>
       </div>
-      <OrderListTable orders={paginatedOrders} selectedOrders={selectedOrders} setSelectedOrders={setSelectedOrders} />
+      <OrderListTable orders={paginatedOrders} selectedOrders={selectedOrders} setSelectedOrders={setSelectedOrders} fetchOrders={order} />
     </>
   );
 };

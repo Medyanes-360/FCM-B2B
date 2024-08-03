@@ -5,12 +5,27 @@ import { FaPencilAlt } from "react-icons/fa";
 import { FaTrashAlt } from "react-icons/fa";
 import OrderEditModal from "./OrderEditModal";
 import DeleteConfirmationModal from "./DeleteConfirmationModal";
+import OrderDetailModal from "./OrderDetailModal";
 
-const OrderListTable = ({ orders, setSelectedOrders, selectedOrders }) => {
+const OrderListTable = ({
+  orders,
+  setSelectedOrders,
+  selectedOrders,
+  fetchOrders,
+}) => {
   const [isOpenEditModal, setIsOpenEditModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
+  const [isOrderDetailModal, setIsOrderDetailModal] = useState(false);
 
+  const handleOrderClick = (order) => {
+    setSelectedOrder(order);
+    setIsOrderDetailModal(true);
+  };
+  const handleModalClose = () => {
+    setIsOrderDetailModal(false);
+    setSelectedOrder(null);
+  };
   const handleEditOpenModal = (order) => {
     setSelectedOrder(order);
     setIsOpenEditModal(true);
@@ -52,8 +67,8 @@ const OrderListTable = ({ orders, setSelectedOrders, selectedOrders }) => {
   };
 
   const handleOrderSelect = (order) => {
-    if (selectedOrders.some((o) => o.id === order.id)) {
-      setSelectedOrders(selectedOrders.filter((o) => o.id !== order.id));
+    if (selectedOrders.some((o) => o.id === order.ID)) {
+      setSelectedOrders(selectedOrders.filter((o) => o.ID !== order.ID));
     } else {
       setSelectedOrders([...selectedOrders, order]);
     }
@@ -93,9 +108,9 @@ const OrderListTable = ({ orders, setSelectedOrders, selectedOrders }) => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200 ">
-            {orders.map((order, index) => (
+            {fetchOrders.map((order, index) => (
               <tr
-                key={order.id}
+                key={order.ID}
                 className={`${index % 2 === 1 ? "bg-white" : "bg-gray-50"} `}
               >
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -105,8 +120,11 @@ const OrderListTable = ({ orders, setSelectedOrders, selectedOrders }) => {
                     onChange={() => handleOrderSelect(order)}
                   />
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-LightBlue relative group cursor-pointer ">
-                  {order.orderNumber}
+                <td
+                  onClick={() => handleOrderClick(order)}
+                  className="px-6 py-4 whitespace-nowrap text-LightBlue relative group cursor-pointer "
+                >
+                  {order.STKNAME}
                   <span className="invisible group-hover:visible w-28 bg-LightBlue text-xs text-white text-center rounded-lg p-2 absolute z-10 -mt-1 ml-2">
                     Sipariş Detayı
                   </span>
@@ -114,23 +132,25 @@ const OrderListTable = ({ orders, setSelectedOrders, selectedOrders }) => {
                 <td className="px-6 py-4 whitespace-nowrap text-LightBlue cursor-pointer relative group">
                   <div className="flex items-center ">
                     <RxEyeOpen className="text-LightBlue  " />
-                    <span className="ml-2">{order.dealerName}</span>
+                    <span className="ml-2">{order.CARUNVAN}</span>
                   </div>
                   <span className="invisible group-hover:visible w-28 bg-LightBlue text-wrap text-xs text-white text-center rounded-lg p-2 absolute z-10 -mt-1 ml-2">
                     Adres: {order.dealerAddress}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">{order.date}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{order.ORDERGUN}/{order.ORDERAY}/{order.ORDERYIL}</td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div
                     className={`inline-block rounded-sm px-2 py-1 ${
                       statusColors[order.status]
                     }`}
                   >
-                    {order.status}
+                    {order.ORDERSTATUS}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">{order.total}₺</td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {order.ORDERFIYATTOPLAM}₺
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex space-x-3">
                     <button
@@ -164,6 +184,13 @@ const OrderListTable = ({ orders, setSelectedOrders, selectedOrders }) => {
           isOpen={isOpenDeleteModal}
           setIsOpen={setIsOpenDeleteModal}
           handleDelete={handleDelete}
+          order={selectedOrder}
+        />
+      )}
+      {isOrderDetailModal && (
+        <OrderDetailModal
+          isOpen={isOpenEditModal}
+          onClose={handleModalClose}
           order={selectedOrder}
         />
       )}

@@ -14,7 +14,7 @@ const DeleteConfirmationModal = ({
       <div className="bg-white p-6 rounded-lg shadow-lg z-10">
         <h2 className="text-xl mb-4">
           <span className="border  p-2 rounded-md bg-LightBlue/40 cursor-not-allowed">
-            {order.orderNumber}
+            {order.ID}
           </span>{" "}
           numaralı siparişi silmek istiyor musunuz?
         </h2>
