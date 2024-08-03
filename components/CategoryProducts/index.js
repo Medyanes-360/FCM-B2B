@@ -19,6 +19,7 @@ function CategoryProducts() {
   const [cart, setCart] = useState([]); // Sepet ürünleri için state
   const [imageMap, setImageMap] = useState({}); // Resim eşleştirmeleri için state
   const {productDetail,changeProductDetail} = useProductDetailStore() // productDetail STKKOD değeri alır,changeProductDetail productDetail'i değiştirir
+    
 
   // Komponent yüklendiğinde API'den ürünleri getir ve resim eşleştirmelerini oluştur
   useEffect(() => {
@@ -108,7 +109,7 @@ function CategoryProducts() {
       );
 
       await new Promise((resolve) => setTimeout(resolve, 1000));
-
+   
       const updatedUrunler = urunler.map((item) =>
         item.STKKOD === urun.STKKOD
           ? {
@@ -118,6 +119,7 @@ function CategoryProducts() {
             }
           : item
       );
+
       setUrunler(updatedUrunler);
 
       const updatedCart = [...cart];

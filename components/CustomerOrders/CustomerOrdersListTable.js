@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { HiOutlineDocumentAdd } from "react-icons/hi";
 import { FaEye } from "react-icons/fa";
 
@@ -7,6 +7,7 @@ import { ImCancelCircle } from "react-icons/im";
 import RequestModal from "./RequestModal";
 import OrderCancellation from "./OrderCancallation";
 import Link from "next/link";
+import { getAPI } from "@/services/fetchAPI";
 
 const CustomerOrdersListTable = ({ orders }) => {
   const [selectAllChecked, setSelectAllChecked] = useState(false);
@@ -14,6 +15,7 @@ const CustomerOrdersListTable = ({ orders }) => {
   const [isOpenReqModal, setIsOpenReqModal] = useState(false);
   const [isOpenOrderCanModal, setIsOpenOrderCanModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [products, setProducts] = useState([]);
   // statu Renkleri
   const statusColors = {
     Beklemede: "bg-[#e5e5e5] text-[#80808b]",
@@ -23,6 +25,20 @@ const CustomerOrdersListTable = ({ orders }) => {
     "İptal edildi": "bg-[#e3e5e3] text-[#7a7a7c]",
     Başarısız: "bg-[#eaa4a4] text-[#762024]",
   };
+
+  useEffect(()=>{
+    const fetch = async ()=>{
+      try{
+        const data = await getAPI("/allorders");
+        console.log("Ürünler", data);
+        setProducts(data)
+      }
+      catch(err){
+        console.log(err);
+      }
+    }
+    fetch();
+  }, [])
 
   const handleSelectAllCheckboxChange = (event) => {
     const { checked } = event.target;
@@ -80,9 +96,9 @@ const CustomerOrdersListTable = ({ orders }) => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200 ">
-            {orders.map((order, index) => (
+            {products.map((product, index) => (
               <tr
-                key={order.id}
+                key={product.ID}
                 className={`${
                   index % 2 === 1 ? "bg-white" : "bg-gray-50"
                 } text-center`}
@@ -90,40 +106,40 @@ const CustomerOrdersListTable = ({ orders }) => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   <input
                     type="checkbox"
-                    checked={selectedOrderCheckboxes[order.id] || false}
-                    onChange={() => handleSingleCheckboxChange(order.id)}
+                    // checked={selectedOrderCheckboxes[product.ID] || false}
+                    // onChange={() => handleSingleCheckboxChange(product.ID)}
                   />
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-LightBlue">
-                  {order.orderNumber}
+                  {product.STKNAME}
                 </td>
 
-                <td className="px-6 py-4 whitespace-nowrap ">{order.date}</td>
+                <td className="px-6 py-4 whitespace-nowrap ">{product.DATE}</td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div
-                    className={`inline-block rounded-sm px-2 py-1  ${
-                      statusColors[order.status]
-                    }`}
+                    // className={`inline-block rounded-sm px-2 py-1  ${
+                    //   statusColors[order.status]
+                    // }`}
                   >
-                    {order.status}
+                    {product.ORDERSTATUS}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">{order.total}₺</td>
+                <td className="px-6 py-4 whitespace-nowrap">{product.ORDERFIYATTOPLAM}₺</td>
                 <td className="px-6 py-4 space-x-2 flex   whitespace-nowrap ">
                   <button
                     className="bg-NavyBlue/75 p-2 rounded-md  hover:bg-NavyBlue text-white flex items-center space-x-1 "
-                    onClick={() => handleOpenRequestModal(order)}
+                    // onClick={() => handleOpenRequestModal(order)}
                   >
                     <HiOutlineDocumentAdd />{" "}
                     <span>Talep oluştur</span>{" "}
                   </button>
                   <button
                     className="bg-red-300 p-2 rounded-md hover:bg-red-400 flex items-center space-x-1"
-                    onClick={() => handleOrderCancellation(order)}
+                    // onClick={() => handleOrderCancellation(order)}
                   >
                     <ImCancelCircle /> <span> Sipariş İptal</span>
                   </button>
-                  <Link href={`/customer-orders/${order.id}`}>
+                  <Link href={`/customer-orders/${product.ID}`}>
                     <button className="bg-LightBlue/75  p-2 rounded-md hover:bg-LightBlue flex items-center space-x-1">
                       <FaEye /> <span>Sipariş İncele</span>{" "}
                     </button>

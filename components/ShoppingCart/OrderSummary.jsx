@@ -25,7 +25,7 @@ const OrderSummary = ({
                 {item.STKCINSI} (x{item.quantity})
               </span>
               <span className="font-bold text-CustomGray">
-                ₺{item.STKOZKOD5 * item.quantity}
+                ₺{parseFloat(item.STKOZKOD5) * item.quantity}
               </span>
             </div>
           ))}

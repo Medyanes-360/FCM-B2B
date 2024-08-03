@@ -131,33 +131,11 @@ const ShoppingCart = () => {
 
     if (!isNaN(newQuantity) && newQuantity >= 1) {
       updatedCart[index].quantity = newQuantity;
-
-      // STKOZKOD5'i sayıya çevir
-      const price = parseFloat(updatedCart[index].STKOZKOD5);
-      if (isNaN(price)) {
-        console.error(`Geçersiz fiyat değeri: ${updatedCart[index].STKOZKOD5}`);
-        toast.error(
-          "Ürün fiyatı geçersiz. Lütfen yöneticiyle iletişime geçin."
-        );
-        return;
-      }
-      updatedCart[index].STKOZKOD5 = price;
-
       setStoredCart(updatedCart);
       localStorage.setItem("cart", JSON.stringify(updatedCart));
       updateTotalPrice(updatedCart);
 
       toast.success("Ürün adedi başarıyla güncellendi.", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-    } else {
-      toast.error("Geçersiz miktar. Lütfen pozitif bir tam sayı girin.", {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -205,10 +183,7 @@ const ShoppingCart = () => {
 
   const updateTotalPrice = (cart) => {
     const totalPrice = cart.reduce((acc, item) => {
-      // STKOZKOD5 değerini sayıya çevir
-      const price = parseFloat(item.STKOZKOD5);
-      // Eğer geçerli bir sayı değilse, 0 kullan
-      return acc + (isNaN(price) ? 0 : price) * item.quantity;
+      return acc + parseFloat(item.STKOZKOD5) * item.quantity;
     }, 0);
     setTotalPrice(totalPrice);
   };
@@ -310,6 +285,7 @@ const ShoppingCart = () => {
                 </thead>
                 <tbody>
                   {storedCart.map((item, index) => (
+                    console.log(typeof item.STKOZKOD5),
                     <tr key={item.STKKOD} className="shadow-sm">
                       <td className="px-2 sm:px-5 py-5 hidden sm:table-cell">
                         <div className="w-24 h-24 mr-4">
@@ -349,7 +325,7 @@ const ShoppingCart = () => {
                       </td>
                       <td className="px-5 py-3">
                         <p className="w-full flex items-center justify-center">
-                          ₺{item.STKOZKOD5 * item.quantity}
+                          ₺{parseFloat(item.STKOZKOD5) * item.quantity}
                         </p>
                       </td>
                       <td className="px-2 sm:px-5 py-3">
