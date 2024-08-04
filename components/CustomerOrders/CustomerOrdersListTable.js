@@ -40,23 +40,23 @@ const CustomerOrdersListTable = ({ orders }) => {
     fetch();
   }, [])
 
-  const handleSelectAllCheckboxChange = (event) => {
-    const { checked } = event.target;
-    setSelectAllChecked(checked);
+  // const handleSelectAllCheckboxChange = (event) => {
+  //   const { checked } = event.target;
+  //   setSelectAllChecked(checked);
 
-    const updatedSelectedOrderCheckboxes = {};
-    orders.forEach((order) => {
-      updatedSelectedOrderCheckboxes[order.id] = checked;
-    });
-    setSelectedOrderCheckboxes(updatedSelectedOrderCheckboxes);
-  };
+  //   const updatedSelectedOrderCheckboxes = {};
+  //   orders.forEach((order) => {
+  //     updatedSelectedOrderCheckboxes[order.id] = checked;
+  //   });
+  //   setSelectedOrderCheckboxes(updatedSelectedOrderCheckboxes);
+  // };
 
-  const handleSingleCheckboxChange = (orderId) => {
-    setSelectedOrderCheckboxes((prevSelectedOrderCheckboxes) => ({
-      ...prevSelectedOrderCheckboxes,
-      [orderId]: !prevSelectedOrderCheckboxes[orderId],
-    }));
-  };
+  // const handleSingleCheckboxChange = (orderId) => {
+  //   setSelectedOrderCheckboxes((prevSelectedOrderCheckboxes) => ({
+  //     ...prevSelectedOrderCheckboxes,
+  //     [orderId]: !prevSelectedOrderCheckboxes[orderId],
+  //   }));
+  // };
 
   const handleOpenRequestModal = (order) => {
     setSelectedOrder(order);
@@ -74,13 +74,13 @@ const CustomerOrdersListTable = ({ orders }) => {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-NavyBlue text-white ">
             <tr className="text-center">
-              <th className="px-6 py-3  text-left text-xs font-medium">
+              {/* <th className="px-6 py-3  text-left text-xs font-medium">
                 <input
                   type="checkbox"
                   checked={selectAllChecked}
                   onChange={handleSelectAllCheckboxChange}
                 />
-              </th>
+              </th> */}
               <th className="px-6 py-3 text-center text-base font-medium  ">
                 Sipariş
               </th>
@@ -96,51 +96,51 @@ const CustomerOrdersListTable = ({ orders }) => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200 ">
-            {products.map((product, index) => (
+            {orders.map((order, index) => (
               <tr
-                key={product.ID}
+                key={order.id}
                 className={`${
                   index % 2 === 1 ? "bg-white" : "bg-gray-50"
                 } text-center`}
               >
-                <td className="px-6 py-4 whitespace-nowrap">
+                {/* <td className="px-6 py-4 whitespace-nowrap">
                   <input
                     type="checkbox"
                     // checked={selectedOrderCheckboxes[product.ID] || false}
                     // onChange={() => handleSingleCheckboxChange(product.ID)}
                   />
-                </td>
+                </td> */}
                 <td className="px-6 py-4 whitespace-nowrap text-LightBlue">
-                  {product.STKNAME}
+                  {order.orderNumber}
                 </td>
 
-                <td className="px-6 py-4 whitespace-nowrap ">{product.DATE}</td>
+                <td className="px-6 py-4 whitespace-nowrap ">{order.date}</td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div
-                    // className={`inline-block rounded-sm px-2 py-1  ${
-                    //   statusColors[order.status]
-                    // }`}
+                    className={`inline-block rounded-sm px-2 py-1  ${
+                      statusColors[order.status]
+                    }`}
                   >
-                    {product.ORDERSTATUS}
+                    {order.status}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">{product.ORDERFIYATTOPLAM}₺</td>
-                <td className="px-6 py-4 space-x-2 flex   whitespace-nowrap ">
+                <td className="px-6 py-4 whitespace-nowrap">{order.total}₺</td>
+                <td className="px-6 py-4 space-x-2 flex justify-end whitespace-nowrap ">
                   <button
-                    className="bg-NavyBlue/75 p-2 rounded-md  hover:bg-NavyBlue text-white flex items-center space-x-1 "
+                    className="bg-NavyBlue/75 p-2 rounded-md hover:bg-NavyBlue text-white flex items-center space-x-1 "
                     // onClick={() => handleOpenRequestModal(order)}
                   >
                     <HiOutlineDocumentAdd />{" "}
                     <span>Talep oluştur</span>{" "}
                   </button>
-                  <button
+                  {/* <button
                     className="bg-red-300 p-2 rounded-md hover:bg-red-400 flex items-center space-x-1"
                     // onClick={() => handleOrderCancellation(order)}
                   >
                     <ImCancelCircle /> <span> Sipariş İptal</span>
-                  </button>
-                  <Link href={`/customer-orders/${product.ID}`}>
-                    <button className="bg-LightBlue/75  p-2 rounded-md hover:bg-LightBlue flex items-center space-x-1">
+                  </button> */}
+                  <Link href={`/customer-orders/${order.id}`}>
+                    <button className="bg-gray-300 p-2 rounded-md hover:bg-gray-400 flex items-center space-x-1">
                       <FaEye /> <span>Sipariş İncele</span>{" "}
                     </button>
                   </Link>

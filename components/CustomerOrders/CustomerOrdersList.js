@@ -176,7 +176,7 @@ const CustomerOrdersList = () => {
           <div className="flex gap-2">
             {/* Toplu İşlemler Select */}
 
-            <select
+            {/* <select
               className={`p-1 border rounded-md text-CustomGray w-52 ${
                 selectAll !== "Toplu İşlemler" ? "bg-NavyBlue text-white" : ""
               }`}
@@ -190,7 +190,7 @@ const CustomerOrdersList = () => {
               <option>Kargoya verildi</option>
               <option>PDF Fatura</option>
               <option>PDF Paketleme Fişi</option>
-            </select>
+            </select> */}
           </div>
 
           <div className="flex gap-2 flex-wrap">
