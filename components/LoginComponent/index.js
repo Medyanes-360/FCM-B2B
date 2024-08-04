@@ -6,11 +6,52 @@ import * as Yup from "yup";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Loading from "../Loading";
+import Lottie from "lottie-react";
+import WrongAnimation from "../../public/wronganimation.json";
+import SuccessAnimation from "../../public/successanimation.json";
+
+// Modal bileşeni
+const Modal = ({ isOpen, onClose, message, type }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white px-6 flex items-center justify-center rounded-lg shadow-lg">
+        <div>
+          <Lottie
+            animationData={
+              type === "success" ? SuccessAnimation : WrongAnimation
+            }
+            className="w-60"
+            loop={false}
+          />
+        </div>
+        <div className="flex flex-col items-left">
+          <h2
+            className={`text-xl font-bold mb-4 ${
+              type === "success" ? "text-green-600" : "text-red-600"
+            }`}
+          >
+            {type === "success" ? "Başarılı" : "Hata"}
+          </h2>
+          <p>{message}</p>
+          <button
+            onClick={onClose}
+            className="mt-4 bg-CustomRed text-white font-bold rounded-md px-4 py-2 hover:bg-CustomRed/80"
+          >
+            Kapat
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const LoginComponent = ({ pageRole }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [statusMessage, setStatusMessage] = useState("");
-  const [messageType, setMessageType] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const [modalType, setModalType] = useState("");
 
   const initialValues = {
     email: "",
@@ -20,14 +61,15 @@ const LoginComponent = ({ pageRole }) => {
 
   const validationSchema = Yup.object({
     email: Yup.string()
-      .required("e mail boş bırakılamaz.")
-      .email("Geçerli bir e mail adresi giriniz."),
+      .required("E-mail boş bırakılamaz.")
+      .email("Geçerli bir e-mail adresi giriniz."),
     password: Yup.string().required("Parola zorunludur"),
   });
 
+  const router = useRouter();
+
   const handleSubmit = async (values) => {
     setIsLoading(true);
-    setStatusMessage("");
 
     try {
       const result = await signIn("credentials", {
@@ -38,41 +80,53 @@ const LoginComponent = ({ pageRole }) => {
         redirect: false,
       });
 
+      console.log("Sign in result:", result);
+
       if (result.error) {
-        if (result.error.includes("Kullanıcı bulunamadı")) {
-          setStatusMessage("Kullanıcı bulunamadı. Lütfen tekrar deneyiniz.");
-          setMessageType("error");
-        } else if (result.error.includes("Şifre eşleşmesi başarısız")) {
-          setStatusMessage("Şifre eşleşmiyor. Lütfen tekrar deneyiniz.");
-          setMessageType("error");
-        } else if (
-          result.error.includes("Yeni şifreniz e-posta adresinize gönderildi")
-        ) {
-          setStatusMessage(
-            "Şifreniz oluşturuldu. Lütfen mailinizi kontrol ediniz."
-          );
-          setMessageType("success");
-        } else {
-          setStatusMessage("Bir hata oluştu. Lütfen tekrar deneyiniz.");
-          setMessageType("error");
+        let response;
+        try {
+          response = JSON.parse(result.error);
+        } catch {
+          response = { success: false, message: result.error };
         }
+
+        console.log("Parsed response:", response);
+
+        if (response.success) {
+          setModalMessage(
+            "Oluşturulan şifreniz mailinize gönderilmiştir. Lütfen kontrol ediniz."
+          );
+          setModalType("success");
+        } else {
+          if (response.message.includes("Kullanıcı bulunamadı")) {
+            setModalMessage("Kullanıcı bulunamadı. Lütfen tekrar deneyiniz.");
+          } else if (response.message.includes("Şifre eşleşmesi başarısız")) {
+            setModalMessage("Şifre eşleşmiyor. Lütfen tekrar deneyiniz.");
+          } else {
+            setModalMessage(
+              response.message || "Bir hata oluştu. Lütfen tekrar deneyiniz."
+            );
+          }
+          setModalType("error");
+        }
+        setIsModalOpen(true);
       } else if (result.ok) {
-        setStatusMessage("Başarıyla giriş yaptınız. Yönlendiriliyorsunuz.");
-        setMessageType("success");
+        setModalMessage("Başarıyla giriş yaptınız. Yönlendiriliyorsunuz.");
+        setModalType("success");
+        setIsModalOpen(true);
         setTimeout(() => {
           router.push("/");
         }, 2000);
       }
     } catch (error) {
       console.error("Login error:", error);
-      setStatusMessage("Bir hata oluştu. Lütfen tekrar deneyiniz.");
-      setMessageType("error");
+      setModalMessage("Bir hata oluştu. Lütfen tekrar deneyiniz.");
+      setModalType("error");
+      setIsModalOpen(true);
     } finally {
       setIsLoading(false);
     }
   };
-
-  const router = useRouter();
 
   return (
     <div className="bg-white flex items-center flex-col py-[35px] sm:py-[60px] w-screen lg:w-[1188px] h-screen">
@@ -138,20 +192,15 @@ const LoginComponent = ({ pageRole }) => {
         )}
       </Formik>
       {isLoading && <Loading />}
-      {statusMessage && (
-        <div
-          className={`mt-4 text-${
-            messageType === "success" ? "green" : "red"
-          }-500 font-bold`}
-        >
-          {statusMessage}
-        </div>
-      )}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        message={modalMessage}
+        type={modalType}
+      />
       <div className="clear" />
       <p className="mt-4 text-CustomRed/75 text-[14px] hover:text-CustomRed  transition-all ease-in-out duration-700 transform ">
-        <Link href="https://caliskanari.com/my-account/lost-password/">
-          Parolanızı mı unuttunuz?
-        </Link>
+        <Link href="/auth/forgot-password">Parolanızı mı unuttunuz?</Link>
       </p>
     </div>
   );

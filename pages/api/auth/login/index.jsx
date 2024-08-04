@@ -147,7 +147,8 @@ const handler = async (req, res) => {
         console.log("##### 6- YENİ ŞİFRE E-POSTA İLE GÖNDERİLDİ!");
         return res.status(200).json({
           success: true,
-          message: `Yeni şifreniz e-posta adresinize gönderildi. Lütfen e-postanızı kontrol edin.`,
+          message:
+            "Yeni şifreniz e-posta adresinize gönderildi. Lütfen e-postanızı kontrol edin.",
         });
       } else {
         console.log("##### 1- İŞLEM SIRASINDA BİR HATA OLUŞTU!");
