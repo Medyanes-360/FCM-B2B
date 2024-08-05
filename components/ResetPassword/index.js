@@ -101,7 +101,7 @@ const ResetPassword = () => {
   return (
     <div className="bg-white flex items-center flex-col py-[35px] sm:py-[60px] w-screen lg:w-[1188px] h-screen">
       <h1 className="text-[48px] text-center font-semibold text-CustomGray italic mb-[40px]">
-        Şifre Sıfırlama
+        Yeni Şifreyi Maile Gönder
       </h1>
       <Formik
         initialValues={initialValues}
@@ -130,15 +130,10 @@ const ResetPassword = () => {
             <div className="mb-4 flex flex-col md:flex-row gap-4 items-center justify-center">
               <button
                 type="submit"
-                className="bg-CustomRed text-white font-bold rounded-md px-6 py-2 w-[175px] hover:scale-105 transition-all ease-in-out duration-700 transform"
+                className="bg-CustomRed text-white w-[175px] text-xs md:text-base font-bold rounded-md px-6 py-2 md:w-[225px] hover:scale-105 transition-all ease-in-out duration-700 transform"
               >
-                Şifremi Sıfırla
+                Şifremi Maile gönder
               </button>
-              <Link href="/auth/login">
-                <button className="bg-green-600 text-white font-bold rounded-md px-6 py-2 w-[175px] hover:scale-105 transition-all ease-in-out duration-700 transform">
-                  Giriş Yap
-                </button>
-              </Link>
             </div>
           </Form>
         )}

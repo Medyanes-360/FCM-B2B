@@ -200,7 +200,9 @@ const LoginComponent = ({ pageRole }) => {
       />
       <div className="clear" />
       <p className="mt-4 text-CustomRed/75 text-[14px] hover:text-CustomRed  transition-all ease-in-out duration-700 transform ">
-        <Link href="/auth/forgot-password">Parolanızı mı unuttunuz?</Link>
+        <Link href="/auth/forgot-password">
+          Yeni şifre talebi için buraya tıklayınız.
+        </Link>
       </p>
     </div>
   );
