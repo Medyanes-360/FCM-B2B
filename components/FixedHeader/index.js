@@ -10,8 +10,8 @@ import headerStore from "@/utils/headerStore";
 import useCartItemCount from "@/utils/useCartItemCount";
 import { CiShop } from "react-icons/ci";
 
-// showShop = /shop sayfasında kendine özgü biçimde gözükür
-const FixedHeader = ({ showShop = false }) => {
+// showShop = sadece mağaza sayfası gözükür.  /shop sayfasında kendine özgü biçimde gözükür
+const FixedHeader = ({ showShop = true }) => {
   const [hoveredMainMenu, setHoveredMainMenu] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -65,7 +65,7 @@ const FixedHeader = ({ showShop = false }) => {
                 </div>
               </div>
               <div className="flex-row items-center justify-center hidden lg:flex " id="mainmenuitem">
-                <div className="flex-row flex  text-CustomGray items-center justify-center ">
+                <div className="flex-row flex ml-[2.20rem]  text-CustomGray items-center justify-center ">
                   <Link
                     className="flex flex-col items-center justify-center group"
                     href={"/shop"}

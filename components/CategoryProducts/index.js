@@ -196,7 +196,7 @@ function CategoryProducts({ showSearchAndCart = false }) { // /shop için yapıl
     }
 
     return (
-      <div className="bg-white w-screen md:w-[600px] lg:w-[960px] xl:w-[1188px] pt-[20px] lg:pt-[50px]">
+      <div className="bg-white w-screen md:w-[600px] lg:w-[960px] xl:w-[1188px] pt-[10px] lg:pt-[30px]">
         <div className="mb-4 flex flex-col md:flex-row items-center justify-center ">
           {classes.map((classType) => (
             <div
@@ -255,10 +255,11 @@ function CategoryProducts({ showSearchAndCart = false }) { // /shop için yapıl
                 )}
             </div>
           ))}
+          {/** /shop sayfasında çalışır */}
           {showSearchAndCart && (
             <div className="flex mb-5 justify-center mx-1 gap-x-6 p-1 items-center">
               <button className=" text-CustomGray" onClick={toggleSearchPanel}>
-                <FaSearch className="w-[25px] h-[25px] hover:text-LightBlue hover:scale-110 transition-all duration-700 ease-in-out transform " />
+                <FaSearch className="w-[20px] h-[20px] hover:text-LightBlue hover:scale-110 transition-all duration-700 ease-in-out transform " />
               </button>
               <Link
                 className="flex flex-col items-center justify-center  hover:text-LightBlue hover:scale-110 transition-all duration-700 ease-in-out transform relative"
@@ -266,7 +267,8 @@ function CategoryProducts({ showSearchAndCart = false }) { // /shop için yapıl
               >
                 <span>
                   <RiShoppingBasketFill
-                    style={{ width: "30px", height: "30px" }}
+                    style={{ width: "25px", height: "25px" }}
+                    className="text-CustomGray"
                   />
                 </span>
                 {cartItemCount > 0 && (

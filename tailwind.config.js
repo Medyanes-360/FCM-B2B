@@ -42,7 +42,7 @@ module.exports = {
         BaşarısızOlanBg: "#eaa4a4",
         BaşarısızOlanText: "#762024",
       },
-      height: {
+      minHeight: {
         'screen-minus-50': 'calc(100vh - 50px)',
       }
     },

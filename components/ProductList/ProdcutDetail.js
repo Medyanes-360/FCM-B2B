@@ -1,28 +1,79 @@
 "use client";
 import Link from "next/link";
-import { React, useState } from "react";
-import { FaPlus } from "react-icons/fa";
+import { React, useState, useEffect } from "react";
+import { FaPlus, FaMinus, FaCheck } from "react-icons/fa";
 import { IoArrowBackCircleSharp } from "react-icons/io5";
 import ProductToggleButton from "./ProductToggleButton";
+import { Formik, Form, Field } from "formik";
+import * as Yup from "yup";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function ProdcutDetail({ product,img }) {
-  const [purchaseAmount, setPurchaseAmount] = useState(1);
-  // satın alma sayısı arttır/azalt fonksiyonları
-  function incrementAmount() {
-    if (purchaseAmount < product.stokCount) {
-      setPurchaseAmount((state) => state + 1);
+  const [cart, setCart] = useState([]); // Sepet ürünleri için state
+  // Komponent yüklendiğinde local storage dan sepeti al
+  useEffect(() => {
+    const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
+    setCart(storedCart);
+  }, []);
+  // Sepet durumu değiştiğinde local storegadaki sepeti güncelle
+  useEffect(() => {
+    const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
+    if (storedCart.length > 0) {
+      localStorage.setItem("cart", JSON.stringify(storedCart));
+    } else {
+      localStorage.setItem("cart", JSON.stringify(cart));
     }
-  }
-  function decreaseAmount() {
-    if (purchaseAmount > 1) {
-      setPurchaseAmount((state) => state - 1);
+  }, [cart]);
+  // Sepete ürün ekleme işlemi
+  const handleAddToCart = async (values, urun) => {
+    try {
+      
+
+      const updatedCart = [...cart];
+      const existingItemIndex = updatedCart.findIndex(
+        (item) => item.STKKOD === urun.STKKOD
+      );
+
+      if (existingItemIndex !== -1) {
+        updatedCart[existingItemIndex].quantity += values.quantity;
+      } else {
+        updatedCart.push({
+          ...urun,
+          quantity: values.quantity,
+          imagePath:
+            img ||
+            "https://caliskanari.com/wp-content/uploads/2022/11/X7-420x420.png.webp",
+        });
+      }
+
+      setCart(updatedCart);
+
+      localStorage.setItem("cart", JSON.stringify(updatedCart));
+
+      toast.success("Ürün sepete eklendi.", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    } catch (error) {
+      console.error("Sepete ekleme hatası: ", error);
+      toast.error("Ürün sepete eklenirken bir hata oluştu.");
     }
-  }
+  };
+  // Ürünün sepette olup olmadığını kontrol et
+  const isInCart = (product) => {
+    return cart.some((item) => item.STKKOD === product.STKKOD);
+  };
   // fiyat etiketi
   function PriceTag() {
     return (
       <div>
-        <div className="flex relative justify-between  bg-LightBlue/75 text-white w-1/3 my-4  h-10 p-1 px-2">
+        <div className="flex relative justify-between  bg-LightBlue/75 text-white min-w-40 w-1/3 my-4  h-10 p-1 px-2">
           <span className="font-medium text-lg">Fiyat: ₺{product.STKOZKOD5}</span>
           <span className="h-7 w-7 absolute top-1 right-[-14px] rotate-45 bg-gray-50"></span>
         </div>
@@ -31,7 +82,7 @@ function ProdcutDetail({ product,img }) {
   }
   return (
     <div className="flex flex-col justify-center items-center bg-[url('/backgroundImage.webp')] bg-no-repeat   bg-contain bg-[#6bcdec]">
-      <div className="bg-gray-50 h-screen-minus-50">
+      <div className="bg-gray-50 min-h-screen-minus-50">
         <div className="grid grid-rows-2 px-5 lg:w-[1188px]  md:px-14 pt-14 pb-3 mb-2  lg:mx-auto">
           <div className={`md:grid md:grid-cols-4 md:grid-flow-col ${product.desc && product.bookDetail ? 'row-span-1':'row-span-2'}`}>
             <div className="col-span-2 flex md:justify-center border border-dashed rounded-lg bg-white">
@@ -66,34 +117,104 @@ function ProdcutDetail({ product,img }) {
                 <PriceTag />
               </div>
               <div className="flex flex-row items-center mt-5 mb-5 px-3">
-                <div className="border border-LightBlue hover:border-CustomGray bg-white rounded flex justify-around w-20 text-LightBlue    hover:text-CustomGray transition duration-300 ease-in-out transform">
-                  <button
-                    onClick={decreaseAmount}
-                    className="w-full opacity-50  px-1 py-1"
+              <Formik
+                    initialValues={{ quantity: 1 }}
+                    validationSchema={Yup.object().shape({
+                      quantity: Yup.number()
+                        .min(1, "En az 1 olmalı")
+                        .required("Zorunlu alan"),
+                    })}
+                    onSubmit={(values, { resetForm }) => {
+                      handleAddToCart(values, product);
+                      resetForm();
+                    }}
                   >
-                    -
-                  </button>
-                  <span className="w-full text-center self-center">
-                    {purchaseAmount}
-                  </span>
-                  <button
-                    onClick={incrementAmount}
-                    className="w-full opacity-50  px-1 py-1"
-                  >
-                    +
-                  </button>
-                </div>
-                <button
-                  type="submit"
-                  className="flex flex-row items-center justify-center gap-2 ml-10 sm:ml-4 lg:ml-2 text-white font-bold hover:scale-105 transition-all transform easy-in-out duration-500 cursor-pointer bg-LightBlue/75 pl-2 pr-9 py-2 rounded-full relative w-[130px] sm:w-[160px] h-[40px] text-[13px] sm:text-[15px]"
-                >
-                  Sepete Ekle
-                  <span
-                    className={`absolute -top-1 -right-2 text-white bg-gradient-to-r from-sky-600 to-cyan-700 p-3 border-4 border-white rounded-full transition-all duration-500 ease-out transform`}
-                  >
-                    <FaPlus />
-                  </span>
-                </button>
+                    {({
+                      values,
+                      handleChange,
+                      handleSubmit,
+                      errors,
+                      touched,
+                    }) => (
+                      <Form>
+                        <div className="flex flex-col items-center justify-center text-LightBlue">
+                          <div className="flex flex-row items-center justify-center">
+                            <div className="flex items-center mt-2  p-2 border border-LightBlue hover:border-CustomGray bg-white rounded-lg">
+                              <button
+                                type="button"
+                                className="text-sm sm:text-md text-LightBlue hover:scale-110 transition duration-500 ease-in-out transform"
+                                onClick={() => {
+                                  if (values.quantity > 1) {
+                                    handleChange({
+                                      target: {
+                                        name: "quantity",
+                                        value: values.quantity - 1,
+                                      },
+                                    });
+                                  }
+                                }}
+                              >
+                                <FaMinus />
+                              </button>
+                              <Field
+                                min="1"
+                                name="quantity"
+                                className="w-6 text-center outline-none text-CustomGray"
+                              />
+                              <button
+                                type="button"
+                                className="text-LightBlue hover:scale-110 text-sm sm:text-md transition duration-500 ease-in-out transform"
+                                onClick={() =>
+                                  handleChange({
+                                    target: {
+                                      name: "quantity",
+                                      value: values.quantity + 1,
+                                    },
+                                  })
+                                }
+                              >
+                                <FaPlus />
+                              </button>
+                            </div>
+                            {errors.quantity && touched.quantity && (
+                              <div className="text-red-500 mt-1">
+                                {errors.quantity}
+                              </div>
+                            )}
+                            <button
+                              type="submit"
+                              className="flex flex-row items-center justify-center gap-2 ml-2 sm:ml-4 lg:ml-2 text-white font-bold hover:scale-105 transition-all transform easy-in-out duration-500 cursor-pointer bg-LightBlue/75 pl-2 pr-9 py-2 rounded-full relative w-[130px] sm:w-[160px] h-[40px] text-[13px] sm:text-[15px]"
+                              onClick={handleSubmit}
+                              disabled={product.addingToCart}
+                            >
+                              {product.addingToCart ? (
+                                <div className="flex flex-row items-center justify-center gap-1">
+                                  <div className="h-2 w-2 rounded-full animate-pulse bg-blue-900"></div>
+                                  <div className="h-2 w-2 rounded-full animate-pulse bg-blue-900"></div>
+                                  <div className="h-2 w-2 rounded-full animate-pulse bg-blue-900"></div>
+                                </div>
+                              ) : (
+                                <>Sepete Ekle</>
+                              )}
+                              <span
+                                className={`absolute -top-1 -right-2 text-white bg-gradient-to-r from-sky-600 to-cyan-700 p-3 border-4 border-white rounded-full transition-all duration-500 ease-out transform`}
+                              >
+                                {isInCart(product) ? (
+                                  <FaCheck
+                                    className={`transition-all duration-1000 ease-in-out transform ${
+                                      isInCart(product) ? "scale-100" : "scale-0"
+                                    }`}
+                                  />
+                                ) : (
+                                  <FaPlus />
+                                )}
+                              </span>
+                            </button>
+                          </div>
+                        </div>
+                      </Form>
+                    )}
+                  </Formik>
               </div>
             </div>
           </div>
