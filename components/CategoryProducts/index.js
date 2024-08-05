@@ -14,18 +14,21 @@ import { RiShoppingBasketFill } from "react-icons/ri";
 import useCartItemCount from "@/utils/useCartItemCount";
 import { FaSearch } from "react-icons/fa";
 import SearchPanel from "@/components/SearchPanel";
+import Loading from "../Loading";
 
-function CategoryProducts({ showSearchAndCart = false }) { // /shop için yapıldı searchPanel ve sepet kategorilerle beraber gözükür
+function CategoryProducts({ showSearchAndCart = false }) {
+  // /shop için yapıldı searchPanel ve sepet kategorilerle beraber gözükür
   const [urunler, setUrunler] = useState([]); // Ürünler için state
   const [selectedClass, setSelectedClass] = useState("1.SINIF"); // Seçili sınıf filtresi için state
   const [selectedCategory, setSelectedCategory] = useState(""); // Seçili kategori filtresi için state
   const [dropdownOpen, setDropdownOpen] = useState({}); // Dropdown açılış durumu için state
   const [cart, setCart] = useState([]); // Sepet ürünleri için state
   const [imageMap, setImageMap] = useState({}); // Resim eşleştirmeleri için state
-  const { productDetail, changeProductDetail } = useProductDetailStore(); // productDetail STKKOD değeri alır,changeProductDetail productDetail'i değiştirir
-  const cartItemCount = useCartItemCount();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const { productDetail, changeProductDetail } = useProductDetailStore(); // productDetail STKKOD değeri alır,changeProductDetail productDetail'i değiştirir
+  const [loading, setLoading] = useState(true);
 
+  const cartItemCount = useCartItemCount();
   const toggleSearchPanel = () => {
     setIsSearchOpen(!isSearchOpen);
   };
@@ -34,6 +37,7 @@ function CategoryProducts({ showSearchAndCart = false }) { // /shop için yapıl
     const fetchData = async () => {
       try {
         const data = await getAPI("/products");
+        setLoading(false)
         const filteredData = data.data.filter((urun) => urun.STKOZKOD1 === "A"); // STKOZKOD1 === "A" olan ürünleri filtrele
         setUrunler(
           filteredData.map((urun) => ({
@@ -115,6 +119,7 @@ function CategoryProducts({ showSearchAndCart = false }) { // /shop için yapıl
           item.STKKOD === urun.STKKOD ? { ...item, addingToCart: true } : item
         )
       );
+      setLoading(true)
 
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -127,6 +132,7 @@ function CategoryProducts({ showSearchAndCart = false }) { // /shop için yapıl
             }
           : item
       );
+      setLoading(false)
       setUrunler(updatedUrunler);
 
       const updatedCart = [...cart];
@@ -448,6 +454,8 @@ function CategoryProducts({ showSearchAndCart = false }) { // /shop için yapıl
       </div>
     );
   };
+
+  if (loading) return <Loading />;
 
   return <div>{renderBooks()}</div>;
 }
