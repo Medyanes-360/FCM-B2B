@@ -1,11 +1,14 @@
 import Link from 'next/link';
 import React from 'react';
+import useProductDetailStore from "@/utils/productDetailStore"; // ürün detayına gitmek için
 
-function ProductModal({ setIsOpenModal, productImage }) {
+function ProductModal({ setIsOpenModal, productImage, productStkkod }) {
   const handleCloseModal = () => {
     setIsOpenModal(false);
   };
-
+  const {productDetail,changeProductDetail} = useProductDetailStore() // productDetail STKKOD değeri alır,changeProductDetail productDetail'i değiştirir
+  console.log(productImage);
+  
   return (
     <div className="fixed z-10 inset-0 overflow-y-auto bg-gray-500 bg-opacity-75">
       <div className="flex items-center justify-center min-h-screen border  ">
@@ -18,7 +21,7 @@ function ProductModal({ setIsOpenModal, productImage }) {
             <div className="flex justify-center items-center">
               <div className="mx-auto flex-shrink-0  flex items-center justify-center  max-h-96 overflow-hidden  sm:mx-0">
                 {/* Product Image */}
-                <img src={productImage.imgPath} alt="Product" className='max-h-80' />
+                <img src={productImage} alt="Product" className='max-h-80' />
               </div>
               
             </div>
@@ -31,7 +34,7 @@ function ProductModal({ setIsOpenModal, productImage }) {
             >
               Close
             </button>
-            <Link href={`/products/${productImage.id}`}>
+            <Link href={`/products/productDetail`} onClick={()=>changeProductDetail(productStkkod)}>
               <button
             
               type="button"

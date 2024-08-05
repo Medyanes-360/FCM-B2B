@@ -22,7 +22,7 @@ function ProdcutDetail({ product,img }) {
   function PriceTag() {
     return (
       <div>
-        <div className="flex relative justify-between  bg-LightBlue/75 text-white w-[134px] my-4  h-10 p-1 px-2">
+        <div className="flex relative justify-between  bg-LightBlue/75 text-white w-1/3 my-4  h-10 p-1 px-2">
           <span className="font-medium text-lg">Fiyat: ₺{product.STKOZKOD5}</span>
           <span className="h-7 w-7 absolute top-1 right-[-14px] rotate-45 bg-gray-50"></span>
         </div>

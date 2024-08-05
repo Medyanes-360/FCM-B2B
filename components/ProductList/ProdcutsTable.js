@@ -9,17 +9,23 @@ import { IoIosCloseCircle } from "react-icons/io";
 import { FaCheckCircle } from "react-icons/fa";
 import Loading from "../Loading";
 import Image from "next/image";
+import useProductDetailStore from "@/utils/productDetailStore"; // ürün detayına gitmek için
 
-function ProdcutsTable({ currentProducts, loading }) {
+
+function ProdcutsTable({ currentProducts, loading, img }) {
   const [sortOrder, setSortOrder] = useState("asc");
   const [sortedColumn, setSortedColumn] = useState(null);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [productImage, setProductImage] = useState(null);
+  const [productStkkod,setProductStkkod] = useState(null)
   const [selectAll, setSelectAll] = useState(false);
+  const {productDetail,changeProductDetail} = useProductDetailStore() // productDetail STKKOD değeri alır,changeProductDetail productDetail'i değiştirir
 
-  const handleOpenModal = (product) => {
+  const handleOpenModal = (product,stkkod) => {
+    
     setIsOpenModal(true);
     setProductImage(product);
+    setProductStkkod(stkkod);
   };
   const handleSort = (column) => {
     if (sortedColumn === column) {
@@ -33,6 +39,8 @@ function ProdcutsTable({ currentProducts, loading }) {
   };
 
   let sortedProducts = [...currentProducts];
+  console.log(sortedProducts);
+  
 
   if (sortedColumn === "STKCINSI") {
     sortedProducts = [...currentProducts].sort((a, b) => {
@@ -131,7 +139,7 @@ function ProdcutsTable({ currentProducts, loading }) {
                 <td
                   className="px-6 py-4 whitespace-nowrap cursor-pointer"
                   onClick={() => {
-                    handleOpenModal(product);
+                    handleOpenModal(img[product.STKKOD],product.STKKOD);
                   }}
                 >
                   img
@@ -139,7 +147,8 @@ function ProdcutsTable({ currentProducts, loading }) {
 
                 <td className="px-6 py-4 whitespace-nowrap  ">
                   <Link
-                    href={`/products/${product.id}`}
+                    onClick={()=>changeProductDetail(product.STKKOD)}
+                    href={`/products/productDetail`}
                     className="cursor-pointer hover:text-[#0284c7]  "
                   >
                     {product.STKCINSI}
@@ -185,6 +194,7 @@ function ProdcutsTable({ currentProducts, loading }) {
         <ProductModal
           setIsOpenModal={setIsOpenModal}
           productImage={productImage}
+          productStkkod={productStkkod}
         />
       )}
     </div>

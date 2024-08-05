@@ -11,6 +11,7 @@ function ProductList() {
   const [productsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
+  const [imageMap, setImageMap] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,7 +31,23 @@ function ProductList() {
         console.error("Data fetching error: ", error);
       }
     };
+    const fetchImages = async () => {
+      try {
+        const imageResponse = await fetch("/data.json");
+        const imageData = await imageResponse.json();
+  
+        // Resim eşleştirmelerini oluştur
+        const imgMap = {};
+        imageData.forEach((item) => {
+          imgMap[item.stkkod] = item.path;
+        });
+        setImageMap(imgMap);        
+      } catch (error) {
+        console.error(error);
+      }
+    };
     fetchData();
+    fetchImages();
   }, []);
 
   const handleSearch = (event) => {
@@ -89,7 +106,7 @@ function ProductList() {
         setCurrentPage={setCurrentPage}
         setProducts={setProducts}
       />
-      <ProductsTable currentProducts={currentProducts} loading={loading} />
+      <ProductsTable currentProducts={currentProducts} loading={loading} img={imageMap} />
     </>
   );
 }

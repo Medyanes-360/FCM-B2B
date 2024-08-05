@@ -10,8 +10,12 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getAPI } from "@/services/fetchAPI";
 import useProductDetailStore from "@/utils/productDetailStore"; // ürün detayına gitmek için
+import { RiShoppingBasketFill } from "react-icons/ri";
+import useCartItemCount from "@/utils/useCartItemCount";
+import { FaSearch } from "react-icons/fa";
+import SearchPanel from "@/components/SearchPanel";
 
-function CategoryProducts() {
+function CategoryProducts({ showSearchAndCart = false }) { // /shop için yapıldı searchPanel ve sepet kategorilerle beraber gözükür
   const [urunler, setUrunler] = useState([]); // Ürünler için state
   const [selectedClass, setSelectedClass] = useState("1.SINIF"); // Seçili sınıf filtresi için state
   const [selectedCategory, setSelectedCategory] = useState(""); // Seçili kategori filtresi için state
@@ -19,7 +23,12 @@ function CategoryProducts() {
   const [cart, setCart] = useState([]); // Sepet ürünleri için state
   const [imageMap, setImageMap] = useState({}); // Resim eşleştirmeleri için state
   const { productDetail, changeProductDetail } = useProductDetailStore(); // productDetail STKKOD değeri alır,changeProductDetail productDetail'i değiştirir
+  const cartItemCount = useCartItemCount();
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
+  const toggleSearchPanel = () => {
+    setIsSearchOpen(!isSearchOpen);
+  };
   // Komponent yüklendiğinde API'den ürünleri getir ve resim eşleştirmelerini oluştur
   useEffect(() => {
     const fetchData = async () => {
@@ -118,7 +127,6 @@ function CategoryProducts() {
             }
           : item
       );
-
       setUrunler(updatedUrunler);
 
       const updatedCart = [...cart];
@@ -165,8 +173,7 @@ function CategoryProducts() {
   // Kitapları render et
   const renderBooks = () => {
     let filteredUrunler = urunler.filter(
-      (urun) =>
-        urun.STKOZKOD3 === selectedClass && parseFloat(urun.STKOZKOD5) > 0
+      (urun) => urun.STKOZKOD3 === selectedClass
     );
 
     // ANASINIFI ve İNGİLİZCE dışında bir sınıf seçildiyse
@@ -189,7 +196,7 @@ function CategoryProducts() {
     }
 
     return (
-      <div className="bg-white w-screen md:w-[600px] lg:w-[960px] xl:w-[1188px] pt-[30px] lg:pt-[80px]">
+      <div className="bg-white w-screen md:w-[600px] lg:w-[960px] xl:w-[1188px] pt-[20px] lg:pt-[50px]">
         <div className="mb-4 flex flex-col md:flex-row items-center justify-center ">
           {classes.map((classType) => (
             <div
@@ -248,6 +255,30 @@ function CategoryProducts() {
                 )}
             </div>
           ))}
+          {showSearchAndCart && (
+            <div className="flex mb-5 justify-center mx-1 gap-x-6 p-1 items-center">
+              <button className=" text-CustomGray" onClick={toggleSearchPanel}>
+                <FaSearch className="w-[25px] h-[25px] hover:text-LightBlue hover:scale-110 transition-all duration-700 ease-in-out transform " />
+              </button>
+              <Link
+                className="flex flex-col items-center justify-center  hover:text-LightBlue hover:scale-110 transition-all duration-700 ease-in-out transform relative"
+                href="/cart"
+              >
+                <span>
+                  <RiShoppingBasketFill
+                    style={{ width: "30px", height: "30px" }}
+                  />
+                </span>
+                {cartItemCount > 0 && (
+                  <div className="absolute -top-3 -right-4 bg-[#ff5b4b] rounded-full px-[5px]  flex items-center justify-center">
+                    <span className="text-white font-extrabold text-[16px] w-[14px] h-[24px]">
+                      {cartItemCount}
+                    </span>
+                  </div>
+                )}
+              </Link>
+            </div>
+          )}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 justify-center sm:mx-[35px] mb-[30px] px-[15px] w-auto">
           {filteredUrunler.map((urun) => (
@@ -407,6 +438,11 @@ function CategoryProducts() {
             </div>
           ))}
         </div>
+        {isSearchOpen && showSearchAndCart && (
+          <div className="absolute top-10 rounded-xl  right-0 md:right-0 z-[1000]	bg-white">
+            <SearchPanel toggleSearchPanel={toggleSearchPanel} />
+          </div>
+        )}
       </div>
     );
   };
