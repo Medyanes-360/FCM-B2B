@@ -37,7 +37,7 @@ function CategoryProducts({ showSearchAndCart = false }) {
     const fetchData = async () => {
       try {
         const data = await getAPI("/products");
-        setLoading(false)
+        setLoading(false);
         const filteredData = data.data.filter((urun) => urun.STKOZKOD1 === "A"); // STKOZKOD1 === "A" olan ürünleri filtrele
         setUrunler(
           filteredData.map((urun) => ({
@@ -119,7 +119,7 @@ function CategoryProducts({ showSearchAndCart = false }) {
           item.STKKOD === urun.STKKOD ? { ...item, addingToCart: true } : item
         )
       );
-      setLoading(true)
+      setLoading(true);
 
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -132,7 +132,7 @@ function CategoryProducts({ showSearchAndCart = false }) {
             }
           : item
       );
-      setLoading(false)
+      setLoading(false);
       setUrunler(updatedUrunler);
 
       const updatedCart = [...cart];
@@ -179,7 +179,9 @@ function CategoryProducts({ showSearchAndCart = false }) {
   // Kitapları render et
   const renderBooks = () => {
     let filteredUrunler = urunler.filter(
-      (urun) => urun.STKOZKOD3 === selectedClass
+      (urun) =>
+        // BU KISIM KATEGORIDEKI FIYATI OLMAYAN URUNLERIN GOSTERILMESINI ENGELLER.
+        urun.STKOZKOD3 === selectedClass && parseFloat(urun.STKOZKOD5) > 0
     );
 
     // ANASINIFI ve İNGİLİZCE dışında bir sınıf seçildiyse
