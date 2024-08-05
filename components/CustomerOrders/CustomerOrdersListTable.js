@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { HiOutlineDocumentAdd } from "react-icons/hi";
 import { FaEye } from "react-icons/fa";
-
 import { ImCancelCircle } from "react-icons/im";
-
 import RequestModal from "./RequestModal";
 import OrderCancellation from "./OrderCancallation";
 import Link from "next/link";
@@ -16,6 +14,7 @@ const CustomerOrdersListTable = ({ orders }) => {
   const [isOpenOrderCanModal, setIsOpenOrderCanModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [products, setProducts] = useState([]);
+
   // statu Renkleri
   const statusColors = {
     Beklemede: "bg-[#e5e5e5] text-[#80808b]",
@@ -26,19 +25,18 @@ const CustomerOrdersListTable = ({ orders }) => {
     Başarısız: "bg-[#eaa4a4] text-[#762024]",
   };
 
-  useEffect(()=>{
-    const fetch = async ()=>{
-      try{
+  useEffect(() => {
+    const fetch = async () => {
+      try {
         const data = await getAPI("/allorders");
-        console.log("Ürünler", data);
-        setProducts(data)
-      }
-      catch(err){
+        console.log(data);
+        setProducts(data);
+      } catch (err) {
         console.log(err);
       }
-    }
+    };
     fetch();
-  }, [])
+  }, []);
 
   // const handleSelectAllCheckboxChange = (event) => {
   //   const { checked } = event.target;
@@ -57,7 +55,6 @@ const CustomerOrdersListTable = ({ orders }) => {
   //     [orderId]: !prevSelectedOrderCheckboxes[orderId],
   //   }));
   // };
-
   const handleOpenRequestModal = (order) => {
     setSelectedOrder(order);
     setIsOpenReqModal(true);
@@ -96,9 +93,9 @@ const CustomerOrdersListTable = ({ orders }) => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200 ">
-            {orders.map((order, index) => (
+            {products.map((order, index) => (
               <tr
-                key={order.id}
+                key={order.ID}
                 className={`${
                   index % 2 === 1 ? "bg-white" : "bg-gray-50"
                 } text-center`}
@@ -111,35 +108,56 @@ const CustomerOrdersListTable = ({ orders }) => {
                   />
                 </td> */}
                 <td className="px-6 py-4 whitespace-nowrap text-LightBlue">
-                  {order.orderNumber}
+                  {order.STKNAME}
                 </td>
 
-                <td className="px-6 py-4 whitespace-nowrap ">{order.date}</td>
+                <td className="px-6 py-4 whitespace-nowrap ">
+                  {order.ORDERGUN}/{order.ORDERAY}/{order.ORDERYIL}
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div
                     className={`inline-block rounded-sm px-2 py-1  ${
                       statusColors[order.status]
                     }`}
                   >
-                    {order.status}
+                    {order.ORDERSTATUS}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">{order.total}₺</td>
-                <td className="px-6 py-4 space-x-2 flex justify-end whitespace-nowrap ">
+                <td className="px-6 py-4 whitespace-nowrap">
+                  {order.STKBIRIMFIYATTOPLAM}₺
+                </td>
+                <td className="px-6 py-4 space-x-2 flex justify-center whitespace-nowrap ">
                   <button
                     className="bg-NavyBlue/75 p-2 rounded-md hover:bg-NavyBlue text-white flex items-center space-x-1 "
                     // onClick={() => handleOpenRequestModal(order)}
                   >
-                    <HiOutlineDocumentAdd />{" "}
-                    <span>Talep oluştur</span>{" "}
+                    <HiOutlineDocumentAdd /> <span>Talep oluştur</span>{" "}
                   </button>
                   {/* <button
                     className="bg-red-300 p-2 rounded-md hover:bg-red-400 flex items-center space-x-1"
                     // onClick={() => handleOrderCancellation(order)}
-                  >
+                  > href={`/customer-orders/${order.id}`}
                     <ImCancelCircle /> <span> Sipariş İptal</span>
                   </button> */}
-                  <Link href={`/customer-orders/${order.id}`}>
+                  <Link
+                    href={{
+                      pathname: `/customer-orders/${order.ID}`,
+                      query: {
+                        id: order.CARKOD,
+                        product: order.STKNAME,
+                        company: order.CARUNVAN,
+                        description : order.ACIKLAMA,
+                        quantity : order.STKADET,
+                        quantityCost : order.STKBIRIMFIYAT,
+                        totalCost: order.STKBIRIMFIYATTOPLAM,
+                        status: order.ORDERSTATUS,
+                        day: order.ORDERGUN,
+                        month: order.ORDERAY,
+                        year: order.ORDERYIL,
+                        time : order.ORDERSAAT
+                      },
+                    }}
+                  >
                     <button className="bg-gray-300 p-2 rounded-md hover:bg-gray-400 flex items-center space-x-1">
                       <FaEye /> <span>Sipariş İncele</span>{" "}
                     </button>
