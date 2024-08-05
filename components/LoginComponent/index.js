@@ -79,9 +79,18 @@ const LoginComponent = ({ pageRole }) => {
         callbackUrl: "/",
         redirect: false,
       });
-
+      console.log("Sign in result error:", result.error);
       console.log("Sign in result:", result);
-
+      if (
+        result.error ===
+        "Yeni şifreniz e-posta adresinize gönderildi. Lütfen e-postanızı kontrol edin."
+      ) {
+        setModalMessage(
+          "Oluşturulan şifreniz mailinize gönderilmiştir. Lütfen kontrol ediniz."
+        );
+        setModalType("success");
+        return setIsModalOpen(true);
+      }
       if (result.error) {
         let response;
         try {

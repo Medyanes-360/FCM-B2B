@@ -28,7 +28,7 @@ const authOptions = {
         }
 
         // admin girişi yapılırsa admin paneline yönlendirme yapılır.
-        if (data.findUser.CARKOD === "7034922") {
+        if (data.findUser?.CARKOD === "7034922") {
           loginPageRoute = data.findUser.CARYETKILI;
         }
 
@@ -39,18 +39,23 @@ const authOptions = {
             data.error || "Bir hata oluştu. Lütfen tekrar deneyiniz."
           );
         }
-
+        console.log("##### LOGIN DATA: ", data);
         // Kullanıcı bilgilerini döndürüyoruz.
-        const user = {
-          id: data.findUser.CARKOD,
-          email: data.findUser.CARUNVAN3,
-          name: data.findUser.CARUNVAN,
-          role: loginPageRoute,
-          isActive: data.findUser.CAROZKOD1,
-          isPartner: data.findUser.CAROZKOD3,
-        };
 
-        return user;
+        if (data?.isNewPassword) {
+          throw new Error(data.message);
+        } else {
+          const user = {
+            id: data.findUser.CARKOD,
+            email: data.findUser.CARUNVAN3,
+            name: data.findUser.CARUNVAN,
+            role: loginPageRoute,
+            isActive: data.findUser.CAROZKOD1,
+            isPartner: data.findUser.CAROZKOD3,
+          };
+
+          return user;
+        }
       },
     }),
   ],

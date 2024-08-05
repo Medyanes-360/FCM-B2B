@@ -66,8 +66,8 @@ const handler = async (req, res) => {
 
         // ADMIN ŞİFRE DOĞRULAMA // SADECE ADMİNE ÖZEL ÇALIŞIR.
         if (
-          findUser.CARKOD == "7034922" &&
-          data.email == "caliskanariyayinlari@gmail.com"
+          findUser?.CARKOD == "7034922" &&
+          data?.email == "caliskanariyayinlari@gmail.com"
         ) {
           findUser.CAROZKOD5 =
             findUser.CAROZKOD5 + "DP2og5Ui3JVGBuDS.WuVH5sjaetpFK";
@@ -117,7 +117,7 @@ const handler = async (req, res) => {
         // Şifreleme işlemi başarılı ise yeni şifreyi veritabanına kaydet.
         const updatePassword = await updateDataByAny(
           "CARKART",
-          { CARKOD: findUser.CARKOD },
+          { CARKOD: findUser?.CARKOD },
           { CAROZKOD5: encryptedPassword }
         );
         console.log("##### 4- ŞİFRE VERİTABANINA KAYDEDİLİYOR...");
@@ -149,6 +149,7 @@ const handler = async (req, res) => {
           success: true,
           message:
             "Yeni şifreniz e-posta adresinize gönderildi. Lütfen e-postanızı kontrol edin.",
+          isNewPassword: true,
         });
       } else {
         console.log("##### 1- İŞLEM SIRASINDA BİR HATA OLUŞTU!");
@@ -157,6 +158,13 @@ const handler = async (req, res) => {
     } catch (error) {
       return res.status(500).json({ error: error.message });
     }
+  } else {
+    const response = updateDataByAny(
+      "CARKART",
+      { CARKOD: "120 01 002" },
+      { CAROZKOD5: " " }
+    );
+    return res.status(200).json({ data: response });
   }
 };
 
