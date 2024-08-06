@@ -54,12 +54,29 @@ function OrderDetails() {
   } = params;
   return (
     <>
-      <div className="h-screen bg-gray-50">
+      <div className="bg-[url('/backgroundImage.webp')] bg-no-repeat   bg-contain bg-[#6bcdec]">
+      <div className="min-h-screen-minus-50 bg-gray-50 w-screen xl:w-[1188px] pt-[10px] mx-auto ">
+        <div className="flex items-center mt-[3.15rem] justify-center text-[35px] md:text-[48px] text-CustomGray leading-[41px] font-bold italic mb-[60px]">
+          Sipariş Detay Sayfası
+        </div>
         <Navbar id={id} />
         <div className="flex flex-col md:gap-4 md:mt-4 md:mx-8 xl:mx-32">
-          <TopSection day={day} month={month} year={year} time={time} description={description} />
-          <ProductSummary product={product} company={company} quantity={quantity} quantityCost={quantityCost} totalCost={totalCost} />
+          <TopSection
+            day={day}
+            month={month}
+            year={year}
+            time={time}
+            description={description}
+          />
+          <ProductSummary
+            product={product}
+            company={company}
+            quantity={quantity}
+            quantityCost={quantityCost}
+            totalCost={totalCost}
+          />
         </div>
+      </div>
       </div>
     </>
   );

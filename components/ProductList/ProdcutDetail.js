@@ -85,164 +85,169 @@ function ProdcutDetail({ product, img }) {
   }
   return (
     <div className="flex flex-col justify-center items-center bg-[url('/backgroundImage.webp')] bg-no-repeat   bg-contain bg-[#6bcdec]">
-      <div className="bg-gray-50 min-h-screen-minus-50 border">
-        <div className="flex mb-5 justify-end  p-1 items-center">
-          <Link
-            className="flex flex-col items-center justify-center mr-10 mt-7 hover:text-LightBlue hover:scale-110 transition-all duration-700 ease-in-out transform relative"
-            href="/cart"
-          >
-            <span>
-              <RiShoppingBasketFill
-                style={{ width: "25px", height: "25px" }}
-                className="text-CustomGray"
-              />
-            </span>
-            {cartItemCount > 0 && (
-              <div className="absolute -top-3 -right-4 bg-[#ff5b4b] rounded-full px-[5px]  flex items-center justify-center">
-                <span className="text-white font-extrabold text-[16px] w-[14px] h-[24px]">
-                  {cartItemCount}
-                </span>
-              </div>
-            )}
-          </Link>
-        </div>
-        <div className="grid grid-rows-2 px-5 lg:w-[1188px]  md:px-14 pt-14 pb-3 mb-2  lg:mx-auto">
-          <div
-            className={`md:grid md:grid-cols-4 md:grid-flow-col ${
-              product.desc && product.bookDetail ? "row-span-1" : "row-span-2"
-            }`}
-          >
-            <div className="col-span-2 flex md:justify-center border border-dashed rounded-lg bg-white">
-              <div className=" max-w-xl">
-                <img className="max-h-96" src={img} alt={img} />
-              </div>
-            </div>
-            <div className=" flex flex-col justify-center col-span-2 md:ml-5  pt-5">
-              <div className="font-bold text-3xl md:mt-0 mt-6 pb-3 px-3">
-                {product.STKCINSI}
-              </div>
-              <div className="flex flex-col   mt-5 px-3">
-                <div className="flex space-x-2">
-                  <div className="flex flex-col space-y-4 justify-evenly   text-gray-500 ">
-                    <div className="pb-[1px]">
-                      {/** Yayınevi yazması gereken yer */}&nbsp;
-                    </div>
-                    <div className="pt-[1px]">Kategori:</div>
-                  </div>
-                  <div className="flex flex-col space-y-4  justify-evenly ">
-                    <div className="text-LightBlue inline p-0 text-lg ">
-                      {/** Yayınevi değerinin gelmesi gereken yer */}&nbsp;
-                    </div>
-                    <div className="text-LightBlue inline p-0 text-lg ">
-                      {/** kategori */}
-                      {product.STKOZKOD3 + " " + product.STKOZKOD2}
-                    </div>
-                  </div>
+      <div className="bg-gray-50 min-h-screen-minus-50 ">
+        <div className="px-5 xl:w-[1188px]   lg:px-14 pt-14 pb-3 mb-2  lg:mx-auto">
+          <div className="flex p-1 mb-3 md:mb-0 justify-end ">
+            <Link
+              className="flex flex-col items-center justify-center hover:text-LightBlue hover:scale-110 transition-all duration-700 ease-in-out transform relative"
+              href="/cart"
+            >
+              <span>
+                <RiShoppingBasketFill
+                  style={{ width: "25px", height: "25px" }}
+                  className="text-CustomGray"
+                />
+              </span>
+              {cartItemCount > 0 && (
+                <div className="absolute -top-3 -right-4 bg-[#ff5b4b] rounded-full px-[5px]  flex items-center justify-center">
+                  <span className="text-white font-extrabold text-[16px] w-[14px] h-[24px]">
+                    {cartItemCount}
+                  </span>
                 </div>
-                <PriceTag />
+              )}
+            </Link>
+          </div>
+          <div className="grid grid-rows-2 ">
+            <div
+              className={`md:grid md:grid-cols-4 md:grid-flow-col ${
+                product.desc && product.bookDetail ? "row-span-1" : "row-span-2"
+              }`}
+            >
+              <div className="col-span-2 flex md:justify-center border border-dashed rounded-lg bg-white">
+                <div className=" max-w-xl">
+                  <img className="max-h-96" src={img} alt={img} />
+                </div>
               </div>
-              <div className="flex flex-row items-center mt-5 mb-5 px-3">
-                <Formik
-                  initialValues={{ quantity: 1 }}
-                  validationSchema={Yup.object().shape({
-                    quantity: Yup.number()
-                      .min(1, "En az 1 olmalı")
-                      .required("Zorunlu alan"),
-                  })}
-                  onSubmit={(values, { resetForm }) => {
-                    handleAddToCart(values, product);
-                    resetForm();
-                  }}
-                >
-                  {({
-                    values,
-                    handleChange,
-                    handleSubmit,
-                    errors,
-                    touched,
-                  }) => (
-                    <Form>
-                      <div className="flex flex-col items-center justify-center text-LightBlue">
-                        <div className="flex flex-row items-center justify-center">
-                          <div className="flex items-center mt-2  p-2 border border-LightBlue hover:border-CustomGray bg-white rounded-lg">
-                            <button
-                              type="button"
-                              className="text-sm sm:text-md text-LightBlue hover:scale-110 transition duration-500 ease-in-out transform"
-                              onClick={() => {
-                                if (values.quantity > 1) {
+              <div className="flex flex-col justify-center col-span-2 md:ml-5  pt-5">
+                <div className="font-bold text-3xl md:mt-0 mt-6 pb-3 px-3">
+                  {product.STKCINSI}
+                </div>
+                <div className="flex flex-col   mt-5 px-3">
+                  <div className="flex space-x-2">
+                    <div className="flex flex-col space-y-4 justify-evenly   text-gray-500 ">
+                      <div className="pb-[1px]">
+                        {/** Yayınevi yazması gereken yer */}&nbsp;
+                      </div>
+                      <div className="pt-[1px]">Kategori:</div>
+                    </div>
+                    <div className="flex flex-col space-y-4  justify-evenly ">
+                      <div className="text-LightBlue inline p-0 text-lg ">
+                        {/** Yayınevi değerinin gelmesi gereken yer */}&nbsp;
+                      </div>
+                      <div className="text-LightBlue inline p-0 text-lg ">
+                        {/** kategori */}
+                        {product.STKOZKOD3 + " " + product.STKOZKOD2}
+                      </div>
+                    </div>
+                  </div>
+                  <PriceTag />
+                </div>
+                <div className="flex flex-row items-center mt-5 mb-5 px-3">
+                  <Formik
+                    initialValues={{ quantity: 1 }}
+                    validationSchema={Yup.object().shape({
+                      quantity: Yup.number()
+                        .min(1, "En az 1 olmalı")
+                        .required("Zorunlu alan"),
+                    })}
+                    onSubmit={(values, { resetForm }) => {
+                      handleAddToCart(values, product);
+                      resetForm();
+                    }}
+                  >
+                    {({
+                      values,
+                      handleChange,
+                      handleSubmit,
+                      errors,
+                      touched,
+                    }) => (
+                      <Form>
+                        <div className="flex flex-col items-center justify-center text-LightBlue">
+                          <div className="flex flex-row items-center justify-center">
+                            <div className="flex items-center mt-2  p-2 border border-LightBlue hover:border-CustomGray bg-white rounded-lg">
+                              <button
+                                type="button"
+                                className="text-sm sm:text-md text-LightBlue hover:scale-110 transition duration-500 ease-in-out transform"
+                                onClick={() => {
+                                  if (values.quantity > 1) {
+                                    handleChange({
+                                      target: {
+                                        name: "quantity",
+                                        value: values.quantity - 1,
+                                      },
+                                    });
+                                  }
+                                }}
+                              >
+                                <FaMinus />
+                              </button>
+                              <Field
+                                min="1"
+                                name="quantity"
+                                className="w-6 text-center outline-none text-CustomGray"
+                              />
+                              <button
+                                type="button"
+                                className="text-LightBlue hover:scale-110 text-sm sm:text-md transition duration-500 ease-in-out transform"
+                                onClick={() =>
                                   handleChange({
                                     target: {
                                       name: "quantity",
-                                      value: values.quantity - 1,
+                                      value: values.quantity + 1,
                                     },
-                                  });
+                                  })
                                 }
-                              }}
-                            >
-                              <FaMinus />
-                            </button>
-                            <Field
-                              min="1"
-                              name="quantity"
-                              className="w-6 text-center outline-none text-CustomGray"
-                            />
+                              >
+                                <FaPlus />
+                              </button>
+                            </div>
+                            {errors.quantity && touched.quantity && (
+                              <div className="text-red-500 mt-1">
+                                {errors.quantity}
+                              </div>
+                            )}
                             <button
-                              type="button"
-                              className="text-LightBlue hover:scale-110 text-sm sm:text-md transition duration-500 ease-in-out transform"
-                              onClick={() =>
-                                handleChange({
-                                  target: {
-                                    name: "quantity",
-                                    value: values.quantity + 1,
-                                  },
-                                })
-                              }
+                              type="submit"
+                              className="flex flex-row items-center justify-center gap-2 ml-2 sm:ml-4 lg:ml-2 text-white font-bold hover:scale-105 transition-all transform easy-in-out duration-500 cursor-pointer bg-LightBlue/75 pl-2 pr-9 py-2 rounded-full relative w-[130px] sm:w-[160px] h-[40px] text-[13px] sm:text-[15px]"
+                              onClick={handleSubmit}
+                              disabled={product.addingToCart}
                             >
-                              <FaPlus />
+                              {product.addingToCart ? (
+                                <div className="flex flex-row items-center justify-center gap-1">
+                                  <div className="h-2 w-2 rounded-full animate-pulse bg-blue-900"></div>
+                                  <div className="h-2 w-2 rounded-full animate-pulse bg-blue-900"></div>
+                                  <div className="h-2 w-2 rounded-full animate-pulse bg-blue-900"></div>
+                                </div>
+                              ) : (
+                                <>Sepete Ekle</>
+                              )}
+                              <span
+                                className={`absolute -top-1 -right-2 text-white bg-gradient-to-r from-sky-600 to-cyan-700 p-3 border-4 border-white rounded-full transition-all duration-500 ease-out transform`}
+                              >
+                                {isInCart(product) ? (
+                                  <FaCheck
+                                    className={`transition-all duration-1000 ease-in-out transform ${
+                                      isInCart(product)
+                                        ? "scale-100"
+                                        : "scale-0"
+                                    }`}
+                                  />
+                                ) : (
+                                  <FaPlus />
+                                )}
+                              </span>
                             </button>
                           </div>
-                          {errors.quantity && touched.quantity && (
-                            <div className="text-red-500 mt-1">
-                              {errors.quantity}
-                            </div>
-                          )}
-                          <button
-                            type="submit"
-                            className="flex flex-row items-center justify-center gap-2 ml-2 sm:ml-4 lg:ml-2 text-white font-bold hover:scale-105 transition-all transform easy-in-out duration-500 cursor-pointer bg-LightBlue/75 pl-2 pr-9 py-2 rounded-full relative w-[130px] sm:w-[160px] h-[40px] text-[13px] sm:text-[15px]"
-                            onClick={handleSubmit}
-                            disabled={product.addingToCart}
-                          >
-                            {product.addingToCart ? (
-                              <div className="flex flex-row items-center justify-center gap-1">
-                                <div className="h-2 w-2 rounded-full animate-pulse bg-blue-900"></div>
-                                <div className="h-2 w-2 rounded-full animate-pulse bg-blue-900"></div>
-                                <div className="h-2 w-2 rounded-full animate-pulse bg-blue-900"></div>
-                              </div>
-                            ) : (
-                              <>Sepete Ekle</>
-                            )}
-                            <span
-                              className={`absolute -top-1 -right-2 text-white bg-gradient-to-r from-sky-600 to-cyan-700 p-3 border-4 border-white rounded-full transition-all duration-500 ease-out transform`}
-                            >
-                              {isInCart(product) ? (
-                                <FaCheck
-                                  className={`transition-all duration-1000 ease-in-out transform ${
-                                    isInCart(product) ? "scale-100" : "scale-0"
-                                  }`}
-                                />
-                              ) : (
-                                <FaPlus />
-                              )}
-                            </span>
-                          </button>
                         </div>
-                      </div>
-                    </Form>
-                  )}
-                </Formik>
+                      </Form>
+                    )}
+                  </Formik>
+                </div>
               </div>
             </div>
           </div>
+
           <div
             className={`${
               product.desc && product.bookDetail ? "row-span-1 " : "hidden"

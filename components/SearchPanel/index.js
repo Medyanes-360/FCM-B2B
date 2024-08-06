@@ -138,7 +138,7 @@ function SearchPanel({ toggleSearchPanel }) {
                 <div className="relative border-2 border-LightBlue rounded-full  py-2 pr-2 hover:border-DarkBlue transition duration-300 ease-in-out transform pl-4">
                   <Field
                     name="searchinput"
-                    placeholder="Search products..."
+                    placeholder="Ürün arama..."
                     className={`form-control text-[15px] w-[250px] sm:w-[310px] flex items-start font-bold lowercase outline-none ${
                       errors.searchinput && touched.searchinput
                         ? "is-invalid"
