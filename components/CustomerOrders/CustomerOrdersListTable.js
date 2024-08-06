@@ -1,42 +1,48 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { HiOutlineDocumentAdd } from "react-icons/hi";
 import { FaEye } from "react-icons/fa";
 import { ImCancelCircle } from "react-icons/im";
 import RequestModal from "./RequestModal";
 import OrderCancellation from "./OrderCancallation";
 import Link from "next/link";
-import { getAPI } from "@/services/fetchAPI";
 
-const CustomerOrdersListTable = ({ orders }) => {
-  const [selectAllChecked, setSelectAllChecked] = useState(false);
-  const [selectedOrderCheckboxes, setSelectedOrderCheckboxes] = useState({});
+
+const CustomerOrdersListTable = ({ orders, products }) => {
+  const [isChecked, setIsChecked] = useState(orders.map(() => false));
+  const [isAllChecked, setIsAllChecked] = useState(false);
   const [isOpenReqModal, setIsOpenReqModal] = useState(false);
   const [isOpenOrderCanModal, setIsOpenOrderCanModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [products, setProducts] = useState([]);
 
   // statu Renkleri
   const statusColors = {
     Beklemede: "bg-[#e5e5e5] text-[#80808b]",
     Hazırlanıyor: "bg-[#c7e1c7] text-[#5d7b45]",
     "Ödeme bekleniyor": "bg-[#f8dda5] text-[#876b17]",
+    "Sipariş Oluşturuldu": "bg-[#f8dda5] text-[#876b17]",
     Tamamlandı: "bg-[#c7d8e2] text-[#324356]",
     "İptal edildi": "bg-[#e3e5e3] text-[#7a7a7c]",
     Başarısız: "bg-[#eaa4a4] text-[#762024]",
   };
 
-  useEffect(() => {
-    const fetch = async () => {
-      try {
-        const data = await getAPI("/allorders");
-        console.log(data);
-        setProducts(data);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    fetch();
-  }, []);
+  
+  // single check process for inputs
+  const handleCheckboxChange = (index) => {
+    const newCheckedItems = [...isChecked];
+    newCheckedItems[index] = !newCheckedItems[index];
+    setIsChecked(newCheckedItems);
+
+    const allChecked = newCheckedItems.every((item) => item);
+    setIsAllChecked(allChecked);
+  };
+  // all check process for "select all" input
+  const handleAllCheck = () => {
+    const newAllCheckState = !isAllChecked;
+    setIsAllChecked(newAllCheckState);
+
+    const newCheckedElements = orders.map(() => newAllCheckState);
+    return setIsChecked(newCheckedElements);
+  };
 
   // const handleSelectAllCheckboxChange = (event) => {
   //   const { checked } = event.target;
@@ -71,13 +77,16 @@ const CustomerOrdersListTable = ({ orders }) => {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-NavyBlue text-white ">
             <tr className="text-center">
-              {/* <th className="px-6 py-3  text-left text-xs font-medium">
-                <input
-                  type="checkbox"
-                  checked={selectAllChecked}
-                  onChange={handleSelectAllCheckboxChange}
-                />
-              </th> */}
+              {
+                <th className="px-6 py-3  text-left text-xs font-medium">
+                  <input
+                    type="checkbox"
+                    checked={isAllChecked}
+                    onChange={handleAllCheck}
+                  />
+                </th>
+              }
+
               <th className="px-6 py-3 text-center text-base font-medium  ">
                 Sipariş
               </th>
@@ -100,15 +109,15 @@ const CustomerOrdersListTable = ({ orders }) => {
                   index % 2 === 1 ? "bg-white" : "bg-gray-50"
                 } text-center`}
               >
-                {/* <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-6 py-4 whitespace-nowrap">
                   <input
                     type="checkbox"
-                    // checked={selectedOrderCheckboxes[product.ID] || false}
-                    // onChange={() => handleSingleCheckboxChange(product.ID)}
+                    checked={isChecked[index]}
+                    onChange={() => handleCheckboxChange(index)}
                   />
-                </td> */}
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap text-LightBlue">
-                  {order.STKNAME}
+                  {order.STKNAME} | {order.ORDERNO}
                 </td>
 
                 <td className="px-6 py-4 whitespace-nowrap ">
@@ -117,7 +126,7 @@ const CustomerOrdersListTable = ({ orders }) => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div
                     className={`inline-block rounded-sm px-2 py-1  ${
-                      statusColors[order.status]
+                      statusColors[order.ORDERSTATUS]
                     }`}
                   >
                     {order.ORDERSTATUS}
@@ -133,12 +142,12 @@ const CustomerOrdersListTable = ({ orders }) => {
                   >
                     <HiOutlineDocumentAdd /> <span>Talep oluştur</span>{" "}
                   </button>
-                  {/* <button
+                  <button
                     className="bg-red-300 p-2 rounded-md hover:bg-red-400 flex items-center space-x-1"
-                    // onClick={() => handleOrderCancellation(order)}
-                  > href={`/customer-orders/${order.id}`}
+                    onClick={() => handleOrderCancellation(order)}
+                  >
                     <ImCancelCircle /> <span> Sipariş İptal</span>
-                  </button> */}
+                  </button>
                   <Link
                     href={{
                       pathname: `/customer-orders/${order.ID}`,
@@ -146,15 +155,15 @@ const CustomerOrdersListTable = ({ orders }) => {
                         id: order.CARKOD,
                         product: order.STKNAME,
                         company: order.CARUNVAN,
-                        description : order.ACIKLAMA,
-                        quantity : order.STKADET,
-                        quantityCost : order.STKBIRIMFIYAT,
+                        description: order.ACIKLAMA,
+                        quantity: order.STKADET,
+                        quantityCost: order.STKBIRIMFIYAT,
                         totalCost: order.STKBIRIMFIYATTOPLAM,
                         status: order.ORDERSTATUS,
                         day: order.ORDERGUN,
                         month: order.ORDERAY,
                         year: order.ORDERYIL,
-                        time : order.ORDERSAAT
+                        time: order.ORDERSAAT,
                       },
                     }}
                   >

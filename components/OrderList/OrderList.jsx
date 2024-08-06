@@ -23,6 +23,20 @@ const OrderList = () => {
   const [anyFilterSelected, setAnyFilterSelected] = useState(false);
   const [selectedOrders, setSelectedOrders] = useState([]);
   const [orderCounts, setOrderCounts] = useState({});
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const fetch = async () => {
+      try {
+        const data = await getAPI("/allorders");
+        console.log(data);
+        setProducts(data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetch();
+  }, []);
 
   useEffect(() => {
     const dates = [...new Set(filteredOrders.map((order) => order.date))];
@@ -121,8 +135,19 @@ const OrderList = () => {
   const handleDateSortChange = (event) => {
     const sortType = event.target.value;
     setDateSortType(sortType);
-    sortOrders(priceSortType, sortType);
-    setAnyFilterSelected(true);
+
+    const sortedProducts = ([...products].sort = (a, b) => {
+      const dateA = new Date(a.ORDERYIL, a.ORDERAY - 1, a.ORDERGUN);
+      const dateB = new Date(b.ORDERYIL, b.ORDERAY - 1, b.ORDERGUN);
+      if (sortType === "Önce en yeni") {
+        return dateB - dateA;
+      } else if (sortType === "Önce en eski") {
+        return dateA - dateB;
+      } else {
+        return 0;
+      }
+    });
+    setProducts(sortedProducts)
   };
 
   const handleClearFilters = () => {
@@ -172,7 +197,7 @@ const OrderList = () => {
 
       setFilteredOrders(updatedOrders);
       setSelectedOrders([]);
-      setSelectAll("Toplu İşlemler")
+      setSelectAll("Toplu İşlemler");
     }
   };
 
@@ -185,22 +210,41 @@ const OrderList = () => {
     <>
       <div className="justify-between flex flex-wrap ">
         <div className="flex  gap-2 text-LightBlue flex-wrap text-base ">
-          <span onClick={handleAllOrders} className={selectedStatus === "Tümü" ? "text-BaseDark cursor-pointer" : "cursor-pointer"}>
+          <span
+            onClick={handleAllOrders}
+            className={
+              selectedStatus === "Tümü"
+                ? "text-BaseDark cursor-pointer"
+                : "cursor-pointer"
+            }
+          >
             <span>Tümü</span>
             <span>({orders.length})</span>
             <span className="text-CustomGray ml-1">|</span>
           </span>
           {statuses.map((status, index) => (
             <React.Fragment key={index}>
-              <span onClick={() => filterStatus(status)} className={selectedStatus === status ? "text-BaseDark cursor-pointer" : "cursor-pointer"}>
+              <span
+                onClick={() => filterStatus(status)}
+                className={
+                  selectedStatus === status
+                    ? "text-BaseDark cursor-pointer"
+                    : "cursor-pointer"
+                }
+              >
                 {status}
               </span>
-              <span className="text-CustomGray"> ({orderCounts[status] || 0})</span>
-              {index !== statuses.length - 1 && <span className="text-CustomGray">|</span>}
+              <span className="text-CustomGray">
+                {" "}
+                ({orderCounts[status] || 0})
+              </span>
+              {index !== statuses.length - 1 && (
+                <span className="text-CustomGray">|</span>
+              )}
             </React.Fragment>
           ))}
         </div>
-       
+
         <div className="flex">
           <form action="" className="flex gap-2 w-72 ">
             <input
@@ -217,7 +261,13 @@ const OrderList = () => {
         <div className="flex gap-4 flex-wrap">
           <div className="flex gap-2 mr-6">
             <select
-              className={`p-1 border rounded-md text-CustomGray w-36 ${selectAll !== "Toplu İşlemler" ? "bg-NavyBlue text-white" : ""} ${selectedOrders.length === 0 ?"pointer-events-none opacity-50":""}`}
+              className={`p-1 border rounded-md text-CustomGray w-36 ${
+                selectAll !== "Toplu İşlemler" ? "bg-NavyBlue text-white" : ""
+              } ${
+                selectedOrders.length === 0
+                  ? "pointer-events-none opacity-50"
+                  : ""
+              }`}
               name="filterActions"
               value={selectAll}
               onChange={handleSelectAll}
@@ -232,7 +282,11 @@ const OrderList = () => {
             </select>
             <button
               onClick={handleBulkUpdate}
-              className={`px-1  text-NavyBlue border text-sm border-NavyBlue rounded-md ${selectAll === "Toplu İşlemler" ? "opacity-50 cursor-not-allowed" : "hover:bg-NavyBlue hover:text-white"}`}
+              className={`px-1  text-NavyBlue border text-sm border-NavyBlue rounded-md ${
+                selectAll === "Toplu İşlemler"
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-NavyBlue hover:text-white"
+              }`}
               disabled={selectAll === "Toplu İşlemler"}
             >
               Uygula
@@ -240,7 +294,9 @@ const OrderList = () => {
           </div>
           <div className="flex gap-2 flex-wrap">
             <select
-              className={`p-1 border rounded-md text-BaseDark w-32 font-medium ${orderDate !== "Tüm Tarihler" ? "bg-NavyBlue text-white" : ""}`}
+              className={`p-1 border rounded-md text-BaseDark w-32 font-medium ${
+                orderDate !== "Tüm Tarihler" ? "bg-NavyBlue text-white" : ""
+              }`}
               name="filterDates"
               onChange={(e) => {
                 const selectedDate = e.target.value;
@@ -262,7 +318,11 @@ const OrderList = () => {
               <option>Kayıtlı Kullanıcılara göre Filtrele</option>
             </select>
             <select
-              className={`${priceSortType === "Fiyata Göre Sırala" ? "" : "bg-NavyBlue text-white"}`}
+              className={`${
+                priceSortType === "Fiyata Göre Sırala"
+                  ? ""
+                  : "bg-NavyBlue text-white"
+              }`}
               name="filterUsers"
               onChange={handlePriceSortChange}
               value={priceSortType}
@@ -272,7 +332,11 @@ const OrderList = () => {
               <option>Önce en düşük</option>
             </select>
             <select
-              className={`${dateSortType === "Tarihe Göre Sırala" ? "" : "bg-NavyBlue text-white"}`}
+              className={`${
+                dateSortType === "Tarihe Göre Sırala"
+                  ? ""
+                  : "bg-NavyBlue text-white"
+              }`}
               name="filterUsers"
               onChange={handleDateSortChange}
               value={dateSortType}
@@ -283,7 +347,11 @@ const OrderList = () => {
             </select>
             <button
               onClick={handleClearFilters}
-              className={`p-[6px]  font-[500] border text-NavyBlue  rounded-md text-sm whitespace-nowrap ${anyFilterSelected ? "border-NavyBlue cursor-pointer hover:bg-NavyBlue hover:text-white" : "text-NavyBlue opacity-50 border-gray-400 cursor-not-allowed"}`}
+              className={`p-[6px]  font-[500] border text-NavyBlue  rounded-md text-sm whitespace-nowrap ${
+                anyFilterSelected
+                  ? "border-NavyBlue cursor-pointer hover:bg-NavyBlue hover:text-white"
+                  : "text-NavyBlue opacity-50 border-gray-400 cursor-not-allowed"
+              }`}
             >
               Filtre Temizle
             </button>
@@ -292,34 +360,56 @@ const OrderList = () => {
         <div className="flex items-center gap-2 ">
           <p className="text-CustomGray">{filteredOrders.length} öge</p>
           <div
-            className={`border-2 rounded-sm text-[18px] md:p-3 p-1 ${page === 0 ? "cursor-not-allowed text-gray-300" : "cursor-pointer hover:bg-gray-200 duration-300 hover:border-NavyBlue hover:rounded-xl"}`}
+            className={`border-2 rounded-sm text-[18px] md:p-3 p-1 ${
+              page === 0
+                ? "cursor-not-allowed text-gray-300"
+                : "cursor-pointer hover:bg-gray-200 duration-300 hover:border-NavyBlue hover:rounded-xl"
+            }`}
             onClick={() => handleChangePage("prev")}
           >
             <MdKeyboardDoubleArrowLeft />
           </div>
           <div
-            className={`border-2 rounded-sm text-[18px] md:p-3 p-1 ${page === 0 ? " cursor-not-allowed text-gray-300" : "cursor-pointer hover:bg-gray-200 duration-300 hover:border-NavyBlue hover:rounded-xl"}`}
+            className={`border-2 rounded-sm text-[18px] md:p-3 p-1 ${
+              page === 0
+                ? " cursor-not-allowed text-gray-300"
+                : "cursor-pointer hover:bg-gray-200 duration-300 hover:border-NavyBlue hover:rounded-xl"
+            }`}
             onClick={() => handleChangePage("prev")}
           >
             <MdKeyboardArrowLeft />
           </div>
-          <span className="border md:px-4 md:py-2 py-1 px-3 rounded-full bg-NavyBlue text-white">{page + 1}</span>
+          <span className="border md:px-4 md:py-2 py-1 px-3 rounded-full bg-NavyBlue text-white">
+            {page + 1}
+          </span>
           <span>/ {Math.ceil(filteredOrders.length / rowsPerPage)}</span>
           <div
-            className={`border-2 rounded-sm text-[18px] md:p-3 p-1 ${(page + 1) * rowsPerPage >= filteredOrders.length ? " cursor-not-allowed text-gray-300" : "cursor-pointer hover:bg-gray-200 duration-300 hover:border-NavyBlue hover:rounded-xl"}`}
+            className={`border-2 rounded-sm text-[18px] md:p-3 p-1 ${
+              (page + 1) * rowsPerPage >= filteredOrders.length
+                ? " cursor-not-allowed text-gray-300"
+                : "cursor-pointer hover:bg-gray-200 duration-300 hover:border-NavyBlue hover:rounded-xl"
+            }`}
             onClick={() => handleChangePage("next")}
           >
             <MdKeyboardArrowRight />
           </div>
           <div
-            className={`border-2 rounded-sm text-[18px] md:p-3 p-1 ${(page + 1) * rowsPerPage >= filteredOrders.length ? "cursor-not-allowed text-gray-300" : "cursor-pointer hover:bg-gray-200 duration-300 hover:border-NavyBlue hover:rounded-xl"}`}
+            className={`border-2 rounded-sm text-[18px] md:p-3 p-1 ${
+              (page + 1) * rowsPerPage >= filteredOrders.length
+                ? "cursor-not-allowed text-gray-300"
+                : "cursor-pointer hover:bg-gray-200 duration-300 hover:border-NavyBlue hover:rounded-xl"
+            }`}
             onClick={() => handleChangePage("next")}
           >
             <MdKeyboardDoubleArrowRight />
           </div>
         </div>
       </div>
-      <OrderListTable orders={paginatedOrders} selectedOrders={selectedOrders} setSelectedOrders={setSelectedOrders} />
+      <OrderListTable
+        orders={paginatedOrders}
+        selectedOrders={selectedOrders}
+        setSelectedOrders={setSelectedOrders}
+      />
     </>
   );
 };
