@@ -1,6 +1,6 @@
-import { withAuth } from 'next-auth/middleware';
-import { NextResponse } from 'next/server';
-import { getToken } from 'next-auth/jwt';
+import { withAuth } from "next-auth/middleware";
+import { NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
 export default withAuth(async function middleware(req) {
   // Kullanıcının bilgisi alınır.
   const session = await getToken({
@@ -12,7 +12,10 @@ export default withAuth(async function middleware(req) {
   const currentPath = req.nextUrl.pathname;
 
   // NextAuth API isteklerini hariç tutmak için kontrol ediyoruz.
-  if (currentPath.startsWith('/api/auth')) {
+  if (
+    currentPath.startsWith("/api/auth") ||
+    currentPath.startsWith("/api/reset-password")
+  ) {
     return NextResponse.next(); // İşlemi geçmesine izin veriyoruz.
   }
 
@@ -25,13 +28,13 @@ export default withAuth(async function middleware(req) {
 //https://nextjs.org/docs/app/building-your-application/routing/middleware#matcher
 export const config = {
   matcher: [
-    '/cart/:path',
-    '/shop/:path',
-    '/urun-kategori/:path',
-    '/billings/:path',
-    '/customer-orders/:path',
-    '/orders/:path',
-    '/products/:path',
-    '/api/:path*',
+    "/cart/:path",
+    "/shop/:path",
+    "/urun-kategori/:path",
+    "/billings/:path",
+    "/customer-orders/:path",
+    "/orders/:path",
+    "/products/:path",
+    "/api/:path*",
   ],
 };

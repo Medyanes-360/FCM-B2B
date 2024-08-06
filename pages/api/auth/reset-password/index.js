@@ -1,7 +1,7 @@
 import { getDataByUnique, updateDataByAny } from "@/services/serviceOperations";
 import PasswordGenerator from "@/functions/other/PasswordGenerator";
 import EncryptPassword from "@/functions/other/cryptology/encryptPassword";
-import sendPasswordEmail from "../mail/sendMail";
+import sendPasswordEmail from "../../mail/sendMail";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
