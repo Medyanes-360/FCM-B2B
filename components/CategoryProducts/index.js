@@ -89,6 +89,7 @@ function CategoryProducts({ showSearchAndCart = false }) {
     "4.SINIF",
     "ANASINIFI",
     "İNGİLİZCE",
+    "HİKAYE"
   ];
   // Seçilen sınıf tipine göre kategorileri getir
   const getClassCategories = (classType) => {
@@ -184,7 +185,7 @@ function CategoryProducts({ showSearchAndCart = false }) {
     );
 
     // ANASINIFI ve İNGİLİZCE dışında bir sınıf seçildiyse
-    if (selectedClass !== "ANASINIFI" && selectedClass !== "İNGİLİZCE") {
+    if (selectedClass !== "ANASINIFI" && selectedClass !== "İNGİLİZCE" && selectedClass !== "HİKAYE") {
       if (selectedCategory === "hepsi") {
       } else if (selectedCategory === "empty") {
         filteredUrunler = filteredUrunler.filter((urun) => !urun.STKOZKOD2);
@@ -201,6 +202,11 @@ function CategoryProducts({ showSearchAndCart = false }) {
         (urun) => urun.STKOZKOD2 === "İNGİLİZCE"
       );
     }
+    // Hikaye sınıfı seçildiğinde sadece STKOZKOD2 değeri "HİKAYE" olan ürünler listelensin
+
+    if (selectedClass === "HİKAYE") {
+      filteredUrunler = urunler.filter((urun) => urun.STKOZKOD2 === "HİKAYE");
+    }
 
     return (
       <div className="bg-white w-screen md:w-[600px] lg:w-[960px] xl:w-[1188px] pt-[10px] lg:pt-[30px]">
@@ -215,23 +221,25 @@ function CategoryProducts({ showSearchAndCart = false }) {
                   setSelectedClass(classType);
                   setSelectedCategory("");
                 }}
-                className={`flex flex-row gap-5 items-center justify-center text-[14px] md:text-[12px] lg:text-[14px] font-bold rounded-full py-[22px] pr-[28px] pl-[28px] tracking-[1px] h-[40px] mx-[8px] mb-[8px] hover:scale-105 transition-all duration-500 ease-in-out transform cursor-pointer  ${
+                className={`flex flex-row gap-5 items-center justify-center text-[14px] md:text-[12px] lg:text-[14px] font-bold rounded-full py-[22px] px-6 tracking-[1px] h-[40px] mx-[8px] mb-[8px] hover:scale-105 transition-all duration-500 ease-in-out transform cursor-pointer  ${
                   selectedClass === classType
                     ? " border-[3px] border-LightBlue text-LightBlue"
                     : "border-[3px] border-CategoriesTitle text-CategoriesTitle"
                 }`}
               >
                 {classType}
-                {classType !== "ANASINIFI" && classType !== "İNGİLİZCE" && (
-                  <span
-                    onClick={() => {
-                      toggleDropdown(classType);
-                    }}
-                    className="cursor-pointer"
-                  >
-                    <IoIosArrowDown className="w-5 h-5 hover:scale-110 transition-all duration-500 ease-in-out transform cursor-pointer hover:text-cyan-700" />
-                  </span>
-                )}
+                {classType !== "ANASINIFI" &&
+                  classType !== "İNGİLİZCE" &&
+                  classType !== "HİKAYE" && (
+                    <span
+                      onClick={() => {
+                        toggleDropdown(classType);
+                      }}
+                      className="cursor-pointer"
+                    >
+                      <IoIosArrowDown className="w-5 h-5 hover:scale-110 transition-all duration-500 ease-in-out transform cursor-pointer hover:text-cyan-700" />
+                    </span>
+                  )}
               </button>
               {dropdownOpen[classType] &&
                 classType !== "ANASINIFI" &&
