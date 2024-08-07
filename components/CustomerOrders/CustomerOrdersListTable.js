@@ -77,15 +77,10 @@ const CustomerOrdersListTable = ({ orders, products }) => {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-NavyBlue text-white ">
             <tr className="text-center">
-              {
-                <th className="px-6 py-3  text-left text-xs font-medium">
-                  <input
-                    type="checkbox"
-                    checked={isAllChecked}
-                    onChange={handleAllCheck}
-                  />
-                </th>
-              }
+
+            <th className="px-6 py-3 text-center text-base font-medium  ">
+                Açıklama
+              </th>
 
               <th className="px-6 py-3 text-center text-base font-medium  ">
                 Sipariş
@@ -109,14 +104,29 @@ const CustomerOrdersListTable = ({ orders, products }) => {
                   index % 2 === 1 ? "bg-white" : "bg-gray-50"
                 } text-center`}
               >
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <input
-                    type="checkbox"
-                    checked={isChecked[index]}
-                    onChange={() => handleCheckboxChange(index)}
-                  />
+                <td className="px-6 py-4 whitespace-nowrap hover:scale-105 transition-all">
+                <Link
+                    href={{
+                      pathname: `/customer-orders/${order.ID}`,
+                      query: {
+                        id: order.CARKOD,
+                        product: order.STKNAME,
+                        company: order.CARUNVAN,
+                        description: order.ACIKLAMA,
+                        quantity: order.STKADET,
+                        quantityCost: order.STKBIRIMFIYAT,
+                        totalCost: order.STKBIRIMFIYATTOPLAM,
+                        status: order.ORDERSTATUS,
+                        day: order.ORDERGUN,
+                        month: order.ORDERAY,
+                        year: order.ORDERYIL,
+                        time: order.ORDERSAAT,
+                      },
+                    }}>
+                  {order.STKNAME}
+                  </Link>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-LightBlue">
+                <td className="px-6 py-4 whitespace-nowrap text-LightBlue hover:scale-105 transition-all">
                 <Link
                     href={{
                       pathname: `/customer-orders/${order.ID}`,
