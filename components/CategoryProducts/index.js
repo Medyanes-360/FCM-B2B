@@ -316,6 +316,7 @@ function CategoryProducts({ showSearchAndCart = false }) {
                     }
                     width={210}
                     height={210}
+                    className="object-cover w-[140px] md:w-[210px] h-[140px] md:h-[210px]"
                     alt={urun.STKCINSI || "Ürün resmi"}
                   />
                 </span>
