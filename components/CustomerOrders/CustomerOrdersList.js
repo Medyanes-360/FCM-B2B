@@ -9,19 +9,21 @@ import {
 } from "react-icons/md";
 import { getAPI } from "@/services/fetchAPI";
 import { statusList } from "./data";
+import Footer from "../Footer";
 
 const CustomerOrdersList = () => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const [page, setPage] = useState(0);
+  const rowsPerPage = 10;
+  const [sortedProducts, setSortedProducts] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("Tümü");
   const [orderDate, setOrderDate] = useState("Tüm Tarihler");
   const [uniqueDates, setUniqueDates] = useState([]);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [selectAll, setSelectAll] = useState("Toplu İşlemler");
-  const [priceSortType, setPriceSortType] = useState("Fiyata Göre Sırala");
+  const [priceSortType, setPriceSortType] = useState("Önce en düşük");
   const [dateSortType, setDateSortType] = useState("Tarihe Göre Sırala");
   const [anyFilterSelected, setAnyFilterSelected] = useState(false);
 
@@ -37,13 +39,14 @@ const CustomerOrdersList = () => {
     };
     fetch();
   }, []);
+
+  //for filter status
   const filteredProd = (status) => {
-    if(status === "Tümü"){
+    if (status === "Tümü") {
       setFilteredProducts(products);
       setSelectedStatus(status);
-      console.log(filteredOrders)
-    }
-    else{
+      console.log(filteredOrders);
+    } else {
       setFilteredProducts(
         products.filter((product) => {
           return product.ORDERSTATUS === status;
@@ -52,17 +55,40 @@ const CustomerOrdersList = () => {
       setSelectedStatus(status);
     }
   };
-  
-  const handleSelectAll = (e) => {
-    setSelectAll(e.target.value);
+
+  // for pagination process
+  const handleChangePage = (direction) => {
+    if (direction === "prev" && page > 0) {
+      setPage(page - 1);
+    } else if (
+      direction === "next" &&
+      (page + 1) * rowsPerPage < filteredProducts.length
+    ) {
+      setPage(page + 1);
+    }
   };
 
-     useEffect(() => {
-    const dates = [...new Set(filteredOrders.map((order) => order.date))];
-    setUniqueDates(dates);
-  }, [filteredOrders]); 
+  const paginatedOrders = filteredProducts.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
 
-  const filterOrders = (searchValue, status, date) => {
+  // for sorting product price values
+  /*   useEffect(() => {
+    let sorted = [...filteredProducts];
+    if (priceSortType === "Önce en yüksek") {
+      sorted.sort((a, b) => b.total - a.total);
+    } else if (priceSortType === "Önce en düşük") {
+      sorted.sort((a, b) => a.total - b.total);
+    }
+    setSortedProducts(sorted);
+  }, [filteredProducts, priceSortType]);
+
+  const handleSortChange = (e) => {
+    setPriceSortType(e.target.value);
+  }; */
+
+  /* const filterOrders = (searchValue, status, date) => {
     let filteredOrders = orders;
 
     if (searchValue) {
@@ -91,38 +117,28 @@ const CustomerOrdersList = () => {
       }
     });
     setFilteredOrders(filteredOrders);
-  }; 
+  }; */
 
   // Arama
-   /* const handleSearchChange = (event) => {
+  /* const handleSearchChange = (event) => {
     const { value } = event.target;
     setSearchValue(value);
     filterOrders(value, selectedStatus, orderDate);
   };  */
 
   // status fiiltresi  degisikligini yonetiyor
-  const filterStatus = (status) => {
+  /*   const filterStatus = (status) => {
     setSelectedStatus(status);
     filteredOrders(searchValue, status, orderDate, uniqueDates);
-  };
+  }; */
 
-  const handleChangePage = (direction) => {
-    if (direction === "prev" && page > 0) {
-      setPage(page - 1);
-    } else if (
-      direction === "next" &&
-      (page + 1) * rowsPerPage < filteredOrders.length
-    ) {
-      setPage(page + 1);
-    }
-  };
+  useEffect(() => {
+    const dates = [...new Set(filteredProducts.map((order) => order.date))];
+    setUniqueDates(dates);
+  }, [filteredProducts]);
 
-  const paginatedOrders = filteredOrders.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
-  );
   const sortOrders = (priceSortType, dateSortType) => {
-    let sortedOrders = [...filteredOrders];
+    let sortedOrders = [...filteredProducts];
     if (priceSortType === "Önce en yüksek") {
       sortedOrders.sort((a, b) => b.total - a.total);
     } else if (priceSortType === "Önce en düşük") {
@@ -134,9 +150,10 @@ const CustomerOrdersList = () => {
     } else if (dateSortType === "Önce en eski") {
       sortedOrders.sort((a, b) => new Date(a.date) - new Date(b.date));
     }
-    setFilteredOrders(sortedOrders);
+    setFilteredProducts(sortedOrders);
   };
 
+  //FİYAT SIRALAMA
   const handlePriceSortChange = (event) => {
     const sortType = event.target.value;
     setPriceSortType(sortType);
@@ -144,7 +161,8 @@ const CustomerOrdersList = () => {
     setAnyFilterSelected(true);
   };
 
-  const handleDateSortChange = (event) => {
+  //TARİH SIRALAMA
+  /* const handleDateSortChange = (event) => {
     const sortType = event.target.value;
     setDateSortType(sortType);
 
@@ -152,9 +170,9 @@ const CustomerOrdersList = () => {
       const dateA = new Date(a.ORDERYIL, a.ORDERAY - 1, a.ORDERGUN);
       const dateB = new Date(b.ORDERYIL, b.ORDERAY - 1, b.ORDERGUN);
 
-      if (sortType === 'Önce en yeni') {
+      if (sortType === "Önce en yeni") {
         return dateB - dateA;
-      } else if (sortType === 'Önce en eski') {
+      } else if (sortType === "Önce en eski") {
         return dateA - dateB;
       } else {
         return 0;
@@ -162,7 +180,7 @@ const CustomerOrdersList = () => {
     });
 
     setFilteredOrders(sortedOrders);
-  };
+  }; */
   return (
     <>
       {/* <div className=" text-center pt-5 pb-7 text-3xl text-NavyBlue font[600]">Siparişler</div>*/}
@@ -175,8 +193,8 @@ const CustomerOrdersList = () => {
                 onClick={() => filteredProd(status.name)}
                 className={
                   selectedStatus === status.name
-                    ? "text-BaseDark cursor-pointer"
-                    : "cursor-pointer"
+                    ? "text-BaseDark cursor-pointer underline"
+                    : "cursor-pointer underline"
                 }
               >
                 {status.name}
@@ -233,8 +251,8 @@ const CustomerOrdersList = () => {
               name="filterDates"
               onChange={(e) => {
                 const selectedDate = e.target.value;
-                setOrderDate(selectedDate);
-                filterOrders(searchValue, selectedStatus, selectedDate);
+                /* setOrderDate(selectedDate);
+                filterOrders(searchValue, selectedStatus, selectedDate); */
               }}
               value={orderDate}
             >
@@ -268,8 +286,8 @@ const CustomerOrdersList = () => {
                   : "bg-NavyBlue text-white"
               }`}
               name="filterUsers"
-              onChange={handleDateSortChange}
-              value={dateSortType}
+              /* onChange={handleDateSortChange}
+              value={dateSortType} */
             >
               <option>Tarihe Göre Sırala</option>
               <option>Önce en yeni</option>
@@ -277,7 +295,6 @@ const CustomerOrdersList = () => {
             </select>
             {/* Filtrele Butonu */}
             <button
-              /* onClick={handleClearFilters} */
               className={`p-[6px]  font-[500] border text-NavyBlue  rounded-md   text-sm whitespace-nowrap
             ${
               anyFilterSelected
@@ -293,7 +310,7 @@ const CustomerOrdersList = () => {
 
         {/* Sıralama ve Sayfalama */}
         <div className="flex items-center gap-2 ">
-          <p className="text-CustomGray">{filteredOrders.length} öge</p>
+          <p className="text-CustomGray">{rowsPerPage} öge</p>
           <div
             className={`border-2 rounded-sm text-[18px]  md:p-3 p-1 ${
               page === 0
@@ -319,11 +336,11 @@ const CustomerOrdersList = () => {
           <span className="border  md:px-4 md:py-2 py-1 px-3 rounded-full bg-NavyBlue text-white">
             {page + 1}
           </span>
-          <span>/ {Math.ceil(filteredOrders.length / rowsPerPage)}</span>
+          <span>/ {Math.ceil(setFilteredProducts.length / rowsPerPage)}</span>
 
           <div
             className={`border-2 rounded-sm text-[18px] md:p-3 p-1 ${
-              (page + 1) * rowsPerPage >= filteredOrders.length
+              (page + 1) * rowsPerPage >= setFilteredProducts.length
                 ? " cursor-not-allowed text-gray-300"
                 : "cursor-pointer hover:bg-gray-200 duration-300 hover:border-NavyBlue hover:rounded-xl"
             }`}
@@ -334,7 +351,7 @@ const CustomerOrdersList = () => {
 
           <div
             className={`border-2 rounded-sm text-[18px] md:p-3 p-1 ${
-              (page + 1) * rowsPerPage >= filteredOrders.length
+              (page + 1) * rowsPerPage >= setFilteredProducts.length
                 ? "cursor-not-allowed text-gray-300 "
                 : "cursor-pointer hover:bg-gray-200 duration-300 hover:border-NavyBlue hover:rounded-xl"
             }`}
@@ -344,8 +361,11 @@ const CustomerOrdersList = () => {
           </div>
         </div>
       </div>
-      {/* buraya göndereceksin filter edilenleri */}
-      <CustomerOrdersListTable orders={paginatedOrders} products={filteredProducts} />
+      <CustomerOrdersListTable
+        orders={paginatedOrders}
+        products={filteredProducts}
+      />
+      <Footer />
     </>
   );
 };

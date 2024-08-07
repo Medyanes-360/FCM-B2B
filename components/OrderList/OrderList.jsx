@@ -358,7 +358,7 @@ const OrderList = () => {
           </div>
         </div>
         <div className="flex items-center gap-2 ">
-          <p className="text-CustomGray">{filteredOrders.length} öge</p>
+          <p className="text-CustomGray">{products.length} öge</p>
           <div
             className={`border-2 rounded-sm text-[18px] md:p-3 p-1 ${
               page === 0

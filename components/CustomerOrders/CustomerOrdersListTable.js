@@ -168,7 +168,7 @@ const CustomerOrdersListTable = ({ orders, products }) => {
                 <td className="px-6 py-4 space-x-2 flex justify-center whitespace-nowrap ">
                   <button
                     className="bg-NavyBlue/75 p-2 rounded-md hover:bg-NavyBlue text-white flex items-center space-x-1 "
-                    // onClick={() => handleOpenRequestModal(order)}
+                    onClick={() => handleOpenRequestModal(order)}
                   >
                     <HiOutlineDocumentAdd /> <span>Talep oluştur</span>{" "}
                   </button>
