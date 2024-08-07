@@ -117,11 +117,31 @@ const CustomerOrdersListTable = ({ orders, products }) => {
                   />
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-LightBlue">
-                  {order.STKNAME} | {order.ORDERNO}
+                <Link
+                    href={{
+                      pathname: `/customer-orders/${order.ID}`,
+                      query: {
+                        id: order.CARKOD,
+                        product: order.STKNAME,
+                        company: order.CARUNVAN,
+                        description: order.ACIKLAMA,
+                        quantity: order.STKADET,
+                        quantityCost: order.STKBIRIMFIYAT,
+                        totalCost: order.STKBIRIMFIYATTOPLAM,
+                        status: order.ORDERSTATUS,
+                        day: order.ORDERGUN,
+                        month: order.ORDERAY,
+                        year: order.ORDERYIL,
+                        time: order.ORDERSAAT,
+                      },
+                    }}
+                  >
+                  {order.ORDERNO}
+                  </Link>
                 </td>
 
                 <td className="px-6 py-4 whitespace-nowrap ">
-                  {order.ORDERGUN}/{order.ORDERAY}/{order.ORDERYIL}
+                  {order.ORDERGUN}.{order.ORDERAY}.{order.ORDERYIL}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div
@@ -142,12 +162,7 @@ const CustomerOrdersListTable = ({ orders, products }) => {
                   >
                     <HiOutlineDocumentAdd /> <span>Talep oluştur</span>{" "}
                   </button>
-                  <button
-                    className="bg-red-300 p-2 rounded-md hover:bg-red-400 flex items-center space-x-1"
-                    onClick={() => handleOrderCancellation(order)}
-                  >
-                    <ImCancelCircle /> <span> Sipariş İptal</span>
-                  </button>
+
                   <Link
                     href={{
                       pathname: `/customer-orders/${order.ID}`,
