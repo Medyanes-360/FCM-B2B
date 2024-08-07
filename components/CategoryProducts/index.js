@@ -119,7 +119,6 @@ function CategoryProducts({ showSearchAndCart = false }) {
           item.STKKOD === urun.STKKOD ? { ...item, addingToCart: true } : item
         )
       );
-      setLoading(true);
 
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -132,7 +131,7 @@ function CategoryProducts({ showSearchAndCart = false }) {
             }
           : item
       );
-      setLoading(false);
+
       setUrunler(updatedUrunler);
 
       const updatedCart = [...cart];
@@ -313,14 +312,11 @@ function CategoryProducts({ showSearchAndCart = false }) {
                 <span className="flex items-center justify-center">
                   <Image
                     src={
-                      imageMap[urun.STKKOD]
-                        ? imageMap[urun.STKKOD]
-                        : "https://caliskanari.com/wp-content/uploads/2022/11/X7-420x420.png.webp"
+                      imageMap[urun.STKKOD] || "/assets/images/resim-yok.jpg"
                     }
-                    alt={urun.STKCINSI}
-                    className="object-cover w-[140px] md:w-[210px] h-[140px] md:h-[210px]"
                     width={210}
                     height={210}
+                    alt={urun.STKCINSI || "Ürün resmi"}
                   />
                 </span>
               </div>
