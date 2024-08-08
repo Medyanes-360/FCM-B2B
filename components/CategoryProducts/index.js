@@ -38,7 +38,7 @@ function CategoryProducts({ showSearchAndCart = false }) {
       try {
         const data = await getAPI("/products");
         setLoading(false);
-        const filteredData = data.data.filter((urun) => urun.STKOZKOD1 === "A"); // STKOZKOD1 === "A" olan ürünleri filtrele
+        const filteredData = data.data;
         setUrunler(
           filteredData.map((urun) => ({
             ...urun,
@@ -89,7 +89,7 @@ function CategoryProducts({ showSearchAndCart = false }) {
     "4.SINIF",
     "ANASINIFI",
     "İNGİLİZCE",
-    "HİKAYE"
+    "HİKAYE",
   ];
   // Seçilen sınıf tipine göre kategorileri getir
   const getClassCategories = (classType) => {
@@ -185,7 +185,11 @@ function CategoryProducts({ showSearchAndCart = false }) {
     );
 
     // ANASINIFI ve İNGİLİZCE dışında bir sınıf seçildiyse
-    if (selectedClass !== "ANASINIFI" && selectedClass !== "İNGİLİZCE" && selectedClass !== "HİKAYE") {
+    if (
+      selectedClass !== "ANASINIFI" &&
+      selectedClass !== "İNGİLİZCE" &&
+      selectedClass !== "HİKAYE"
+    ) {
       if (selectedCategory === "hepsi") {
       } else if (selectedCategory === "empty") {
         filteredUrunler = filteredUrunler.filter((urun) => !urun.STKOZKOD2);

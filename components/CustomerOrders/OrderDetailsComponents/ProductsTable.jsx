@@ -1,10 +1,4 @@
-export default function ProductsTable({
-  product,
-  company,
-  quantity,
-  quantityCost,
-  totalCost,
-}) {
+export default function ProductsTable({ orders }) {
   return (
     <div id="table">
       <div className="bg-white rounded-lg">
@@ -19,25 +13,25 @@ export default function ProductsTable({
             </tr>
           </thead>
           <tbody>
-                <>
-                  <tr className="border-b hover:bg-gray-200">
-                    <td className="text-xs md:text-sm text-center py-0.5 md:py-2 px-1">
-                      {product}
-                    </td>
-                    <td className="text-xs md:text-sm text-center py-0.5 px-1">
-                      {quantityCost}
-                    </td>
-                    <td className="text-xs md:text-sm text-center py-0.5 px-1">
-                      %0
-                    </td>
-                    <td className="text-xs md:text-sm text-center py-0.5 px-1">
-                      {quantity}
-                    </td>
-                    <td className="text-xs md:text-sm text-center py-0.5 px-1">
-                      {totalCost} ₺
-                    </td>
-                  </tr>
-                </>
+            {orders.map((order, index) => (
+              <tr key={index} className="border-b hover:bg-gray-200">
+                <td className="text-xs md:text-sm text-center py-0.5 md:py-2 px-1">
+                  {order.STKNAME}
+                </td>
+                <td className="text-xs md:text-sm text-center py-0.5 px-1">
+                  {order.STKBIRIMFIYAT}
+                </td>
+                <td className="text-xs md:text-sm text-center py-0.5 px-1">
+                  %0
+                </td>
+                <td className="text-xs md:text-sm text-center py-0.5 px-1">
+                  {order.STKADET}
+                </td>
+                <td className="text-xs md:text-sm text-center py-0.5 px-1">
+                  {order.STKBIRIMFIYATTOPLAM} ₺
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>

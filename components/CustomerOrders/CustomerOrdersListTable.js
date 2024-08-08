@@ -6,7 +6,6 @@ import RequestModal from "./RequestModal";
 import OrderCancellation from "./OrderCancallation";
 import Link from "next/link";
 
-
 const CustomerOrdersListTable = ({ orders, products }) => {
   const [isChecked, setIsChecked] = useState(orders.map(() => false));
   const [isAllChecked, setIsAllChecked] = useState(false);
@@ -25,7 +24,6 @@ const CustomerOrdersListTable = ({ orders, products }) => {
     Başarısız: "bg-[#eaa4a4] text-[#762024]",
   };
 
-  
   // single check process for inputs
   const handleCheckboxChange = (index) => {
     const newCheckedItems = [...isChecked];
@@ -77,8 +75,7 @@ const CustomerOrdersListTable = ({ orders, products }) => {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-NavyBlue text-white ">
             <tr className="text-center">
-
-            <th className="px-6 py-3 text-center text-base font-medium  ">
+              <th className="px-6 py-3 text-center text-base font-medium  ">
                 Açıklama
               </th>
 
@@ -97,7 +94,7 @@ const CustomerOrdersListTable = ({ orders, products }) => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200 ">
-            {products.map((order, index) => (
+            {orders.map((order, index) => (
               <tr
                 key={order.ID}
                 className={`${
@@ -105,48 +102,27 @@ const CustomerOrdersListTable = ({ orders, products }) => {
                 } text-center`}
               >
                 <td className="px-6 py-4 whitespace-nowrap hover:scale-105 transition-all">
-                <Link
+                  <Link
                     href={{
                       pathname: `/customer-orders/${order.ID}`,
                       query: {
-                        id: order.CARKOD,
-                        product: order.STKNAME,
-                        company: order.CARUNVAN,
-                        description: order.ACIKLAMA,
-                        quantity: order.STKADET,
-                        quantityCost: order.STKBIRIMFIYAT,
-                        totalCost: order.STKBIRIMFIYATTOPLAM,
-                        status: order.ORDERSTATUS,
-                        day: order.ORDERGUN,
-                        month: order.ORDERAY,
-                        year: order.ORDERYIL,
-                        time: order.ORDERSAAT,
-                      },
-                    }}>
-                  {order.STKNAME}
-                  </Link>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-LightBlue hover:scale-105 transition-all">
-                <Link
-                    href={{
-                      pathname: `/customer-orders/${order.ID}`,
-                      query: {
-                        id: order.CARKOD,
-                        product: order.STKNAME,
-                        company: order.CARUNVAN,
-                        description: order.ACIKLAMA,
-                        quantity: order.STKADET,
-                        quantityCost: order.STKBIRIMFIYAT,
-                        totalCost: order.STKBIRIMFIYATTOPLAM,
-                        status: order.ORDERSTATUS,
-                        day: order.ORDERGUN,
-                        month: order.ORDERAY,
-                        year: order.ORDERYIL,
-                        time: order.ORDERSAAT,
+                        orderno: order.ORDERNO,
                       },
                     }}
                   >
-                  {order.ORDERNO}
+                    {order.ORDERNO}
+                  </Link>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-LightBlue hover:scale-105 transition-all">
+                  <Link
+                    href={{
+                      pathname: `/customer-orders/${order.ID}`,
+                      query: {
+                        orderno: order.ORDERNO,
+                      },
+                    }}
+                  >
+                    {order.STKNAME}
                   </Link>
                 </td>
 
@@ -177,18 +153,7 @@ const CustomerOrdersListTable = ({ orders, products }) => {
                     href={{
                       pathname: `/customer-orders/${order.ID}`,
                       query: {
-                        id: order.CARKOD,
-                        product: order.STKNAME,
-                        company: order.CARUNVAN,
-                        description: order.ACIKLAMA,
-                        quantity: order.STKADET,
-                        quantityCost: order.STKBIRIMFIYAT,
-                        totalCost: order.STKBIRIMFIYATTOPLAM,
-                        status: order.ORDERSTATUS,
-                        day: order.ORDERGUN,
-                        month: order.ORDERAY,
-                        year: order.ORDERYIL,
-                        time: order.ORDERSAAT,
+                        orderno: order.ORDERNO,
                       },
                     }}
                   >

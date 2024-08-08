@@ -1,18 +1,9 @@
 import ProductsTable from "./ProductsTable";
 
-export default function ProductSummary({
-  product,
-  company,
-  quantity,
-  quantityCost,
-  totalCost,
-}) {
+export default function ProductSummary({ orders }) {
   return (
     <>
-      <div
-        id="product-summary"
-        className="mt-4 rounded-xl shadow-md"
-      >
+      <div id="product-summary" className="mt-4 rounded-xl shadow-md">
         <div
           id="title-section"
           className="flex justify-between px-2 gap-1 items-center md:py-2"
@@ -22,7 +13,7 @@ export default function ProductSummary({
           </h1>
         </div>
         <div className="w-full">
-          <ProductsTable product={product} company={company} quantity={quantity} quantityCost={quantityCost} totalCost={totalCost}  />
+          <ProductsTable orders={orders} />
         </div>
       </div>
     </>

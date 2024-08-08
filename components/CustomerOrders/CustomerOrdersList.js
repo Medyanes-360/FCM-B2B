@@ -10,29 +10,53 @@ import {
 import { getAPI } from "@/services/fetchAPI";
 import { statusList } from "./data";
 import Footer from "../Footer";
+import Loading from "../Loading";
 
 const CustomerOrdersList = () => {
-  const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [filteredOrders, setFilteredOrders] = useState([]);
   const [page, setPage] = useState(0);
   const rowsPerPage = 10;
-  const [sortedProducts, setSortedProducts] = useState([]);
-  const [filteredOrders, setFilteredOrders] = useState([]);
-  const [searchValue, setSearchValue] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("Tümü");
-  const [orderDate, setOrderDate] = useState("Tüm Tarihler");
-  const [uniqueDates, setUniqueDates] = useState([]);
-  const [selectAll, setSelectAll] = useState("Toplu İşlemler");
-  const [priceSortType, setPriceSortType] = useState("Önce en düşük");
-  const [dateSortType, setDateSortType] = useState("Tarihe Göre Sırala");
-  const [anyFilterSelected, setAnyFilterSelected] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetch = async () => {
       try {
         const data = await getAPI("/allorders");
-        setProducts(data);
-        setFilteredProducts(data);
+        // Group orders by ORDERNO
+
+        const groupedOrders = data.reduce((acc, order) => {
+          if (!acc[order.ORDERNO]) {
+            acc[order.ORDERNO] = [];
+          }
+          acc[order.ORDERNO].push(order);
+          return acc;
+        }, {});
+        const uniqueOrders = Object.values(groupedOrders)
+          .filter((orders) => orders.length > 0)
+          .map((orders) => ({
+            ORDERNO: orders[0].ORDERNO,
+            CARKOD: orders[0].CARKOD,
+            STKNAME: orders[0].STKNAME,
+            CARUNVAN: orders[0].CARUNVAN,
+            ACIKLAMA: orders[0].ACIKLAMA,
+            STKADET: orders.reduce((total, order) => total + order.STKADET, 0),
+            STKBIRIMFIYAT: orders[0].STKBIRIMFIYAT,
+            STKBIRIMFIYATTOPLAM: orders.reduce(
+              (total, order) => total + order.STKBIRIMFIYATTOPLAM,
+              0
+            ),
+            ORDERSTATUS: orders[0].ORDERSTATUS,
+            ORDERGUN: orders[0].ORDERGUN,
+            ORDERAY: orders[0].ORDERAY,
+            ORDERYIL: orders[0].ORDERYIL,
+            ORDERSAAT: orders[0].ORDERSAAT,
+            ID: orders[0].ID,
+          }));
+        setOrders(uniqueOrders);
+        setFilteredOrders(uniqueOrders);
+        setIsLoading(false);
       } catch (err) {
         console.log(err);
       }
@@ -43,15 +67,10 @@ const CustomerOrdersList = () => {
   //for filter status
   const filteredProd = (status) => {
     if (status === "Tümü") {
-      setFilteredProducts(products);
+      setFilteredOrders(orders);
       setSelectedStatus(status);
-      console.log(filteredOrders);
     } else {
-      setFilteredProducts(
-        products.filter((product) => {
-          return product.ORDERSTATUS === status;
-        })
-      );
+      setFilteredOrders(orders.filter((order) => order.ORDERSTATUS === status));
       setSelectedStatus(status);
     }
   };
@@ -60,131 +79,24 @@ const CustomerOrdersList = () => {
   const handleChangePage = (direction) => {
     if (direction === "prev" && page > 0) {
       setPage(page - 1);
-    } else if (
-      direction === "next" &&
-      (page + 1) * rowsPerPage < filteredProducts.length
-    ) {
+    } else if (direction === "next" && page < totalPages - 1) {
       setPage(page + 1);
     }
   };
 
-  const paginatedOrders = filteredProducts.slice(
+  const paginatedOrders = filteredOrders.slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
   );
-
-  // for sorting product price values
-  /*   useEffect(() => {
-    let sorted = [...filteredProducts];
-    if (priceSortType === "Önce en yüksek") {
-      sorted.sort((a, b) => b.total - a.total);
-    } else if (priceSortType === "Önce en düşük") {
-      sorted.sort((a, b) => a.total - b.total);
-    }
-    setSortedProducts(sorted);
-  }, [filteredProducts, priceSortType]);
-
-  const handleSortChange = (e) => {
-    setPriceSortType(e.target.value);
-  }; */
-
-  /* const filterOrders = (searchValue, status, date) => {
-    let filteredOrders = orders;
-
-    if (searchValue) {
-      filteredOrders = filteredOrders.filter((order) =>
-        order.orderNumber.toLowerCase().includes(searchValue.toLowerCase())
-      );
-    }
-
-    if (status !== "Tümü") {
-      filteredOrders = filteredOrders.filter(
-        (order) => order.status === status
-      );
-    }
-
-    if (date !== "Tüm Tarihler") {
-      filteredOrders = filteredOrders.filter((order) => order.date === date);
-    }
-
-    filteredOrders.forEach((order) => {
-      if (order.status === "Tamamlanan") {
-        order.status = "Tamamlandı";
-      } else if (order.status === "İptal edilen") {
-        order.status = "İptal edildi";
-      } else if (order.status === "Başarısız olan") {
-        order.status = "Başarısız";
-      }
-    });
-    setFilteredOrders(filteredOrders);
-  }; */
-
-  // Arama
-  /* const handleSearchChange = (event) => {
-    const { value } = event.target;
-    setSearchValue(value);
-    filterOrders(value, selectedStatus, orderDate);
-  };  */
-
-  // status fiiltresi  degisikligini yonetiyor
-  /*   const filterStatus = (status) => {
-    setSelectedStatus(status);
-    filteredOrders(searchValue, status, orderDate, uniqueDates);
-  }; */
-
-  useEffect(() => {
-    const dates = [...new Set(filteredProducts.map((order) => order.date))];
-    setUniqueDates(dates);
-  }, [filteredProducts]);
-
-  const sortOrders = (priceSortType, dateSortType) => {
-    let sortedOrders = [...filteredProducts];
-    if (priceSortType === "Önce en yüksek") {
-      sortedOrders.sort((a, b) => b.total - a.total);
-    } else if (priceSortType === "Önce en düşük") {
-      sortedOrders.sort((a, b) => a.total - b.total);
-    }
-
-    if (dateSortType === "Önce en yeni") {
-      sortedOrders.sort((a, b) => new Date(b.date) - new Date(a.date));
-    } else if (dateSortType === "Önce en eski") {
-      sortedOrders.sort((a, b) => new Date(a.date) - new Date(b.date));
-    }
-    setFilteredProducts(sortedOrders);
-  };
+  const totalPages = Math.ceil(filteredOrders.length / rowsPerPage);
 
   //FİYAT SIRALAMA
-  const handlePriceSortChange = (event) => {
-    const sortType = event.target.value;
-    setPriceSortType(sortType);
-    sortOrders(sortType, dateSortType);
-    setAnyFilterSelected(true);
-  };
 
-  //TARİH SIRALAMA
-  /* const handleDateSortChange = (event) => {
-    const sortType = event.target.value;
-    setDateSortType(sortType);
-
-    const sortedOrders = [...filteredOrders].sort((a, b) => {
-      const dateA = new Date(a.ORDERYIL, a.ORDERAY - 1, a.ORDERGUN);
-      const dateB = new Date(b.ORDERYIL, b.ORDERAY - 1, b.ORDERGUN);
-
-      if (sortType === "Önce en yeni") {
-        return dateB - dateA;
-      } else if (sortType === "Önce en eski") {
-        return dateA - dateB;
-      } else {
-        return 0;
-      }
-    });
-
-    setFilteredOrders(sortedOrders);
-  }; */
   return (
     <>
+      {isLoading && <Loading />}
       {/* <div className=" text-center pt-5 pb-7 text-3xl text-NavyBlue font[600]">Siparişler</div>*/}
-      <div className="justify-between flex flex-wrap">
+      <div className="justify-between items-center flex flex-wrap">
         <div className="flex gap-2 text-LightBlue flex-wrap">
           {statusList.map((status) => {
             return (
@@ -202,112 +114,8 @@ const CustomerOrdersList = () => {
             );
           })}
         </div>
-        <div className="flex">
-          <form action="" className="flex gap-2">
-            <input
-              value={searchValue}
-              /* onChange={handleSearchChange} */
-              type="text"
-              className="p-2 border rounded-md"
-            />
-            <button
-              className="p-1 border border-LightBlue text-sm rounded-md"
-              type="submit"
-            >
-              Siparişleri Ara
-            </button>
-          </form>
-        </div>
       </div>
-      <div className="flex flex-wrap justify-between items-center py-3">
-        <div className="flex gap-4 flex-wrap">
-          {/* Filtreleme Seçenekleri */}
-          <div className="flex gap-2">
-            {/* Toplu İşlemler Select */}
-
-            {/* <select
-              className={`p-1 border rounded-md text-CustomGray w-52 ${
-                selectAll !== "Toplu İşlemler" ? "bg-NavyBlue text-white" : ""
-              }`}
-              name="filterActions"
-              value={selectAll}
-              onChange={handleSelectAll}
-            >
-              <option hidden>Toplu İşlemler</option>
-              <option>Toplu İşlemler</option>
-              <option>Çöp kutusuna taşı</option>
-              <option>Kargoya verildi</option>
-              <option>PDF Fatura</option>
-              <option>PDF Paketleme Fişi</option>
-            </select> */}
-          </div>
-
-          <div className="flex gap-2 flex-wrap">
-            {/* Tarihler Select */}
-            <select
-              className={`p-1 border rounded-md text-BaseDark w-54 font-medium ${
-                orderDate !== "Tüm Tarihler" ? "bg-NavyBlue text-white" : ""
-              }`}
-              name="filterDates"
-              onChange={(e) => {
-                const selectedDate = e.target.value;
-                /* setOrderDate(selectedDate);
-                filterOrders(searchValue, selectedStatus, selectedDate); */
-              }}
-              value={orderDate}
-            >
-              <option>Tüm Tarihler</option>
-              {uniqueDates.map((date, index) => (
-                <option key={index} value={date}>
-                  {date}
-                </option>
-              ))}
-            </select>
-
-            <select
-              className={`${
-                priceSortType === "Fiyata Göre Sırala"
-                  ? ""
-                  : "bg-NavyBlue text-white"
-              }`}
-              name="filterUsers"
-              onChange={handlePriceSortChange}
-              value={priceSortType}
-            >
-              <option hidden>Fiyata Göre Sırala</option>
-              <option>Fiyata Göre Sırala</option>
-              <option>Önce en yüksek</option>
-              <option>Önce en düşük</option>
-            </select>
-            <select
-              className={`${
-                dateSortType === "Tarihe Göre Sırala"
-                  ? ""
-                  : "bg-NavyBlue text-white"
-              }`}
-              name="filterUsers"
-              /* onChange={handleDateSortChange}
-              value={dateSortType} */
-            >
-              <option>Tarihe Göre Sırala</option>
-              <option>Önce en yeni</option>
-              <option>Önce en eski</option>
-            </select>
-            {/* Filtrele Butonu */}
-            <button
-              className={`p-[6px]  font-[500] border text-NavyBlue  rounded-md   text-sm whitespace-nowrap
-            ${
-              anyFilterSelected
-                ? "border-NavyBlue cursor-pointer hover:bg-NavyBlue hover:text-white"
-                : "  text-NavyBlue opacity-50 border-gray-400 cursor-not-allowed"
-            }
-`}
-            >
-              Filtre Temizle
-            </button>
-          </div>
-        </div>
-
+      <div className="flex flex-wrap justify-center md:justify-end items-center py-3">
         {/* Sıralama ve Sayfalama */}
         <div className="flex items-center gap-2 ">
           <p className="text-CustomGray">{rowsPerPage} öge</p>
@@ -336,11 +144,11 @@ const CustomerOrdersList = () => {
           <span className="border  md:px-4 md:py-2 py-1 px-3 rounded-full bg-NavyBlue text-white">
             {page + 1}
           </span>
-          <span>/ {Math.ceil(setFilteredProducts.length / rowsPerPage)}</span>
+          <span>/ {totalPages}</span>
 
           <div
             className={`border-2 rounded-sm text-[18px] md:p-3 p-1 ${
-              (page + 1) * rowsPerPage >= setFilteredProducts.length
+              page === totalPages - 1
                 ? " cursor-not-allowed text-gray-300"
                 : "cursor-pointer hover:bg-gray-200 duration-300 hover:border-NavyBlue hover:rounded-xl"
             }`}
@@ -351,7 +159,7 @@ const CustomerOrdersList = () => {
 
           <div
             className={`border-2 rounded-sm text-[18px] md:p-3 p-1 ${
-              (page + 1) * rowsPerPage >= setFilteredProducts.length
+              page === totalPages - 1
                 ? "cursor-not-allowed text-gray-300 "
                 : "cursor-pointer hover:bg-gray-200 duration-300 hover:border-NavyBlue hover:rounded-xl"
             }`}
@@ -361,10 +169,7 @@ const CustomerOrdersList = () => {
           </div>
         </div>
       </div>
-      <CustomerOrdersListTable
-        orders={paginatedOrders}
-        products={filteredProducts}
-      />
+      <CustomerOrdersListTable orders={paginatedOrders} allOrders={orders} />
       <Footer />
     </>
   );

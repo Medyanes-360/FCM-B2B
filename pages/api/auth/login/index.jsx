@@ -158,14 +158,14 @@ const handler = async (req, res) => {
     } catch (error) {
       return res.status(500).json({ error: error.message });
     }
-  } else {
-    const response = updateDataByAny(
-      "CARKART",
-      { CARKOD: "120 01 002" },
-      { CAROZKOD5: " " }
-    );
-    return res.status(200).json({ data: response });
-  }
+  } //  else {
+  //   const response = updateDataByAny(
+  //     "CARKART",
+  //     { CARKOD: "120 01 002" },
+  //     { CAROZKOD5: " " }
+  //   );
+  //   return res.status(200).json({ data: response });
+  // }
 };
 
 export default handler;
