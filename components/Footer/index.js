@@ -24,7 +24,7 @@ function Footer() {
                   alt="Çalışkan Arı Mağaza"
                 />
               </div>
-              {/* isim ve numara */}
+              {/* isim */}
               <div className="text-center mt-2">
                 <div className="text-lg font-medium">
                   Çalışkan Arı Yayınları
@@ -52,9 +52,11 @@ function Footer() {
                 Sepet
               </Link>
             </div>
-            <div className="flex flex-col md:items-start  justify-evenly gap-2">
-              <div className="flex ml-12 md:ml-0 justify-center items-center  gap-x-1 hover:text-green-600 transition-all duration-75">
-                <AiOutlinePhone className="w-8 h-6" />{" "}
+            {/** Sosyal Medya */}
+            <div className="flex flex-col md:items-start justify-evenly mt-4 gap-2">
+             
+              <div className="flex mr-3 md:ml-0 justify-center items-center  gap-x-1 hover:text-green-600 transition-all duration-75">
+                <AiOutlinePhone className="w-8 h-6" />
                 <a
                   className="hover:text-LightBlue/75 transition-all duration-75"
                   href="tel:+902126393912"
@@ -62,8 +64,8 @@ function Footer() {
                   (0212) 639 39 12
                 </a>
               </div>
-              <div className="flex justify-center items-center  gap-x-1 hover:text-green-500 transition-all duration-75">
-                <FaWhatsapp className="w-8 h-6" />{" "}
+              <div className="flex justify-center items-center mr-14 gap-x-1 hover:text-green-500 transition-all duration-75">
+                <FaWhatsapp className="w-8 h-6" />
                 <a
                   className="hover:text-LightBlue/75 transition-all duration-75"
                   href="https://wa.me/+905550013912"
@@ -71,8 +73,8 @@ function Footer() {
                   Whatsapp
                 </a>
               </div>
-              <div className="flex justify-center items-center  gap-x-1 hover:text-pink-500 transition-all duration-75">
-                <FaInstagram className="w-8 h-6" />{" "}
+              <div className="flex justify-center items-center mr-14  gap-x-1 hover:text-pink-500 transition-all duration-75">
+                <FaInstagram className="w-8 h-6" />
                 <a
                   className="hover:text-LightBlue/75 transition-all duration-75"
                   href="https://www.instagram.com/caliskanariyayincilik?igsh=MXFzODRzeDlnY3R2bg=="
@@ -83,17 +85,18 @@ function Footer() {
             </div>
           </div>
           {/* Adres */}
+          <div className="flex justify-center items-center md:border-t w-full md:w-2/3 md:mx-auto pt-5 md:pt-10 mt-3">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3010.955757648957!2d28.798848983261117!3d41.00434154581372!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14caa3f696d37023%3A0x696073342d19d92e!2zw4dBTEnFnktBTiBBUsSwIFlBWUlOTEFSSQ!5e0!3m2!1str!2str!4v1723046034048!5m2!1str!2str"
+              className="w-full md:w-3/4 lg:w-1/2 h-80"
+              style={{ border: "0" }}
+              allowFullScreen=""
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            ></iframe>
+          </div>
         </div>
-        <div className="flex justify-center items-center md:border-t pt-5 md:pt-10 mt-3">
-          <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3010.955757648957!2d28.798848983261117!3d41.00434154581372!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14caa3f696d37023%3A0x696073342d19d92e!2zw4dBTEnFnktBTiBBUsSwIFlBWUlOTEFSSQ!5e0!3m2!1str!2str!4v1723046034048!5m2!1str!2str"
-            className="w-full md:w-3/4 lg:w-1/2 h-80"
-            style={{ border: "0" }}
-            allowFullScreen=""
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          ></iframe>
-        </div>
+
         {/* Not */}
         <div className="h-10 mt-8 flex justify-center items-end text-center text-xs">
           Bu panel yalnızca Çalışkan Arı ve anlaşmalı olduğu bayiler tarafından
