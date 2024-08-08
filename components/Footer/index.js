@@ -10,10 +10,10 @@ function Footer() {
   const { footerLogo } = useFooterStore();
 
   return (
-    <footer id="footer" className="bg-CustomGray mt-[40px] w-full  overflow-hidden">
-      <div className="lg:mx-[50px] pb-3 w-full lg:w-[1088px] py-3 md:py-10 text-gray-300">
+    <footer id="footer" className="bg-CustomGray mt-[40px] w-full">
+      <div className="pb-3 md:mx-auto w-full lg:w-[1188px] py-3 md:py-10 text-gray-300">
         <div className="flex flex-col gap-y-10">
-          <div className="flex flex-col md:flex-row md:justify-evenly gap-5 px-4">
+          <div className="flex flex-col md:flex-row md:justify-evenly gap-5 p-4">
             {/* Logo */}
             <div className="flex flex-col items-center xl:px-1">
               <div className="rounded-full bg-CustomGray w-[90px] h-[90px] flex items-center justify-center hover:bg-LightBlue transition duration-500 ease-in-out transform px-[15px]">
@@ -26,43 +26,78 @@ function Footer() {
               </div>
               {/* isim ve numara */}
               <div className="text-center mt-2">
-                <div className="text-lg font-medium">Çalışkan Arı Yayınları</div>
+                <div className="text-lg font-medium">
+                  Çalışkan Arı Yayınları
+                </div>
               </div>
             </div>
             {/* Sayfalar */}
-            <div className="flex flex-col items-center md:items-start justify-evenly gap-2">
-              <Link className="hover:text-LightBlue/75 hover:underline underline-offset-3 transition-all duration-75" href={"/"}>Ana sayfa</Link>
-              <Link className="hover:text-LightBlue/75 hover:underline underline-offset-3 transition-all duration-75" href={"/shop"}>Mağaza</Link>
-              <Link className="hover:text-LightBlue/75 hover:underline underline-offset-3 transition-all duration-75" href={"/cart"}>Sepet</Link>
+            <div className="flex flex-col items-center md:items-start justify-evenly gap-2 mb-4 md:mb-0">
+              <Link
+                className="hover:text-LightBlue/75 hover:underline underline-offset-3 transition-all duration-75"
+                href={"/"}
+              >
+                Ana sayfa
+              </Link>
+              <Link
+                className="hover:text-LightBlue/75 hover:underline underline-offset-3 transition-all duration-75"
+                href={"/shop"}
+              >
+                Mağaza
+              </Link>
+              <Link
+                className="hover:text-LightBlue/75 hover:underline underline-offset-3 transition-all duration-75"
+                href={"/cart"}
+              >
+                Sepet
+              </Link>
             </div>
-            <div className="flex flex-col items-center md:items-start justify-evenly gap-2">
-              <div className="flex justify-center items-center gap-x-1 hover:text-green-600 transition-all duration-75">
-                <AiOutlinePhone className="w-8 h-6" /> <a className="hover:text-LightBlue/75 transition-all duration-75" href="tel:+902126393912">(0212) 639 39 12</a>
+            <div className="flex flex-col md:items-start  justify-evenly gap-2">
+              <div className="flex ml-12 md:ml-0 justify-center items-center  gap-x-1 hover:text-green-600 transition-all duration-75">
+                <AiOutlinePhone className="w-8 h-6" />{" "}
+                <a
+                  className="hover:text-LightBlue/75 transition-all duration-75"
+                  href="tel:+902126393912"
+                >
+                  (0212) 639 39 12
+                </a>
               </div>
-              <div className="flex justify-center items-center gap-x-1 hover:text-green-500 transition-all duration-75">
-                <FaWhatsapp className="w-8 h-6" /> <a className="hover:text-LightBlue/75 transition-all duration-75" href="https://wa.me/+905550013912">Whatsapp</a>
+              <div className="flex justify-center items-center  gap-x-1 hover:text-green-500 transition-all duration-75">
+                <FaWhatsapp className="w-8 h-6" />{" "}
+                <a
+                  className="hover:text-LightBlue/75 transition-all duration-75"
+                  href="https://wa.me/+905550013912"
+                >
+                  Whatsapp
+                </a>
               </div>
-              <div className="flex justify-center items-center gap-x-1 hover:text-pink-500 transition-all duration-75">
-                <FaInstagram className="w-8 h-6" /> <a className="hover:text-LightBlue/75 transition-all duration-75" href="https://www.instagram.com/caliskanariyayincilik?igsh=MXFzODRzeDlnY3R2bg==">Instagram</a>
+              <div className="flex justify-center items-center  gap-x-1 hover:text-pink-500 transition-all duration-75">
+                <FaInstagram className="w-8 h-6" />{" "}
+                <a
+                  className="hover:text-LightBlue/75 transition-all duration-75"
+                  href="https://www.instagram.com/caliskanariyayincilik?igsh=MXFzODRzeDlnY3R2bg=="
+                >
+                  Instagram
+                </a>
               </div>
             </div>
           </div>
           {/* Adres */}
-          <div className="flex justify-center items-center md:border-t pt-5 md:pt-10">
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3010.955757648957!2d28.798848983261117!3d41.00434154581372!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14caa3f696d37023%3A0x696073342d19d92e!2zw4dBTEnFnktBTiBBUsSwIFlBWUlOTEFSSQ!5e0!3m2!1str!2str!4v1723046034048!5m2!1str!2str"
-              className="w-full md:w-3/4 lg:w-1/2 h-80"
-              style={{ border: "0" }}
-              allowFullScreen=""
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            ></iframe>
-          </div>
         </div>
-
+        <div className="flex justify-center items-center md:border-t pt-5 md:pt-10 mt-3">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3010.955757648957!2d28.798848983261117!3d41.00434154581372!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14caa3f696d37023%3A0x696073342d19d92e!2zw4dBTEnFnktBTiBBUsSwIFlBWUlOTEFSSQ!5e0!3m2!1str!2str!4v1723046034048!5m2!1str!2str"
+            className="w-full md:w-3/4 lg:w-1/2 h-80"
+            style={{ border: "0" }}
+            allowFullScreen=""
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          ></iframe>
+        </div>
         {/* Not */}
         <div className="h-10 mt-8 flex justify-center items-end text-center text-xs">
-          Bu panel yalnızca Çalışkan Arı ve anlaşmalı olduğu bayiler tarafından kullanılmaktadır.
+          Bu panel yalnızca Çalışkan Arı ve anlaşmalı olduğu bayiler tarafından
+          kullanılmaktadır.
         </div>
       </div>
     </footer>
