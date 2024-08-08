@@ -11,7 +11,7 @@ function Footer() {
 
   return (
     <footer id="footer" className="bg-CustomGray mt-[40px] w-full">
-      <div className="pb-3 md:mx-auto w-full lg:w-[1188px] py-3 md:py-10 text-gray-300">
+      <div  className="pb-3 w-screen lg:w-[1188px] py-3 md:py-10 text-gray-300">
         <div className="flex flex-col gap-y-10">
           <div className="flex flex-col md:flex-row md:justify-evenly gap-5 p-4">
             {/* Logo */}
@@ -88,7 +88,7 @@ function Footer() {
           <div className="flex justify-center items-center md:border-t w-full md:w-2/3 md:mx-auto pt-5 md:pt-10 mt-3">
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3010.955757648957!2d28.798848983261117!3d41.00434154581372!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14caa3f696d37023%3A0x696073342d19d92e!2zw4dBTEnFnktBTiBBUsSwIFlBWUlOTEFSSQ!5e0!3m2!1str!2str!4v1723046034048!5m2!1str!2str"
-              className="w-full md:w-3/4 lg:w-1/2 h-80"
+              className="w-full md:w-3/5 lg:w-4/5 h-80"
               style={{ border: "0" }}
               allowFullScreen=""
               loading="lazy"
