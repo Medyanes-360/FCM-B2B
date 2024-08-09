@@ -68,7 +68,7 @@ const CustomerOrdersList = () => {
 
         setIsLoading(false);
       } catch (err) {
-        console.log(err);
+        
         setIsLoading(false);
       }
     };

@@ -99,7 +99,7 @@ const CustomerOrdersListTable = ({ orders, products }) => {
           <tbody className="bg-white divide-y divide-gray-200 ">
             {orders.map(
               (order, index) => (
-                console.log(order),
+                
                 (
                   <tr
                     key={order.ID}
