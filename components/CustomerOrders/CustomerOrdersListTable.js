@@ -71,22 +71,19 @@ const CustomerOrdersListTable = ({ orders, products }) => {
 
   return (
     <>
-      <div className="overflow-x-auto border">
+      <div className="overflow-x-auto overflow-y-hidden border">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-NavyBlue text-white ">
             <tr className="text-center">
               <th className="px-6 py-3 text-center text-base font-medium  ">
-                Açıklama
-              </th>
-
-              <th className="px-6 py-3 text-center text-base font-medium  ">
-                Sipariş
+                Sipariş No
               </th>
 
               <th className="px-6 py-3  text-base font-medium  text-center">
                 Tarih
               </th>
               <th className="px-6 py-3  text-base font-medium">Durum</th>
+              <th className="px-6 py-3  text-base font-medium">Ürün Adedi</th>
               <th className="px-6 py-3  text-base font-medium">Toplam</th>
               <th className="px-6 py-3 text-center text-base font-medium">
                 Eylemler
@@ -95,13 +92,14 @@ const CustomerOrdersListTable = ({ orders, products }) => {
           </thead>
           <tbody className="bg-white divide-y divide-gray-200 ">
             {orders.map((order, index) => (
+              console.log(order),
               <tr
                 key={order.ID}
                 className={`${
                   index % 2 === 1 ? "bg-white" : "bg-gray-50"
                 } text-center`}
               >
-                <td className="px-6 py-4 whitespace-nowrap hover:scale-105 transition-all">
+                <td className="px-6 py-4 whitespace-nowrap hover:scale-105 transition-all ">
                   <Link
                     href={{
                       pathname: `/customer-orders/${order.ID}`,
@@ -110,24 +108,18 @@ const CustomerOrdersListTable = ({ orders, products }) => {
                       },
                     }}
                   >
-                    {order.ORDERNO}
-                  </Link>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-LightBlue hover:scale-105 transition-all">
-                  <Link
-                    href={{
-                      pathname: `/customer-orders/${order.ID}`,
-                      query: {
-                        orderno: order.ORDERNO,
-                      },
-                    }}
-                  >
-                    {order.STKNAME}
+                    <div className="bg-gray-100 p-2 rounded">
+                    <div>{order.ORDERNO}</div>
+                    <div className="text-LightBlue font-bold">{order.STKNAME}</div>
+                    </div>
                   </Link>
                 </td>
 
                 <td className="px-6 py-4 whitespace-nowrap ">
-                  {order.ORDERGUN}.{order.ORDERAY}.{order.ORDERYIL}
+                  <div className="flex flex-col justify-center items-center">
+                    <div>{order.ORDERGUN}.{order.ORDERAY}.{order.ORDERYIL}</div>
+                    <div className="bg-gray-200 rounded px-2">{order.ORDERSAAT && order.ORDERSAAT.substring(0, 5)}</div>
+                  </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div
@@ -138,10 +130,13 @@ const CustomerOrdersListTable = ({ orders, products }) => {
                     {order.ORDERSTATUS}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {order.STKBIRIMFIYATTOPLAM}₺
+                <td className="px-6 py-4 whitespace-nowrap">  
+                  {new Intl.NumberFormat('tr-TR', { style: 'decimal' }).format(order.STKADET)} Adet
                 </td>
-                <td className="px-6 py-4 flex justify-center whitespace-nowrap flex-col lg:flex-row gap-2 ">
+                <td className="px-6 py-4 whitespace-nowrap">
+                {new Intl.NumberFormat('tr-TR', { style: 'decimal' }).format(order.STKBIRIMFIYATTOPLAM)}₺
+                </td>
+                <td className="px-6 py-4 flex justify-center whitespace-nowrap flex-col  gap-2 ">
                   <button
                     className="bg-NavyBlue/75 p-2 rounded-md hover:bg-NavyBlue text-white flex items-center w-36 justify-center"
                     onClick={() => handleOpenRequestModal(order)}
