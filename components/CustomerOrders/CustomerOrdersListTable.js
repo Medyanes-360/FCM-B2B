@@ -16,10 +16,10 @@ const CustomerOrdersListTable = ({ orders, products }) => {
   // statu Renkleri
   const statusColors = {
     Beklemede: "bg-[#e5e5e5] text-[#80808b]",
-    Hazırlanıyor: "bg-[#c7e1c7] text-[#5d7b45]",
+    Hazırlanıyor: "bg-[#c7d8e2] text-[#324356]",
     "Ödeme Bekleniyor": "bg-[#f8dda5] text-[#876b17]",
     "Sipariş Oluşturuldu": "bg-[#f8dda5] text-[#876b17]",
-    Tamamlandı: "bg-[#c7d8e2] text-[#324356]",
+    Tamamlandı: "bg-[#c7e1c7] text-[#5d7b45]",
     İptal: "bg-[#e3e5e3] text-[#7a7a7c]",
     Başarısız: "bg-[#eaa4a4] text-[#762024]",
   };

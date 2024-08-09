@@ -9,7 +9,7 @@ import {
 } from "react-icons/md";
 import { getAPI } from "@/services/fetchAPI";
 import { statusList } from "./data";
-import Footer from "../Footer";
+
 import Loading from "../Loading";
 
 const CustomerOrdersList = () => {
@@ -110,27 +110,28 @@ const CustomerOrdersList = () => {
     <>
       {isLoading && <Loading />}
       {/* <div className=" text-center pt-5 pb-7 text-3xl text-NavyBlue font[600]">Siparişler</div>*/}
-      <div className="justify-between items-center flex flex-wrap">
-        <div className="flex gap-2 text-LightBlue flex-wrap">
-          <select
-            value={selectedStatus}
-            onChange={handleStatusChange}
-            className="p-2 border rounded-md text-BaseDark"
-          >
-            {statusList.map((status) => (
-              <option key={status.name} value={status.name}>
-                {status.name} ({statusCounts[status.name] || 0} adet)
-              </option>
-            ))}
-          </select>
+
+      <div className="flex flex-wrap justify-center md:justify-between items-center py-3">
+        <div className="justify-between items-center flex flex-wrap">
+          <div className="flex gap-2 text-LightBlue flex-wrap mb-4 md:mb-0">
+            <select
+              value={selectedStatus}
+              onChange={handleStatusChange}
+              className="p-2 border rounded-md text-BaseDark"
+            >
+              {statusList.map((status) => (
+                <option key={status.name} value={status.name}>
+                  {status.name} ({statusCounts[status.name] || 0} adet)
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
-      </div>
-      <div className="flex flex-wrap justify-center md:justify-end items-center py-3">
         {/* Sıralama ve Sayfalama */}
         <div className="flex items-center gap-2 ">
           <p className="text-CustomGray">{rowsPerPage} öge</p>
           <div
-            className={`border-2 rounded-sm text-[18px]  md:p-3 p-1 ${
+            className={`border-2 rounded-sm text-[18px] md:p-3 p-1 ${
               page === 0
                 ? "cursor-not-allowed text-gray-300"
                 : "cursor-pointer hover:bg-gray-200 duration-300 hover:border-NavyBlue hover:rounded-xl"
@@ -180,7 +181,6 @@ const CustomerOrdersList = () => {
         </div>
       </div>
       <CustomerOrdersListTable orders={paginatedOrders} allOrders={orders} />
-      <Footer />
     </>
   );
 };

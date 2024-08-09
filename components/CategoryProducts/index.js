@@ -214,18 +214,18 @@ function CategoryProducts({ showSearchAndCart = false }) {
 
     return (
       <div className="bg-white w-screen md:w-[600px] lg:w-[960px] xl:w-[1188px] pt-[10px] lg:pt-[30px]">
-        <div className="mb-4 flex flex-col md:flex-row items-center justify-center ">
+        <div className="mb-4 flex flex-col md:flex-row items-center justify-center gap-3">
           {classes.map((classType) => (
             <div
               key={classType}
-              className="mb-4 relative flex items-center justify-center "
+              className="mb-4 relative flex items-center justify-center"
             >
               <button
                 onClick={() => {
                   setSelectedClass(classType);
                   setSelectedCategory("");
                 }}
-                className={`flex flex-row gap-5 items-center justify-center text-[14px] md:text-[12px] lg:text-[14px] font-bold rounded-full py-[22px] px-6 tracking-[1px] h-[40px] mx-[8px] mb-[8px] hover:scale-105 transition-all duration-500 ease-in-out transform cursor-pointer  ${
+                className={`flex flex-row gap-2 items-center justify-center text-[14px] md:text-[12px] lg:text-[14px] font-bold rounded-full py-[18px] px-4 tracking-[1px] h-[40px] mx-[6px] mb-[8px] hover:scale-105 transition-all duration-500 ease-in-out transform cursor-pointer  ${
                   selectedClass === classType
                     ? " border-[3px] border-LightBlue text-LightBlue"
                     : "border-[3px] border-CategoriesTitle text-CategoriesTitle"

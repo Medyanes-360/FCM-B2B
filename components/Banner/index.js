@@ -20,7 +20,7 @@ function Banner() {
             </Link>
           ) : null}
           <button
-            className="text-LightBlue bg-white rounded-md py-[3px] px-[12px] ml-[10px] text-[14px] hover:bg-CustomGray hover:text-white transition duration-300 ease-in-out transform text-[15px] font-bold"
+            className="text-LightBlue bg-white rounded-md py-[3px] px-[12px] ml-[10px] text-[14px] hover:bg-CustomGray hover:text-white transition duration-300 ease-in-out transform font-bold"
             onClick={hideBanner}
           >
             Kapat
