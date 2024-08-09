@@ -19,6 +19,7 @@ const CustomerOrdersList = () => {
   const rowsPerPage = 10;
   const [selectedStatus, setSelectedStatus] = useState("Tümü");
   const [isLoading, setIsLoading] = useState(true);
+  const [statusCounts, setStatusCounts] = useState({});
 
   useEffect(() => {
     const fetch = async () => {
@@ -56,9 +57,17 @@ const CustomerOrdersList = () => {
           }));
         setOrders(uniqueOrders);
         setFilteredOrders(uniqueOrders);
+        const counts = uniqueOrders.reduce((acc, order) => {
+          acc[order.ORDERSTATUS] = (acc[order.ORDERSTATUS] || 0) + 1;
+          return acc;
+        }, {});
+        counts["Tümü"] = uniqueOrders.length;
+        setStatusCounts(counts);
+
         setIsLoading(false);
       } catch (err) {
         console.log(err);
+        setIsLoading(false);
       }
     };
     fetch();
@@ -73,6 +82,11 @@ const CustomerOrdersList = () => {
       setFilteredOrders(orders.filter((order) => order.ORDERSTATUS === status));
       setSelectedStatus(status);
     }
+  };
+
+  const handleStatusChange = (e) => {
+    const status = e.target.value;
+    filteredProd(status);
   };
 
   // for pagination process
@@ -98,21 +112,17 @@ const CustomerOrdersList = () => {
       {/* <div className=" text-center pt-5 pb-7 text-3xl text-NavyBlue font[600]">Siparişler</div>*/}
       <div className="justify-between items-center flex flex-wrap">
         <div className="flex gap-2 text-LightBlue flex-wrap">
-          {statusList.map((status) => {
-            return (
-              <button
-                key={status.name}
-                onClick={() => filteredProd(status.name)}
-                className={
-                  selectedStatus === status.name
-                    ? "text-BaseDark cursor-pointer underline"
-                    : "cursor-pointer underline"
-                }
-              >
-                {status.name}
-              </button>
-            );
-          })}
+          <select
+            value={selectedStatus}
+            onChange={handleStatusChange}
+            className="p-2 border rounded-md text-BaseDark"
+          >
+            {statusList.map((status) => (
+              <option key={status.name} value={status.name}>
+                {status.name} ({statusCounts[status.name] || 0} adet)
+              </option>
+            ))}
+          </select>
         </div>
       </div>
       <div className="flex flex-wrap justify-center md:justify-end items-center py-3">

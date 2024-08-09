@@ -379,7 +379,7 @@ export const statusList = [
   { name: "Hazırlanıyor" },
   { name: "Ödeme Bekleniyor" },
   { name: "Sipariş Oluşturuldu" },
-  { name: "Tamamlanan" },
-  { name: "İptal Edilen" },
-  { name: "Başarısız Olan" },
+  { name: "Tamamlandı" },
+  { name: "İptal" },
+  { name: "Başarısız" },
 ];

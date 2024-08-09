@@ -527,7 +527,8 @@ const createIRSHAR = async (
   siraNo
 ) => {
   // console.log(`createIRSHAR çağrıldı. Sıra No: ${siraNo}`);
-  const newIRSHARREFNO = lastIRSHAR.IRSHARREFNO + 1;
+  // const newIRSHARREFNO = lastIRSHAR.IRSHARREFNO + 1;
+  const newIRSHARREFNO = createdIRSFISREFNO;
 
   const irsharEntry = {
     IRSHARTAR: now,
