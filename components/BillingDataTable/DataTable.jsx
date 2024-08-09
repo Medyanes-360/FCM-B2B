@@ -197,25 +197,25 @@ export default function DataTable() {
       <div className="max-w-[80%] mx-auto flex flex-col justify-between bg-white rounded-xl border-2 border-dashed border-[#1e3b606e] items-center px-8 gap-4 md:flex-row p-4">
         <div className="flex flex-col w-full md:w-auto">
           <div>
-            <h1 className="text-xl lg:text-2xl text-blue-500">Cari Bilgisi</h1>
+            <h1 className="text-xl lg:text-2xl text-blue-600">Cari Bilgisi</h1>
           </div>
           <div className="flex justify-between gap-8 items-center max-w-[100%]">
             <div className="flex lg:text-base text-sm flex-col text-center md:text-left">
               <div>
                 <div className="font-normal">
-                  <span className="font-bold">Cari Kodu:</span>{" "}
+                  <span className="font-bold text-NavyBlue">Cari Kodu:</span>{" "}
                   <span>{session?.user?.id}</span>
                 </div>
               </div>
               <div>
                 <div className="font-normal">
-                  <span className="font-bold">Cari Unvanı:</span>{" "}
+                  <span className="font-bold text-NavyBlue">Cari Unvanı:</span>{" "}
                   <span>{session?.user?.name}</span>
                 </div>
               </div>
               <div>
                 <div className="font-normal flex-col">
-                  <span className="font-bold">Bakiye:</span>{" "}
+                  <span className="font-bold text-NavyBlue">Bakiye:</span>{" "}
                   <span>{formatCurrency(-userCarBakiye)} </span>
                   <span
                     className={`${
@@ -229,19 +229,19 @@ export default function DataTable() {
             </div>
             <div className="flex flex-col text-sm text-center lg:text-base md:text-left">
               <div className="font-normal">
-                <span className="font-bold">Borç Toplam:</span>
+                <span className="font-bold text-NavyBlue">Borç Toplam:</span>
                 <span className="ml-2 text-red-500">
                   {formatCurrency(carBorcToplam)}
                 </span>
               </div>
               <div className="font-normal">
-                <span className="font-bold">Alacak Toplam:</span>
+                <span className="font-bold text-NavyBlue">Alacak Toplam:</span>
                 <span className="ml-2 text-green-500">
                   {formatCurrency(alacakToplam)}
                 </span>
               </div>
               <div className="font-normal">
-                <span className="font-bold">Genel Toplam:</span>
+                <span className="font-bold text-NavyBlue">Genel Toplam:</span>
                 <span
                   className={`ml-2 ${
                     borcToplam > 0 ? "text-red-500" : "text-green-500"
