@@ -141,12 +141,12 @@ const CustomerOrdersListTable = ({ orders, products }) => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   {order.STKBIRIMFIYATTOPLAM}₺
                 </td>
-                <td className="px-6 py-4 space-x-2 flex justify-center whitespace-nowrap ">
+                <td className="px-6 py-4 flex justify-center whitespace-nowrap flex-col lg:flex-row gap-2 ">
                   <button
-                    className="bg-NavyBlue/75 p-2 rounded-md hover:bg-NavyBlue text-white flex items-center space-x-1 "
+                    className="bg-NavyBlue/75 p-2 rounded-md hover:bg-NavyBlue text-white flex items-center w-36 justify-center"
                     onClick={() => handleOpenRequestModal(order)}
                   >
-                    <HiOutlineDocumentAdd /> <span>Talep oluştur</span>{" "}
+                    <HiOutlineDocumentAdd /> <span>Talep oluştur</span>
                   </button>
 
                   <Link
@@ -157,8 +157,8 @@ const CustomerOrdersListTable = ({ orders, products }) => {
                       },
                     }}
                   >
-                    <button className="bg-gray-300 p-2 rounded-md hover:bg-gray-400 flex items-center space-x-1">
-                      <FaEye /> <span>Sipariş İncele</span>{" "}
+                    <button className="bg-gray-300 p-2 rounded-md hover:bg-gray-400 flex items-center w-36">
+                      <FaEye /> <span>Sipariş İncele</span>
                     </button>
                   </Link>
                 </td>

@@ -24,7 +24,7 @@ const OrderConfirmation = ({ onClose }) => {
               Anasayfa
             </button>
           </Link>
-          <Link href="/orders">
+          <Link href="/customer-orders">
             <button
               onClick={onClose}
               className="bg-green-500/75 text-white px-4 py-2 rounded-full font-bold text-md flex flex-row items-center gap-2 hover:bg-green-500 hover:scale-105 transition-all duration-500 ease-in-out transform"
