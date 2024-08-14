@@ -54,6 +54,19 @@ STKALACAK NUMERIC(28, 9) NOT NULL,
 STKDEPO VARCHAR(40) NOT NULL
 );
 
+## CARKART Admin bilgilerini kaydetme
+INSERT INTO CARKART (CARKOD, CARUNVAN, CARUNVAN3, CARYETKILI, CAROZKOD1, CAROZKOD3, CAROZKOD5)
+VALUES (
+    7034922, 
+    'ÇALIŞKAN ARI YAYINLARI', 
+    'caliskanariyayinlari@gmail.com', 
+    'Admin', 
+    'A', 
+    'B2', 
+    '$2y$10$qdByGVE4u0N8OYiWvt36Ce4'
+);
+
+
 ## CARKART Varchar değeri değiştirme
 
 ALTER TABLE CARKART
