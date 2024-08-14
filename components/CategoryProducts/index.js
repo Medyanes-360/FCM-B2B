@@ -142,12 +142,19 @@ function CategoryProducts({ showSearchAndCart = false }) {
           urun.STKOZKOD2.trim() !== "" &&
           urun.STKOZKOD1 === "2")
     );
+    filteredUrunler.sort((a, b) => {
+      const priceA = parseFloat(a.STKOZKOD5);
+      const priceB = parseFloat(b.STKOZKOD5);
+      return priceB - priceA; // Büyükten küçüğe sıralama
+    });
+
     // Benzersiz kategorileri çıkar
     const categories = [
       ...new Set(filteredUrunler.map((urun) => urun.STKOZKOD2)),
     ].filter(Boolean);
     return categories;
   };
+
   const calculatePrices = (originalPrice) => {
     const price = parseFloat(originalPrice);
     const inflatedPrice = (price * 2.5).toFixed(2); // %150 artırılmış fiyat (2.5 kat)
@@ -244,6 +251,12 @@ function CategoryProducts({ showSearchAndCart = false }) {
     filteredUrunler = filteredUrunler.filter(
       (urun) => urun.STKOZKOD1 === "A" || urun.STKOZKOD1 === "2"
     );
+
+    filteredUrunler.sort((a, b) => {
+      const priceA = parseFloat(a.STKOZKOD5);
+      const priceB = parseFloat(b.STKOZKOD5);
+      return priceB - priceA;
+    });
 
     // OKUL ÖNCESİ ve İNGİLİZCE dışında bir sınıf seçildiyse
     if (
@@ -518,12 +531,17 @@ function CategoryProducts({ showSearchAndCart = false }) {
                               )}
                               <button
                                 type="submit"
-                                className={`flex flex-row items-center justify-center gap-2 ml-2 sm:ml-4 lg:ml-2 text-white font-bold hover:scale-105 transition-all transform easy-in-out duration-500 cursor-pointer ${
+                                className={`flex flex-row items-center justify-center gap-2 ml-2 sm:ml-4 lg:ml-2 text-white font-bold ${
                                   urun.STKOZKOD1 === "2"
-                                    ? "bg-gray-400"
-                                    : "bg-LightBlue/75"
+                                    ? "bg-gray-400 cursor-not-allowed"
+                                    : "bg-LightBlue/75 hover:scale-105 transition-all transform easy-in-out duration-500"
                                 } pl-2 pr-9 py-2 rounded-full relative w-[130px] sm:w-[160px] h-[40px] text-[13px] sm:text-[15px]`}
-                                onClick={handleSubmit}
+                                onClick={(e) => {
+                                  if (urun.STKOZKOD1 !== "2") {
+                                    handleSubmit(e);
+                                  }
+                                }}
+                                disabled={urun.STKOZKOD1 === "2"}
                               >
                                 {urun.addingToCart ? (
                                   <div className="flex flex-row items-center justify-center gap-1">
