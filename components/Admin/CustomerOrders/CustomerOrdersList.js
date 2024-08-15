@@ -42,6 +42,7 @@ const CustomerOrdersList = () => {
             ORDERNO: orders[0].ORDERNO,
             CARKOD: orders[0].CARKOD,
             STKNAME: orders[0].STKNAME,
+            REFNO: orders[0].REFNO,
             CARUNVAN: orders[0].CARUNVAN,
             ACIKLAMA: orders[0].ACIKLAMA,
             STKADET: orders.reduce((total, order) => total + order.STKADET, 0),

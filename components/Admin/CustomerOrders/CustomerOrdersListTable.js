@@ -132,7 +132,6 @@ const CustomerOrdersListTable = ({ orders, allOrders, updateOrderStatus }) => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   {order.CARUNVAN}
                 </td>
-
                 <td className="px-6 py-4 whitespace-nowrap ">
                   <div className="flex flex-col justify-center items-center">
                     <div>

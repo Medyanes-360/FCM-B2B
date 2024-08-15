@@ -6,11 +6,13 @@ import TopSection from "./OrderDetailsComponents/TopSection";
 import ProductSummary from "./OrderDetailsComponents/ProductSummary";
 import { getAPI } from "@/services/fetchAPI";
 import Loading from "../Loading";
+import RequestInfo from "./RequestInfo";
 
 function OrderDetails() {
   const searchParams = useSearchParams();
   const orderno = searchParams.get("orderno");
   const [orderDetails, setOrderDetails] = useState([]);
+  const [requestInfo, setRequestInfo] = useState("");
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
@@ -20,7 +22,13 @@ function OrderDetails() {
           (order) => order.ORDERNO === orderno
         );
         setOrderDetails(filteredOrders);
-      } catch (err) {}
+        // Talep bilgisini al (ilk siparişin TALEP alanını kullanıyoruz)
+        if (filteredOrders.length > 0) {
+          setRequestInfo(filteredOrders[0].TALEP || "");
+        }
+      } catch (err) {
+        console.error("Sipariş detayları alınırken hata oluştu:", err);
+      }
     };
     fetchOrderDetails();
   }, [orderno]);
@@ -59,6 +67,7 @@ function OrderDetails() {
               totalQuantity={totalQuantity}
               orderStatus={orderDetails[0].ORDERSTATUS}
             />
+            <RequestInfo requestInfo={requestInfo} /> {/* Yeni bileşen */}
             <ProductSummary orders={orderDetails} />
           </div>
         </div>

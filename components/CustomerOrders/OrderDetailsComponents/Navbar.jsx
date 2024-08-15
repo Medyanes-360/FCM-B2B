@@ -13,6 +13,11 @@ export default function Navbar({ orderNo }) {
           <h1 className="font-bold text-xl">Sipariş Numarası: </h1>
           <span className="tracking-wider text-lg">#{orderNo}</span>
         </div>
+        {session?.user?.role === "partner" && (
+          <button className="bg-red-500 text-white rounded-xl px-2 py-1 w-24 text-sm hover:scale-110 hover:transition-all hover:duration-500 hover:ease-in-out hover:transform md:py-2">
+            IPTAL ET
+          </button>
+        )}
         <Link
           href={`${
             session?.user?.role === "Admin"
