@@ -24,43 +24,6 @@ export async function createNewData(tableName, newData) {
   }
 }
 
-export async function updateOrderStatus(tableName, where, newStatus) {
-  try {
-    const data = await prisma[tableName].updateMany({
-      where: where,
-      data: { ORDERSTATUS: newStatus },
-    });
-
-    // Eğer yeni durum "İptal" ise, ilgili diğer tabloları da güncelle
-    if (newStatus === "İptal") {
-      await updateRelatedTables(where.REFNO);
-    }
-
-    return data;
-  } catch (error) {
-    return { error: error.message };
-  }
-}
-
-export async function updateRelatedTables(REFNO) {
-  try {
-    // IRSFIS tablosunu güncelle
-    await prisma.IRSFIS.updateMany({
-      where: { IRSFISREFNO: REFNO },
-      data: { IRSFISIPTALFLAG: 1 },
-    });
-
-    // IRSHAR tablosunu güncelle
-    await prisma.IRSHAR.updateMany({
-      where: { IRSHARREFNO: REFNO },
-      data: { IRSHARIPTALFLAG: 1 },
-    });
-  } catch (error) {
-    console.error("Error updating related tables:", error);
-    throw error;
-  }
-}
-
 // GET BY UNIQUE ONE VALUE
 export async function getDataByUnique(tableName, where) {
   try {
@@ -134,6 +97,45 @@ export async function deleteDataAll(tableName) {
     return data;
   } catch (error) {
     return { error: error.message };
+  }
+}
+
+//BU FONKSİYONLAR, SİPARİŞ DURUMUNU DEĞİŞTİRMEK İÇİNDİR. SÜREKLİ KULLANACAĞINIZ FONKSİYONLAR ÜSTTEKİ FONKSİYONLARDIR.
+// ÖZEL FONKSİYONLARDIR LÜTFEN DEĞİŞTİRMEYİN, KULLANMAYIN. ****ILKER DEMIRCI****
+export async function updateOrderStatus(tableName, where, newStatus) {
+  try {
+    const data = await prisma[tableName].updateMany({
+      where: where,
+      data: { ORDERSTATUS: newStatus },
+    });
+
+    // Eğer yeni durum "İptal" ise, ilgili diğer tabloları da güncelle
+    if (newStatus === "İptal") {
+      await updateRelatedTables(where.REFNO);
+    }
+
+    return data;
+  } catch (error) {
+    return { error: error.message };
+  }
+}
+
+export async function updateRelatedTables(REFNO) {
+  try {
+    // IRSFIS tablosunu güncelle
+    await prisma.IRSFIS.updateMany({
+      where: { IRSFISREFNO: REFNO },
+      data: { IRSFISIPTALFLAG: 1 },
+    });
+
+    // IRSHAR tablosunu güncelle
+    await prisma.IRSHAR.updateMany({
+      where: { IRSHARREFNO: REFNO },
+      data: { IRSHARIPTALFLAG: 1 },
+    });
+  } catch (error) {
+    console.error("Error updating related tables:", error);
+    throw error;
   }
 }
 
