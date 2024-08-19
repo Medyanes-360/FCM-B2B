@@ -602,7 +602,7 @@ const createIRSHAR = async (orderItem, createdIRSFISREFNO, siraNo) => {
 
   try {
     const newIrsharData = await createNewData("IRSHAR", irsharEntry);
-    console.log("newIrsharData", newIrsharData);
+    //console.log("newIrsharData", newIrsharData);
 
     return newIRSHARREFNO;
   } catch (error) {
@@ -738,7 +738,7 @@ const createIRSFIS = async (
   };
 
   const newIrsfisData = await createNewData("IRSFIS", irsfisEntry);
-  console.log("newIrsfisData", newIrsfisData);
+  //console.log("newIrsfisData", newIrsfisData);
 
   return newIRSFISREFNO;
 };
@@ -793,7 +793,7 @@ export default async function handler(req, res) {
         };
 
         const responseCreateNewData = await createNewData("ALLORDERS", entry);
-        console.log("responseCreateNewData", responseCreateNewData);
+        //console.log("responseCreateNewData", responseCreateNewData);
         const responseUpdateSTKKART = await updateSTKKART(
           item.STKKOD,
           item.STKADET
