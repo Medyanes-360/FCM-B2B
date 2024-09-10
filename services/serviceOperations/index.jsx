@@ -120,6 +120,27 @@ export async function updateOrderStatus(tableName, where, newStatus) {
   }
 }
 
+export async function updateKargoStatus(tableName, where, kargoData) {
+  try {
+    const updateData = {};
+
+    // Sadece değer varsa güncelleme nesnesine ekle
+    if (kargoData.KARGO !== undefined) updateData.KARGO = kargoData.KARGO;
+    if (kargoData.KARGOTAKIPNO !== undefined)
+      updateData.KARGOTAKIPNO = kargoData.KARGOTAKIPNO;
+    if (kargoData.ORDERSTATUS) updateData.ORDERSTATUS = kargoData.ORDERSTATUS;
+
+    const data = await prisma[tableName].updateMany({
+      where: where,
+      data: updateData,
+    });
+
+    return data;
+  } catch (error) {
+    return { error: error.message };
+  }
+}
+
 export async function updateRelatedTables(REFNO) {
   try {
     // IRSFIS tablosunu güncelle
