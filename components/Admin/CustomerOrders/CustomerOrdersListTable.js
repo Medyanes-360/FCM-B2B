@@ -224,7 +224,7 @@ const CustomerOrdersListTable = ({ orders, allOrders, updateOrderStatus }) => {
                   <span
                     className={`p-2 rounded-md flex items-center mt-2 w-36 justify-center ${
                       order.TALEP
-                        ? "bg-green-500 text-white"
+                        ? "bg-orange-500 text-white"
                         : "bg-gray-300 text-gray-700"
                     }`}
                   >
