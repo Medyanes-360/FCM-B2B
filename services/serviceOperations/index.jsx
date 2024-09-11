@@ -111,7 +111,15 @@ export async function updateOrderStatus(tableName, where, newStatus) {
 
     // Eğer yeni durum "İptal" ise, ilgili diğer tabloları da güncelle
     if (newStatus === "İptal") {
-      await updateRelatedTables(where.REFNO);
+      // Önce REFNO'yu alalım
+      const order = await prisma[tableName].findFirst({
+        where: where,
+        select: { REFNO: true },
+      });
+
+      if (order && order.REFNO) {
+        await updateRelatedTables(order.REFNO);
+      }
     }
 
     return data;
