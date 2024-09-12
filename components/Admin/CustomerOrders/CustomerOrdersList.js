@@ -140,8 +140,24 @@ const CustomerOrdersList = () => {
   useEffect(() => {
     const filteredResults = orders.filter(
       (order) =>
-        order.CARKOD.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        order.CARUNVAN.toLowerCase().includes(searchTermUnvan.toLowerCase())
+        order.CARKOD.toLowerCase()
+          .replace(/\s+/g, "") // boşlukları kaldırma
+          .replace(/ı/g, "i") // ı'yı i'ye çevirme
+          .includes(
+            searchTerm
+              .toLowerCase()
+              .replace(/\s+/g, "") // boşlukları kaldırma
+              .replace(/ı/g, "i") // ı'yı i'ye çevirme
+          ) &&
+        order.CARUNVAN.toLowerCase()
+          .replace(/\s+/g, "") // boşlukları kaldırma
+          .replace(/ı/g, "i") // ı'yı i'ye çevirme
+          .includes(
+            searchTermUnvan
+              .toLowerCase()
+              .replace(/\s+/g, "") // boşlukları kaldırma
+              .replace(/ı/g, "i") // ı'yı i'ye çevirme
+          )
     );
     setFilteredOrders(filteredResults);
   }, [searchTerm, searchTermUnvan, orders]);
