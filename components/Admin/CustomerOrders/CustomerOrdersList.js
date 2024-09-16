@@ -100,28 +100,33 @@ const CustomerOrdersList = () => {
     fetch();
   }, [searchParams]);
 
+  const normalizeText = (text) => {
+    return text
+      .toLowerCase()
+      .replace(/ğ/g, "g")
+      .replace(/ü/g, "u")
+      .replace(/ş/g, "s")
+      .replace(/ı/g, "i")
+      .replace(/ö/g, "o")
+      .replace(/ç/g, "c")
+      .replace(/[^a-z0-9]/g, "");
+  };
+
   useEffect(() => {
-    const filteredResults = orders.filter(
-      (order) =>
-        order.CARKOD.toLowerCase()
-          .replace(/\s+/g, "") // boşlukları kaldırma
-          .replace(/ı/g, "i") // ı'yı i'ye çevirme
-          .includes(
-            searchTerm
-              .toLowerCase()
-              .replace(/\s+/g, "") // boşlukları kaldırma
-              .replace(/ı/g, "i") // ı'yı i'ye çevirme
-          ) &&
-        order.CARUNVAN.toLowerCase()
-          .replace(/\s+/g, "") // boşlukları kaldırma
-          .replace(/ı/g, "i") // ı'yı i'ye çevirme
-          .includes(
-            searchTermUnvan
-              .toLowerCase()
-              .replace(/\s+/g, "") // boşlukları kaldırma
-              .replace(/ı/g, "i") // ı'yı i'ye çevirme
-          )
-    );
+    const filteredResults = orders.filter((order) => {
+      const normalizedCARKOD = normalizeText(order.CARKOD);
+      const normalizedCARUNVAN = normalizeText(order.CARUNVAN);
+      const normalizedSearchTerm = normalizeText(searchTerm);
+      const normalizedSearchTermUnvan = normalizeText(searchTermUnvan);
+
+      const carkodMatch = normalizedCARKOD.includes(normalizedSearchTerm);
+      const carunvanMatch = normalizedCARUNVAN.includes(
+        normalizedSearchTermUnvan
+      );
+
+      return carkodMatch && carunvanMatch;
+    });
+
     setFilteredOrders(filteredResults);
   }, [searchTerm, searchTermUnvan, orders]);
 
@@ -202,7 +207,7 @@ const CustomerOrdersList = () => {
         </div>
         <div className="flex gap-2 justify-center items-center text-LightBlue flex-wrap mb-4 md:mb-0">
           <input
-            type="text"
+            type="number"
             placeholder="Cari Koda Göre Filtrele.."
             value={searchTerm}
             onChange={handleSearch}
