@@ -19,9 +19,9 @@ export default withAuth(async function middleware(req) {
     return NextResponse.next(); // İşlemi geçmesine izin veriyoruz.
   }
   if (
-    session &&
-    session.email === "caliskanariyayinlari@gmail.com" &&
-    currentPath.startsWith("/customer-orders-admin")
+    (session && session.email === "caliskanariyayinlari@gmail.com") ||
+    (session.role === "employee" &&
+      currentPath.startsWith("/customer-orders-admin"))
   ) {
     return NextResponse.next();
   }
