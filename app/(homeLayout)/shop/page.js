@@ -5,10 +5,10 @@ import CategoryProducts from "@/components/CategoryProducts";
 import useCartItemCount from "@/utils/useCartItemCount";
 import FixedHeader from "@/components/FixedHeader";
 import Loading from "@/components/Loading";
-import { useEmployeeRedirect } from "@/functions/other/useEmployeeRedirect/useEmployeeRedirect";
+// import { useEmployeeRedirect } from "@/functions/other/useEmployeeRedirect/useEmployeeRedirect";
 
 function Page() {
-  useEmployeeRedirect();
+  // useEmployeeRedirect();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const toggleSearchPanel = () => {
